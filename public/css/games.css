@@ -334,3 +334,26 @@
   .band-name{font-size:clamp(15px,3.6vw,19px)}
   .slide-knob i{width:52px;height:16px}
 }
+
+/* ---- length picker in the purple band, single-column panels ------------ */
+.len-pick{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;
+  border-top:2px dashed rgba(255,255,255,.28)}
+.len-pick .small{color:#e6d8ff;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  font-size:13px;margin-right:4px}
+.len{font-family:var(--metal);font-size:15px;letter-spacing:.03em;padding:8px 16px;border-radius:10px;
+  background:rgba(255,255,255,.16);color:#fff;border:2px solid rgba(255,255,255,.35);
+  transition:transform .1s,background .15s}
+.len:hover{background:rgba(255,255,255,.3)}
+.len.on{background:#ffd43b;color:#3a2a00;border-color:#c99a00}
+.studio-body.one{grid-template-columns:1fr}
+.garage-info{padding:24px 26px 26px}
+.bar-line{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px;padding-top:14px;
+  border-top:4px dashed #dbe3f2;font-size:15px;font-weight:700;color:#5a6a92}
+.bar-line b{font-family:var(--metal);color:#1d2a52}
+
+/* ---- bigger, structured mode cards ------------------------------------- */
+.tilegrid, #ts-cards{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.tile-art{height:180px}
+.tile-label{padding:14px 16px 15px}
+.tile-label b{font-family:var(--metal);font-size:clamp(19px,2.1vw,25px);letter-spacing:.01em}
+.tile-label span{font-size:14px;font-weight:700}

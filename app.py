@@ -383,6 +383,10 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("X-Frame-Options", "SAMEORIGIN")
         self.send_header("Permissions-Policy", "geolocation=(), camera=(), microphone=()")
+        # assets are edited all day: never let the browser serve a stale game
+        p = urlparse(self.path).path
+        if p.endswith((".js", ".css", ".html")) or p == "/":
+            self.send_header("Cache-Control", "no-cache, must-revalidate")
 
     def end_headers(self):
         self._security_headers()

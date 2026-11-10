@@ -240,7 +240,7 @@
         : (path && path.targetTables && path.targetTables.length ? path.targetTables.slice() : TS.tables.slice());
       const ops = mode === 'studio' || (path && path.mastered) ? 'both'
         : mode === 'sound' ? 'both' : (path ? path.ops : TS.ops);
-      const round = mode === 'garage' ? (path.seconds || 60) * 1000 : ROUND;
+      const round = mode === 'garage' ? GARAGE_MIN * 60000 : ROUND;
       g = {
         mode, stage, pool: pool.length ? pool : [2], ops, round, sessionId: r.sessionId,
         tag: 'ts-' + r.sessionId, startedAt: performance.now(), endsAt: performance.now() + round,
@@ -311,6 +311,7 @@
   /* Clicking a card SELECTS that section and the section's own panel opens
      below it — nothing launches until you press PLAY inside the panel. */
   let TS_TAB = 'garage';
+  let GARAGE_MIN = 3;      // how long a Garage round is: 1, 2 or 3 minutes
 
   function showMenu() {
     const main = App.stage();
@@ -349,6 +350,25 @@
     else soundTab(host);
   }
 
+
+  /* The purple header every mode wears: name, PLAY, and what the mode is. */
+  function modeBand(opts) {
+    return `<div class="studio-band">
+      <div class="studio-band-top">
+        <h2 class="studio-title">${esc(opts.name)}</h2>
+        <button class="play-big" data-mode="${opts.mode}" ${opts.disabled ? 'disabled' : ''}>
+          ${icon('play')} PLAY</button>
+      </div>
+      <div class="studio-meta">
+        <span>${icon('grid')} <b>Tables:</b> ${esc(opts.tables)}</span>
+        <span>${icon('bolt')} <b>${esc(opts.items)}</b></span>
+        <span>${icon('play')} ${opts.time}</span>
+        <span class="coin">${opts.coin}</span>
+      </div>
+      ${opts.extra || ''}
+    </div>`;
+  }
+
   /* --------------------------------------------------- STUDIO section --- */
   /* The ranks exactly as the Studio's own scale: seconds down the left, the
      fastest rank at the top, your average marked, and the games you played. */
@@ -364,17 +384,8 @@
     const qpm = secs ? Math.round((right / secs) * 60) : null;
 
     host.innerHTML = `<div class="studio-panel">
-      <div class="studio-band">
-        <div class="studio-band-top">
-          <h2 class="studio-title">STUDIO</h2>
-          <button class="play-big" data-mode="studio">${icon('play')} PLAY</button>
-        </div>
-        <div class="studio-meta">
-          <span>${icon('grid')} <b>Tables:</b> all tables</span>
-          <span>${icon('bolt')} <b>Play solo</b></span>
-          <span class="coin">1 per correct answer</span>
-        </div>
-      </div>
+      ${modeBand({ name: 'STUDIO', mode: 'studio', tables: 'all tables × and ÷',
+        items: '1 player', time: '60 seconds', coin: '1 per correct answer' })}
 
       <div class="studio-body">
         <div class="studio-speed">
@@ -474,22 +485,32 @@
       { t: 'Another gig, then free play', d: 'All tables and divisions once you are secure.' }
     ];
     const order = p.stage === 'mastered' ? 2 : p.stage === 'study' ? 1 : 0;
-    host.innerHTML = `<div class="card garage-card">
-      <div class="between">
-        <div><div class="eyebrow">Garage · the learning path</div>
-          <h2 style="margin-top:4px">${esc(p.cta)}</h2></div>
-        <span class="pill ${p.mastered ? 'jade' : 'amber'}">${p.mastered ? 'Unlocked' : `Good gigs in a row ${p.goodStreak}/${p.goodNeeded}`}</span>
+    const gig = p.stage !== 'study';
+    host.innerHTML = `${modeBand({
+      name: 'GARAGE', mode: 'garage',
+      tables: gig ? 'all tables' : (p.targetTables.length ? p.targetTables.join(', ') : 'all tables'),
+      items: '1 player', time: `${GARAGE_MIN}m`, coin: '1 per correct answer',
+      disabled: !p.ready,
+      extra: `<div class="len-pick" role="group" aria-label="Length of the round">
+        <span class="small">Length</span>
+        ${[1, 2, 3].map((m) => `<button class="len ${GARAGE_MIN === m ? 'on' : ''}"
+          data-len="${m}" aria-pressed="${GARAGE_MIN === m}">${m} min</button>`).join('')}
+      </div>`
+    })}
+    <div class="studio-body one">
+      <div class="garage-info">
+        <div class="between">
+          <div><div class="eyebrow">Next up</div>
+            <h2 style="margin-top:4px">${esc(p.cta)}</h2></div>
+          <span class="pill ${p.mastered ? 'jade' : 'amber'}">${p.mastered ? 'Unlocked' : `Good gigs in a row ${p.goodStreak}/${p.goodNeeded}`}</span>
+        </div>
+        <div class="steps">${steps.map((s, i) => `<div class="step ${i === order ? 'on' : ''} ${i < order ? 'done' : ''}">
+          <b>${i + 1}</b><span>${esc(s.t)}</span></div>`).join('')}</div>
+        <div class="bar-line">
+          <span>${p.secure}/${p.total} facts secure</span>
+          ${p.lastTest ? `<span>Last gig: <b>${Math.round(p.lastTest.accuracy * 100)}%</b> at ${p.lastTest.perAnswer}s</span>` : ''}
+        </div>
       </div>
-      <p class="small muted">${esc(p.detail)}</p>
-      <div class="steps">${steps.map((s, i) => `<div class="step ${i === order ? 'on' : ''} ${i < order ? 'done' : ''}">
-        <b>${i + 1}</b><span>${esc(s.t)}</span></div>`).join('')}</div>
-      <div class="row" style="margin-top:16px">
-        <button class="btn jade big" data-mode="garage" ${p.ready ? '' : 'disabled'}>
-          ${icon('play')} ${esc(p.ready ? p.cta : 'Learning round unfinished')}</button>
-        <span class="small muted">${p.secure}/${p.total} facts secure${p.targetTables.length ? ' · learning tables ' + p.targetTables.join(', ') : ''}</span>
-      </div>
-      ${p.lastTest ? `<p class="small muted" style="margin-top:10px">Last gig: <b>${Math.round(p.lastTest.accuracy * 100)}%</b>
-        at ${p.lastTest.perAnswer}s an answer${p.lastTest.excellent ? ' — excellent' : ''}.</p>` : ''}
     </div>
 
     <div class="card" style="margin-top:16px">
@@ -506,6 +527,9 @@
       <div class="heatmap">${heatGrid(p.divHeat, '÷')}</div>
     </div>`;
     host.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
+    host.querySelectorAll('[data-len]').forEach((b) => {
+      b.onclick = () => { GARAGE_MIN = Number(b.dataset.len); garageTab(host); };
+    });
   }
 
   function heatKey() {
@@ -539,19 +563,15 @@
   /* ------------------------------------------------- SOUNDCHECK section --- */
   function soundTab(host) {
     const s = App.state.stats.summary;
-    host.innerHTML = `<div class="card">
-      <div class="eyebrow">Soundcheck</div>
-      <h2 style="margin-top:4px">A quick warm-up</h2>
-      <p class="small muted">25 questions from tables 2–12, multiplication and division mixed.
-        No rank, no path — just a warm-up before the Garage or the Studio.</p>
-      <div class="statline" style="margin-top:14px">
-        <div><b>${s.ts.runs}</b><span>Games played</span></div>
-        <div><b>${s.ts.mult}</b><span>× correct</span></div>
-        <div><b>${s.ts.div}</b><span>÷ correct</span></div>
-      </div>
-      <div class="row" style="margin-top:16px">
-        <button class="btn jade big" data-mode="sound">${icon('play')} PLAY SOUNDCHECK</button>
-        <span class="small muted">60 seconds · answer with ENTER</span>
+    host.innerHTML = `${modeBand({ name: 'SOUNDCHECK', mode: 'sound', tables: '2 to 12 × and ÷',
+      items: '1 player', time: '60 seconds', coin: '1 per correct answer' })}
+    <div class="studio-body one">
+      <div class="garage-info">
+        <div class="statline">
+          <div><b>${s.ts.runs}</b><span>Games played</span></div>
+          <div><b>${s.ts.mult}</b><span>× correct</span></div>
+          <div><b>${s.ts.div}</b><span>÷ correct</span></div>
+        </div>
       </div>
     </div>`;
     host.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
