@@ -1,52 +1,5 @@
-/* Astrolab — store, character, room, the three game boards, responsive rules. */
-
-/* ---------- store ---------- */
-.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px}
-.shop-item{border-radius:16px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  display:flex;flex-direction:column;gap:8px;transition:transform .2s var(--ease),border-color .2s}
-.shop-item:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.2)}
-.shop-thumb{height:112px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#26305a,#151a33);
-  display:grid;place-items:center;overflow:hidden;position:relative}
-.shop-thumb svg{width:100%;height:100%}
-.shop-item b{font-size:14px;font-family:var(--display);font-weight:600;line-height:1.2}
-.shop-item .price{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--amber);font-size:14px}
-.shop-item .price svg{width:14px;height:14px}
-.rar{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
-.owned-tag{font-size:11px;color:var(--jade);font-weight:700;letter-spacing:.06em}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-
-/* ---------- character ---------- */
-.char-stage{display:grid;grid-template-columns:minmax(240px,.85fr) 1.15fr;gap:22px;align-items:start}
-.stage{position:relative;border-radius:22px;padding:18px;display:grid;place-items:center;min-height:420px;
-  background:radial-gradient(circle at 50% 30%,rgba(111,179,255,.14),transparent 65%),linear-gradient(180deg,#1a2144,#0f142c);
-  border:var(--edge);overflow:hidden}
-.stage .halo{position:absolute;width:280px;height:280px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,194,71,.14),transparent 70%);filter:blur(6px)}
-.stage svg.big{width:min(100%,260px);position:relative}
-.slot-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.slot-tabs button{padding:7px 12px;border-radius:9px;font-size:13px;color:var(--muted);background:rgba(255,255,255,.05)}
-.slot-tabs button.on{background:var(--paper);color:#12162b;font-weight:600}
-.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px}
-.swatch{border-radius:12px;padding:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);text-align:center}
-.swatch.on{border-color:var(--jade);background:rgba(46,196,166,.12)}
-.swatch .chipc{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.18)}
-.swatch .mini{width:64px;height:64px}
-.lockrow{display:flex;align-items:center;gap:10px;justify-content:space-between;width:100%}
-
-/* ---------- room ---------- */
-.room-wrap{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
-.room-canvas{position:relative;border-radius:20px;overflow:hidden;border:var(--edge);
-  box-shadow:var(--shadow);touch-action:none;background:#11162e}
-.room-canvas svg{display:block;width:100%;height:auto;user-select:none}
-.room-canvas .placed{cursor:grab}
-.room-canvas .placed.dragging{cursor:grabbing}
-.room-canvas .placed.sel{outline:2px dashed var(--amber);outline-offset:2px}
-.room-side{display:flex;flex-direction:column;gap:12px}
-.tray{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:320px;overflow:auto;padding-right:4px}
-.tray button{border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);aspect-ratio:1;display:grid;place-items:center;padding:4px}
-.tray button svg{width:100%;height:100%}
-
+/* Astrolab — GAMES side: TableStar, Spellbound, WorldQuest, Studio ranks,
+   plus the shared shell responsive rules. Owned by the games side. */
 /* ---------- TableStar ---------- */
 .ts-stage{display:grid;grid-template-columns:1fr 138px;gap:18px}
 .ts-play{padding:clamp(14px,2vw,22px);border-radius:20px;position:relative;overflow:hidden;
@@ -197,9 +150,6 @@
 @media(max-width:1080px){
   .hero{grid-template-columns:1fr}
   .hero-figure{display:none}
-  .room-wrap{grid-template-columns:1fr}
-  .char-stage{grid-template-columns:1fr}
-  .stage{min-height:320px}
 }
 @media(max-width:820px){
   .topbar{gap:10px;padding:10px 14px}

@@ -1,4 +1,4 @@
-/* Astrolab — views: Store, My Character, My Room. */
+/* Astrolab — shop views: Store, My Character, My Room. Owned by the content side. */
 (function () {
   'use strict';
   const App = window.App, ART = window.ART, icon = window.icon;

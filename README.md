@@ -29,16 +29,22 @@ python3 data/build_words.py    # spelling library      -> public/data/words.json
 
 ## Layout
 
-| File | Role |
-|---|---|
-| `app.py` | HTTP server + JSON API (all rewards decided here) |
-| `config.py` | classes, Studio speed classes, reward formulas, badge rules, daily challenges |
-| `catalogue.py` | every shop item, starter kit, default room |
-| `store.py` | SQLite schema and access |
-| `progression.py` | sessions -> XP/Starbits/classes/badges/leaderboards/statistics |
-| `public/js/art*.js` | all artwork, generated as SVG from item data |
-| `public/js/views*.js` | Home, Games, Store, Character, Room, Boards, Profile |
-| `public/js/tablestar.js` · `spellbound.js` · `worldquest.js` | the three games |
+The code is split in two halves that never edit the same file — see
+[CONTRIBUTING.md](CONTRIBUTING.md) for the ownership table and how to work in parallel.
+
+| File | Role | Owner |
+|---|---|---|
+| `app.py` | HTTP server + JSON API (routes, session recording) | games |
+| `progression.py` | sessions -> XP/Starbits/classes/badges/leaderboards/statistics | games |
+| `tablestar_path.py` | the forced Garage path (test -> study -> mastered) | games |
+| `config.py` | classes, Studio speed ranks, reward formulas, badge rules, daily challenges | games |
+| `api_shop.py` | buy / character / room routes | shop |
+| `catalogue.py` | every shop item, starter kit, default room | shop |
+| `store.py` | SQLite schema and access | shop |
+| `public/js/games/` | the three games + all game artwork | games |
+| `public/js/shop/` | Store, My Character, My Room + avatar/pet/furniture art | shop |
+| `public/js/core.js` · `views.js` · `boot.js` | shell, router, Home/Games/Boards/Profile | shared |
+| `public/css/games.css` · `shop.css` | game styles / shop styles | games · shop |
 
 ## Systems
 

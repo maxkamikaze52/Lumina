@@ -46,8 +46,10 @@
     boot.classList.add('gone');
     setTimeout(() => { if (boot.parentNode) boot.remove(); }, 600);
     App.refreshWallet();
-    const route = (location.hash || '#/home').slice(2) || 'home';
-    App.route = { name: route, params: {} };
+    // A deep link like #/tablestar or #/store opens that screen; a bare #/
+    // goes home. Without this a reload always landed back on home.
+    const route = (location.hash || '').replace(/^#\/?/, '');
+    App.route = { name: route || 'home', params: {} };
     App.render();
     if (name) App.toast(`Welcome, ${name} — your room is ready`, 'spark');
   }

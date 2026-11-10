@@ -14,6 +14,7 @@ import catalogue
 import config
 import progression
 import store
+import api_shop
 import tablestar_path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -62,48 +63,10 @@ def api(path: str, method: str, body: dict, player: dict | None, q: dict) -> tup
     if path == "/api/state":
         return 200, state(pid)
 
-    if path == "/api/character" and method == "POST":
-        equip = body.get("equipped") or {}
-        owned = store.owned(pid)
-        clean = {}
-        for slot in catalogue.SLOTS:
-            v = equip.get(slot)
-            if v is None:
-                clean[slot] = None
-            elif v in catalogue.ITEM_BY_ID and v in owned:
-                clean[slot] = v
-        store.save_character(pid, clean)
-        return 200, {"equipped": clean}
-
-    if path == "/api/room" and method == "POST":
-        room = body.get("room") or {}
-        owned = store.owned(pid)
-        theme = room.get("theme")
-        if theme not in catalogue.ITEM_BY_ID or theme not in owned:
-            theme = (player["room"] or {}).get("theme", "theme-study")
-        items = []
-        for it in (room.get("items") or [])[:60]:
-            iid = it.get("item")
-            if iid not in catalogue.ITEM_BY_ID or iid not in owned:
-                continue
-            items.append({
-                "uid": str(it.get("uid") or secrets.token_hex(3))[:12],
-                "item": iid,
-                "x": round(max(0, min(960, float(it.get("x", 400)))), 1),
-                "y": round(max(0, min(600, float(it.get("y", 400)))), 1),
-                "z": max(0, min(3, int(it.get("z", 1)))),
-                "flip": bool(it.get("flip")),
-            })
-        layout = {"theme": theme, "items": items}
-        store.save_room(pid, layout)
-        return 200, {"room": layout}
-
-    if path == "/api/shop/buy" and method == "POST":
-        ok, msg = store.buy(pid, str(body.get("item") or ""))
-        p = store.get(pid)
-        return (200 if ok else 400), {"ok": ok, "message": msg,
-                                      "starbits": p["starbits"],
-                                      "owned": sorted(store.owned(pid))}
+    # ---- shop side: buying, characters, rooms (api_shop.py) --------------
+    handled = api_shop.handle(path, method, body, pid, player)
+    if handled is not None:
+        return handled
 
     if path == "/api/session/start" and method == "POST":
         game = body.get("game")
