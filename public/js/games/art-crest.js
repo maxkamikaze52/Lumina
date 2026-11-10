@@ -115,8 +115,8 @@
     const id = 'cr' + (++seq);
     const p = (n - 1) / 19;
     const r = BASE + 1.5 * p;                 // the face grows a little
-    const blur = 2.6 + 3.4 * p;               // halo
-    const haloOp = 0.5 + 0.35 * p;
+    const blur = 2.4 + 2.2 * p;               // halo: tight, so edges stay crisp
+    const haloOp = 0.22 + 0.16 * p;
 
     let svg = `<defs>
         <linearGradient id="${id}m" x1=".2" y1="0" x2=".8" y2="1">
@@ -131,8 +131,8 @@
           <stop offset="1" stop-color="#000"/>
         </radialGradient>
         <radialGradient id="${id}h" cx=".5" cy=".5" r=".5">
-          <stop offset=".38" stop-color="${t.glow}" stop-opacity="0"/>
-          <stop offset=".75" stop-color="${t.glow}" stop-opacity=".85"/>
+          <stop offset=".55" stop-color="${t.glow}" stop-opacity="0"/>
+          <stop offset=".82" stop-color="${t.glow}" stop-opacity=".55"/>
           <stop offset="1" stop-color="${t.glow}" stop-opacity="0"/>
         </radialGradient>
         <filter id="${id}f" x="-60%" y="-60%" width="220%" height="220%">
@@ -140,7 +140,7 @@
         </filter>
       </defs>
 
-      <circle cx="${C}" cy="${C}" r="${30 + 3 * p}" fill="url(#${id}h)"
+      <circle cx="${C}" cy="${C}" r="${27 + 2 * p}" fill="url(#${id}h)"
               filter="url(#${id}f)" opacity="${haloOp.toFixed(2)}"/>
 
       <circle cx="${C}" cy="${C}" r="${r}" fill="url(#${id}c)"/>

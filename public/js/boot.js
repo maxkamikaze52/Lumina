@@ -47,6 +47,9 @@
     setTimeout(() => { if (boot.parentNode) boot.remove(); }, 600);
     App.refreshWallet();
     App.aboutInit();
+    App.paintTheme();
+    const tb = document.getElementById('theme-toggle');
+    if (tb) tb.onclick = () => App.toggleTheme();
     // A deep link like #/tablestar or #/store opens that screen; a bare #/
     // goes home. Without this a reload always landed back on home.
     const route = (location.hash || '').replace(/^#\/?/, '');

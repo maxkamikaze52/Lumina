@@ -128,6 +128,26 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(null); });
   };
 
+  /* ---------- light / dark theme for the site shell (not the games) ---------- */
+  App.theme = function () {
+    return document.documentElement.getAttribute('data-theme') || 'light';
+  };
+  App.setTheme = function (t) {
+    document.documentElement.setAttribute('data-theme', t);
+    try { localStorage.setItem('astrolab-theme', t); } catch (e) {}
+    App.paintTheme();
+  };
+  App.paintTheme = function () {
+    const dark = App.theme() === 'dark';
+    const ico = document.getElementById('theme-ico');
+    const lbl = document.getElementById('theme-lbl');
+    if (ico) ico.innerHTML = dark ? window.icon('sun') : window.icon('moon');
+    if (lbl) lbl.textContent = dark ? 'Light' : 'Dark';
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.setAttribute('aria-pressed', String(dark));
+  };
+  App.toggleTheme = function () { App.setTheme(App.theme() === 'dark' ? 'light' : 'dark'); };
+
   App.reload = async function () {
     App.state = await API.get('/api/state');
     App.refreshWallet();

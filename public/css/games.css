@@ -690,8 +690,8 @@
 .lvl-pip svg.crest{width:100%;max-width:52px;height:auto}
 .badge.crest-badge svg.crest{width:112px;height:auto}
 /* held level: a bloom in the tier's own colour (set inline by the view) */
-.lvl-card.me svg.crest{filter:drop-shadow(0 0 14px var(--glow,#ffd24a)) drop-shadow(0 0 28px var(--glow,#ffd24a))}
-.lvl-pip.me svg.crest{filter:drop-shadow(0 0 10px var(--glow,#ffd24a))}
+.lvl-card.me svg.crest{filter:drop-shadow(0 0 4px var(--glow,#ffd24a)) drop-shadow(0 0 10px var(--glow,#ffd24a))}
+.lvl-pip.me svg.crest{filter:drop-shadow(0 0 5px var(--glow,#ffd24a))}
 .lvl-card.me{border-color:#120a26;box-shadow:0 6px 0 #120a26, 0 0 0 4px var(--glow,#ffd24a)}
 .lvl-card:not(.me) svg.crest{filter:saturate(.72)}
 .lvl-card.todo svg.crest{opacity:.62}
