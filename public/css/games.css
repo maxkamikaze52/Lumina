@@ -259,17 +259,21 @@
 .play-big:active{transform:translateY(4px);box-shadow:0 3px 0 #170a2e}
 .play-big:disabled{opacity:.55;filter:grayscale(.4)}
 .play-big svg{width:24px;height:24px}
-.studio-meta{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:18px;
-  border-top:3px solid rgba(0,0,0,.35)}
-.studio-meta span{display:inline-flex;align-items:center;gap:9px;padding:12px 20px;
-  color:#f0e6ff;font-size:15px;font-weight:800;letter-spacing:.02em;
-  border-right:2px solid rgba(255,255,255,.18)}
-.studio-meta span:first-child{padding-left:0}
-.studio-meta b{color:#fff}
-.studio-meta svg{width:17px;height:17px;opacity:.85}
-.studio-meta .coin{margin-left:auto;border-right:0;padding-right:0}
-.studio-meta .coin::before{content:"";width:18px;height:18px;border-radius:50%;background:#ffd43b;
-  box-shadow:inset 0 0 0 2px #b98a00}
+.studio-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;
+  margin-top:22px;padding-top:20px;border-top:3px solid rgba(0,0,0,.4)}
+.studio-meta .mi{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;
+  column-gap:12px;row-gap:1px;align-items:center;background:rgba(0,0,0,.28);
+  border:2px solid rgba(255,255,255,.16);border-radius:10px;padding:11px 14px}
+.studio-meta .mi-ic{grid-row:1 / span 2;display:grid;place-items:center;width:44px;height:44px;
+  border-radius:9px;background:#ffd43b;border:2px solid #120a26;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.22)}
+.studio-meta .mi-ic svg{width:23px;height:23px;color:#1a1030;opacity:1}
+.studio-meta .mi:nth-child(2) .mi-ic{background:#7ed0ff}
+.studio-meta .mi:nth-child(3) .mi-ic{background:#9df0c3}
+.studio-meta em{font-family:var(--metal);font-style:normal;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:#cdc2ea}
+.studio-meta b{font-family:var(--metal);font-size:17px;letter-spacing:.01em;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .studio-body{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,1fr);
   background:#fff;border:4px solid #1a0d38;border-top:0;border-radius:0 0 14px 14px;overflow:hidden}
@@ -508,3 +512,29 @@
 
 /* a touch of swing down the word, like a hand-painted sign */
 .stamp-text .ch{transform:rotate(calc((var(--i) - 4) * 0.7deg)) translateY(calc(var(--i) * 1px))}
+
+/* ---- mode cards: the outline closes all the way round --------------- */
+.tilegrid, #ts-cards{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px;
+  margin-bottom:34px}
+.tile-card{background:#120a26;padding:5px;border-radius:12px;border:4px solid #120a26;
+  box-shadow:0 9px 0 #120a26, 0 24px 44px -24px rgba(0,0,0,.85)}
+.tile-card .tile-art{border-radius:7px 7px 0 0;border-bottom:4px solid #120a26;height:190px}
+.tile-card .tile-label{border-radius:0 0 7px 7px;padding:16px 18px 18px;border-top:0}
+.tile-card.on{box-shadow:0 9px 0 #120a26, 0 0 0 5px #ffd43b}
+.tile-check{display:none}
+
+/* ---- the gap between a mode band and what it shows ------------------ */
+.studio-body{margin-top:26px;border:4px solid #1a0d38;border-radius:12px;overflow:hidden}
+.studio-band{border-radius:14px 14px 0 0}
+.studio-body.one{margin-top:26px}
+
+/* the Garage panel's own action */
+.btn-go{display:inline-flex;align-items:center;gap:12px;font-family:var(--metal);
+  font-size:clamp(16px,1.9vw,21px);letter-spacing:.05em;text-transform:uppercase;
+  background:#3ddc84;color:#04281a;border:4px solid #120a26;border-radius:8px;
+  padding:16px 34px;box-shadow:0 7px 0 #120a26;transition:transform .1s,box-shadow .1s,background .15s}
+.btn-go:hover{background:#5be89b;transform:translateY(-2px);box-shadow:0 9px 0 #120a26}
+.btn-go:active{transform:translateY(4px);box-shadow:0 3px 0 #120a26}
+.btn-go:focus-visible{outline:3px solid #ffd43b;outline-offset:3px}
+.btn-go svg{width:22px;height:22px}
+.garage-why{margin:16px 0 0;font-size:16px;font-weight:600;line-height:1.55;color:#5a6a92}

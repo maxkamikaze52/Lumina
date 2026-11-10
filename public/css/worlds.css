@@ -196,7 +196,8 @@
 /* ---- the GIG wordmark: outlined, poster-y ------------------------------ */
 #world .giant{font-family:var(--metal);letter-spacing:.01em;line-height:.95;
   -webkit-text-stroke:3px #120a26;text-shadow:0 5px 0 #120a26}
-.world-tablestar .giant{color:#2b1f52}
+.world-tablestar .giant{color:#fff;-webkit-text-stroke:3px #120a26;
+  text-shadow:0 5px 0 #120a26, 0 0 26px rgba(255,180,90,.35)}
 .world-tablestar .giant em{color:#ff9a3c;font-style:normal;
   -webkit-text-stroke:3px #120a26;text-shadow:0 5px 0 #120a26}
 

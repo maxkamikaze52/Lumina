@@ -261,7 +261,10 @@
       const path = mode === 'garage' ? (PLAN || await App.API.get('/api/tablestar/plan')) : null;
       if (path) PLAN = path;
       const stage = mode === 'garage' ? (path.mode || 'test') : null;
-      if (path && !path.ready) { App.toast('Finish the learning round first — then the next gig opens.', 'x'); return; }
+      if (path && !path.ready) {
+        App.toast(`Learn tables ${(path.targetTables || []).join(', ') || 'shown above'} first — ${path.secure}/${path.total} facts are secure.`, 'x');
+        return;
+      }
       const r = await App.API.post('/api/session/start',
         { game: 'tablestar', mode, difficulty: stage || mode,
           meta: { stage, tables: mode === 'studio' ? ALL_TABLES : (path ? path.targetTables : TS.tables),
@@ -397,10 +400,14 @@
           ${icon('play')} PLAY</button>
       </div>
       <div class="studio-meta">
-        <span>${icon('grid')} <b>Tables:</b> ${esc(opts.tables)}</span>
-        <span>${icon('bolt')} <b>${esc(opts.items)}</b></span>
-        <span>${icon('play')} ${opts.time}</span>
-        <span class="coin">${opts.coin}</span>
+        <span class="mi"><i class="mi-ic">${icon('grid')}</i>
+          <em>Tables</em><b>${esc(opts.tables)}</b></span>
+        <span class="mi"><i class="mi-ic">${icon('star')}</i>
+          <em>Players</em><b>${esc(opts.items)}</b></span>
+        <span class="mi"><i class="mi-ic">${icon('calendar')}</i>
+          <em>Time</em><b>${opts.time}</b></span>
+        <span class="mi coin"><i class="mi-ic">${icon('bit')}</i>
+          <em>Reward</em><b>${esc(opts.coin)}</b></span>
       </div>
       ${opts.extra || ''}
     </div>`;
@@ -550,7 +557,7 @@
       name: 'GARAGE', mode: 'garage',
       tables: gig ? 'all tables' : (p.targetTables.length ? p.targetTables.join(', ') : 'all tables'),
       items: '1 player', time: `${GARAGE_MIN}m`, coin: '1 per correct answer',
-      disabled: !p.ready,
+      disabled: false,
       extra: `<div class="len-pick" role="group" aria-label="Length of the round">
         <span class="small">Length</span>
         ${[1, 2, 3].map((m) => `<button class="len ${GARAGE_MIN === m ? 'on' : ''}"
@@ -559,11 +566,12 @@
     })}
     <div class="studio-body one">
       <div class="garage-info">
-        <div class="between">
-          <div><div class="eyebrow">Next up</div>
-            <h2 style="margin-top:4px">${esc(p.cta)}</h2></div>
+        <div class="row" style="align-items:center;gap:18px;flex-wrap:wrap">
+          <button class="btn-go" data-mode="garage">
+            ${icon('play')} ${esc(p.ready ? p.cta : 'Learning round unfinished')}</button>
           <span class="pill ${p.mastered ? 'jade' : 'amber'}">${p.mastered ? 'Unlocked' : `Good gigs in a row ${p.goodStreak}/${p.goodNeeded}`}</span>
         </div>
+        <p class="garage-why">${esc(p.detail)}</p>
         <div class="steps">${steps.map((s, i) => `<div class="step ${i === order ? 'on' : ''} ${i < order ? 'done' : ''}">
           <b>${i + 1}</b><span>${esc(s.t)}</span></div>`).join('')}</div>
         <div class="bar-line">
