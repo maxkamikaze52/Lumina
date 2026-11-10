@@ -176,7 +176,17 @@
       const [a, b] = rest.split('x');
       return kind === 'm' ? `${a} × ${b} = ${a * b}` : `${a * b} ÷ ${a} = ${b}`;
     }))].slice(0, 6);
+    const rankName = studio && studio.class ? studio.class.name : null;
     main_el.innerHTML = `<div class="stack ts">
+      ${rankName ? `<div class="stamp-wrap">
+        <div class="stamp-glow"></div>
+        <div class="stamp-rings"><span></span><span></span></div>
+        <div class="stamp">
+          <div class="stamp-text">${esc(rankName)}</div>
+          <div class="stamp-sub">your studio class</div>
+          <div class="stamp-drips"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+      </div>` : ''}
       <div class="stage">
         <div class="stage-beams" aria-hidden="true"><i style="--r:-22deg"></i><i style="--r:8deg"></i><i style="--r:26deg"></i></div>
         <div class="stage-floor" aria-hidden="true"></div>
