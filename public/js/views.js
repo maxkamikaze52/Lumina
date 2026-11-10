@@ -76,9 +76,10 @@
               <span><b class="num">${num(p.xp)}</b> XP${cls.next ? ` · ${num(cls.toNext)} to go` : ''}</span></div>
             <div class="track lvl"><i style="width:${cls.pct}%"></i></div>
             <div class="lvl-strip">
-              ${(s.stats.levels || []).map((l) => `<span class="lvl-pip ${l.n <= cls.n ? 'on' : ''}
-                ${l.n === cls.n ? 'me' : ''}" title="Level ${l.n} · ${esc(l.title)} — ${num(l.xp)} XP">
-                <span style="display:contents;--glow:${ART.crestGlow(l.n)}">${ART.levelCrest(l.n, { size: l.n === cls.n ? 58 : 44, locked: l.n > cls.n })}</span></span>`).join('')}
+              ${(s.stats.stages || []).map((st) => `<span class="lvl-pip stage ${st.from <= cls.n ? 'on' : ''}
+                ${st.from <= cls.n && cls.n <= st.to ? 'me' : ''}"
+                title="${esc(st.name)} · levels ${st.from}–${st.to}">
+                <span style="display:contents;--glow:${ART.crestGlow(st.to)}">${ART.levelCrest(st.to, { size: 46, locked: st.from > cls.n })}</span></span>`).join('')}
             </div>
             <div class="statline">
               <div><b>${num(p.starbits)}</b><span>Starbits</span></div>
@@ -320,12 +321,19 @@
           <span>${cls.next ? 'Level ' + cls.next.n + ' in ' + num(cls.toNext) + ' XP' : 'Top of the ladder'}</span></div></div>
         <div class="divider"></div>
         <h3 style="margin-bottom:10px">The 20 levels</h3>
-        <div class="lvl-ladder">${s.classes.map((c, i) => `<div class="lvl-card ${i < classIdx ? 'done' : i === classIdx ? 'me' : 'todo'}"
-          style="--glow:${ART.crestGlow(c.n)}"
-          title="Level ${c.n} · ${esc(c.title)} — ${num(c.xp)} XP">
-          ${ART.levelCrest(c.n, { size: 132, locked: c.n > cls.n })}
-          <b>${esc(c.title)}</b>
-          <span>${c.n === 1 ? 'start' : num(c.xp) + ' XP'}</span></div>`).join('')}</div>
+        ${(s.stats.stages || []).map((st) => `
+          <div class="stage-block">
+            <div class="stage-head ${st.from <= cls.n && cls.n <= st.to ? 'me' : ''}">
+              <b>${esc(st.name)}</b>
+              <span>levels ${st.from}–${st.to}${st.xp ? ' · ' + num(st.xp) + ' XP' : ''}</span>
+            </div>
+            <div class="lvl-ladder">${s.classes.slice(st.from - 1, st.to).map((c, k) => `<div class="lvl-card ${c.n < cls.n ? 'done' : c.n === cls.n ? 'me' : 'todo'}"
+              style="--glow:${ART.crestGlow(c.n)}"
+              title="Level ${c.n} · ${esc(c.title)} — ${num(c.xp)} XP">
+              ${ART.levelCrest(c.n, { size: 96, locked: c.n > cls.n })}
+              <b>${esc(c.title)}</b>
+              <span>${c.n === 1 ? 'start' : num(c.xp) + ' XP'}</span></div>`).join('')}</div>
+          </div>`).join('')}
       </section>
 
       <section class="grid g3">

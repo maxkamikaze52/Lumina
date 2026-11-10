@@ -701,3 +701,19 @@
 .lvl-pip svg.crest{width:100%;max-width:44px;height:auto;display:block}
 .badge.crest-badge svg.crest{width:96px;height:auto;display:block}
 .lvl-card{padding:14px 8px 12px}
+
+/* ---- the 100-level ladder, grouped by stage --------------------------- */
+.lvl-strip .lvl-pip.stage{opacity:.45}
+.lvl-strip .lvl-pip.stage.on{opacity:1}
+.lvl-strip .lvl-pip.stage.me{opacity:1;transform:translateY(-3px)}
+.stage-block{margin-bottom:22px}
+.stage-head{display:flex;align-items:baseline;gap:12px;margin:0 0 10px;padding-bottom:8px;
+  border-bottom:3px solid #dbe3f2}
+.stage-head b{font-family:var(--metal);font-size:19px;text-transform:uppercase;color:#120a26}
+.stage-head span{font-size:14px;font-weight:700;color:#6d7a99}
+.stage-head.me b{color:#b3243f}
+.lvl-ladder{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
+.lvl-card{padding:12px 6px 10px}
+.lvl-card svg.crest{max-width:92px}
+.lvl-card b{font-size:11.5px}
+.lvl-card span{font-size:11.5px}

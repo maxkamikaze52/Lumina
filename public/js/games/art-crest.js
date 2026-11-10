@@ -1,177 +1,202 @@
-/* Astrolab — the level crest.
-   Built from the level number and deliberately excessive, but every level sits
-   inside its own edge design, so 19 and 20 never look the same.  The shape of
-   the outline changes with the level:
-     1-4   smooth bronze disc
-     5-8   silver ring with scalloped teeth
-     9-12  gold ring with a jewelled notch at each corner
-     13-16 plasma ring with spikes that break the circle
-     17-19 legend ring with a crown of long points, alternating length
-     20    the same crown, closed — a full sunburst halo
-   Everything is drawn inside a 100x100 box with room for the points, so nothing
-   is ever cropped.  The number is small and dead centre.
+/* Astrolab — the level badge.
+   One ornate emblem per level, in the language of a ranked-badge sheet: a glassy
+   dome in the middle, a thick decorated ring around it, and a motif inside.  The
+   colour family changes every ten levels and the motif changes every level, so
+   no two badges in the ladder look the same.  The level number sits on a plate
+   at the foot of the badge, never lost in the ornament.
 */
 (function () {
   'use strict';
   const A = window.ART = window.ART || {};
 
-  const TIERS = [
-    { name: 'bronze', dark: '#5c2f05', mid: '#e08a2e', hot: '#ffe0a8', glow: '#ff9d2e', accent: '#ffcf7a' },
-    { name: 'silver', dark: '#2f3a4d', mid: '#dfeaff', hot: '#ffffff', glow: '#8fd0ff', accent: '#eaf4ff' },
-    { name: 'gold', dark: '#6b4700', mid: '#ffcf3a', hot: '#fffbd6', glow: '#ffd23a', accent: '#fff0a8' },
-    { name: 'plasma', dark: '#5c0730', mid: '#ff4b86', hot: '#ffd6e6', glow: '#ff2e77', accent: '#ffa8c8' },
-    { name: 'legend', dark: '#04503a', mid: '#5cffc0', hot: '#e9fff8', glow: '#2effb0', accent: '#a8ffe0' }
-  ];
+  /* ten colour families, ten steps each */
+  const METALS = {
+    gray:     { deep: '#1d2430', mid: '#8f9bb0', light: '#eef2f8', glass: '#cfd8e6', edge: '#5d6779' },
+    bronze:   { deep: '#3a1d08', mid: '#c2762e', light: '#ffd8a6', glass: '#f0c08a', edge: '#8a4d15' },
+    copper:   { deep: '#3d1409', mid: '#d0642f', light: '#ffc9a0', glass: '#f2a97e', edge: '#8f3312' },
+    silver:   { deep: '#1b2432', mid: '#cfdaea', light: '#ffffff', glass: '#e6eefb', edge: '#7d8ba1' },
+    gold:     { deep: '#3c2a02', mid: '#e8b crowd', light: '#fff3c0', glass: '#ffe493', edge: '#8c6600' },
+    jade:     { deep: '#04291f', mid: '#39c98d', light: '#d6fff0', glass: '#9df0cb', edge: '#0d6b4d' },
+    sapphire: { deep: '#05193d', mid: '#3f8ce8', light: '#d4e8ff', glass: '#93c6ff', edge: '#0e4a8f' },
+    amethyst: { deep: '#240b3d', mid: '#a06ee8', light: '#ecd9ff', glass: '#cda9ff', edge: '#5f2a94' },
+    crimson:  { deep: '#3d0512', mid: '#e0405f', light: '#ffd6df', glass: '#ff9db1', edge: '#8c1230' },
+    prism:    { deep: '#1a1038', mid: '#ff7ad9', light: '#e8f6ff', glass: '#ffd9a8', edge: '#7a3bc0' }
+  };
+  /* gold above is fixed for clarity */
+  METALS.gold = { deep: '#3c2a02', mid: '#e8b93a', light: '#fff3c0', glass: '#ffe493', edge: '#8c6600' };
 
-  const tierIndex = (n) => Math.min(TIERS.length - 1, Math.floor((n - 1) / 4));
-  const C = 50;
-  const BASE = 27;                 // face radius, comfortably inside the box
-  const RIM = 8;                   // base metal band
-  let seq = 0;
+  /* the ring decoration for each step inside a stage */
+  const RING = ['plain', 'studded', 'notched', 'twisted', 'scalloped', 'spiked',
+    'gemmed', 'braided', 'winged', 'crowned'];
 
-  // points around a circle, for the star-shaped outlines
-  function starPath(points, rOuter, rInner, rot) {
-    let d = '';
-    for (let i = 0; i < points * 2; i++) {
-      const a = (Math.PI * i) / points - Math.PI / 2 + (rot || 0);
-      const r = i % 2 ? rInner : rOuter;
-      const x = C + r * Math.cos(a), y = C + r * Math.sin(a);
-      d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+  /* the motif drawn inside the dome, one per level */
+  function motif(step, t) {
+    const c = '#ffffff', s = t.edge;
+    switch (step) {
+      case 0: return `<circle cx="50" cy="46" r="13" fill="none" stroke="${c}" stroke-width="2.6" opacity=".92"/>
+        <circle cx="50" cy="46" r="5" fill="${c}" opacity=".9"/>`;
+      case 1: return `<path d="M36 34h28v24H36z" fill="none" stroke="${c}" stroke-width="2.6"/>
+        <path d="M50 34v24M36 46h28" stroke="${c}" stroke-width="2"/>`;
+      case 2: return `<path d="M42 30h16v8l-4 22h-8l-4-22z" fill="${c}" opacity=".9"/>`;
+      case 3: return `<path d="M50 30l6 14 14 2-10 10 2 14-12-6-12 6 2-14-10-10 14-2z"
+        fill="${c}" opacity=".92"/>`;
+      case 4: return `<path d="M50 62V32M50 40l-10-6M50 40l10-6M50 50l-11-6M50 50l11-6"
+        stroke="${c}" stroke-width="2.8" stroke-linecap="round" fill="none"/>`;
+      case 5: return `<path d="M34 58c0-11 7-20 16-20s16 9 16 20z" fill="${c}" opacity=".9"/>
+        <rect x="34" y="58" width="32" height="5" rx="2" fill="${c}"/>`;
+      case 6: return `<path d="M50 30c-9 6-14 12-14 20 0 6 6 10 14 10s14-4 14-10c0-8-5-14-14-20z"
+        fill="${c}" opacity=".88"/><circle cx="50" cy="50" r="4" fill="${s}"/>`;
+      case 7: return `<path d="M50 28l7 12h-14zM36 52l12-7v14zM64 52l-12-7v14z"
+        fill="${c}" opacity=".9"/><circle cx="50" cy="48" r="3.4" fill="${s}"/>`;
+      case 8: return `<path d="M38 60c-4-14 2-26 12-30 10 4 16 16 12 30z" fill="${c}" opacity=".9"/>
+        <path d="M50 34v26" stroke="${s}" stroke-width="2"/>`;
+      default: return `<path d="M50 26l5 11 12 1-9 9 3 12-11-6-11 6 3-12-9-9 12-1z"
+        fill="${c}"/><circle cx="50" cy="52" r="16" fill="none" stroke="${c}"
+        stroke-width="1.6" opacity=".65"/>`;
     }
-    return d + 'Z';
   }
 
-  /* the outline that makes each level its own shape */
-  function edge(n, t, r, id) {
-    const tier = tierIndex(n);
-    const step = (n - 1) % 4;      // position inside the tier: 0..3
+  /* the ring ornament, drawn as a path or a set of studs around r */
+  function ring(step, t, r) {
+    const C = 50;
     let out = '';
-
-    // 1. the metal band: round for tiers 1-2, faceted higher up
-    if (tier <= 1) {
-      out += `<circle cx="${C}" cy="${C}" r="${r}" fill="none"
-        stroke="url(#${id}m)" stroke-width="${RIM + step * 0.8}"/>`;
-    } else if (tier === 2) {
-      // gold: sixteen facets
+    if (step === 1) {
+      for (let i = 0; i < 12; i++) {
+        const a = (Math.PI * 2 * i) / 12 - Math.PI / 2;
+        out += `<circle cx="${(C + r * Math.cos(a)).toFixed(1)}" cy="${(C + r * Math.sin(a)).toFixed(1)}"
+          r="2.6" fill="${t.light}" stroke="${t.edge}" stroke-width=".7"/>`;
+      }
+    } else if (step === 2) {
       const pts = [];
       for (let i = 0; i < 16; i++) {
         const a = (Math.PI * 2 * i) / 16;
-        pts.push((C + r * Math.cos(a)).toFixed(1) + ',' + (C + r * Math.sin(a)).toFixed(1));
+        const rr = i % 2 ? r - 3 : r + 1;
+        pts.push((C + rr * Math.cos(a)).toFixed(1) + ',' + (C + rr * Math.sin(a)).toFixed(1));
       }
-      out += `<polygon points="${pts.join(' ')}" fill="none" stroke="url(#${id}m)"
-        stroke-width="${RIM + step * 0.9}" stroke-linejoin="round"/>`;
-    } else if (tier === 3) {
-      // plasma: twelve deep teeth
-      out += `<path d="${starPath(12, r + 4, r - 1)}" fill="none" stroke="url(#${id}m)"
-        stroke-width="${RIM + step}" stroke-linejoin="miter"/>`;
-    } else {
-      // legend: 17-19 get a crown of points; 20 closes into a full sunburst
-      const pts = n === 20 ? 24 : 12 + step * 2;
-      out += `<path d="${starPath(pts, r + 5, r - 2, n === 20 ? 0 : 0.13)}" fill="none"
-        stroke="url(#${id}m)" stroke-width="${RIM + 1}" stroke-linejoin="miter"/>`;
-    }
-
-    // 2. the teeth/scallops that differ inside a tier
-    if (tier === 1) {
-      const teeth = 8 + step * 2;
-      for (let i = 0; i < teeth; i++) {
-        const a = (Math.PI * 2 * i) / teeth - Math.PI / 2;
+      out += `<polygon points="${pts.join(' ')}" fill="none" stroke="${t.light}"
+        stroke-width="2" opacity=".9"/>`;
+    } else if (step === 3) {
+      for (let i = 0; i < 8; i++) {
+        const a = (Math.PI * 2 * i) / 8;
+        out += `<path d="M${(C + (r - 4) * Math.cos(a)).toFixed(1)} ${(C + (r - 4) * Math.sin(a)).toFixed(1)}
+          q${(3 * Math.cos(a + 1)).toFixed(1)} ${(3 * Math.sin(a + 1)).toFixed(1)}
+          ${(4 * Math.cos(a)).toFixed(1)} ${(4 * Math.sin(a)).toFixed(1)}"
+          stroke="${t.light}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+      }
+    } else if (step === 4) {
+      for (let i = 0; i < 10; i++) {
+        const a = (Math.PI * 2 * i) / 10 - Math.PI / 2;
         out += `<circle cx="${(C + (r + 1) * Math.cos(a)).toFixed(1)}"
-          cy="${(C + (r + 1) * Math.sin(a)).toFixed(1)}" r="${1.9 + step * 0.35}"
-          fill="${t.mid}" stroke="${t.dark}" stroke-width=".8"/>`;
+          cy="${(C + (r + 1) * Math.sin(a)).toFixed(1)}" r="4.2" fill="${t.mid}"
+          stroke="${t.edge}" stroke-width="1"/>`;
       }
-    }
-    if (tier === 2) {
-      const gems = 4 + step;
-      for (let i = 0; i < gems; i++) {
-        const a = (Math.PI * 2 * i) / gems - Math.PI / 2;
-        const x = C + (r + 1.5) * Math.cos(a), y = C + (r + 1.5) * Math.sin(a);
-        out += `<rect x="${(x - 2.2).toFixed(1)}" y="${(y - 2.2).toFixed(1)}" width="4.4"
-          height="4.4" transform="rotate(45 ${x.toFixed(1)} ${y.toFixed(1)})"
-          fill="${t.hot}" stroke="${t.dark}" stroke-width=".9"/>`;
+    } else if (step === 5) {
+      for (let i = 0; i < 10; i++) {
+        const a = (Math.PI * 2 * i) / 10 - Math.PI / 2;
+        out += `<line x1="${(C + r * Math.cos(a)).toFixed(1)}" y1="${(C + r * Math.sin(a)).toFixed(1)}"
+          x2="${(C + (r + 6) * Math.cos(a)).toFixed(1)}" y2="${(C + (r + 6) * Math.sin(a)).toFixed(1)}"
+          stroke="${t.light}" stroke-width="2.6" stroke-linecap="round"/>`;
       }
-    }
-    if (tier === 3 || tier === 4) {
-      // a second, shorter ring of points offset from the first
-      const pts = 10 + step * 2 + (n === 20 ? 10 : 0);
-      for (let i = 0; i < pts; i++) {
-        const a = (Math.PI * 2 * i) / pts - Math.PI / 2 + Math.PI / pts;
-        const r1 = r + 1, r2 = r + 5 + step * 1.6 + (n === 20 ? 4 : 0);
-        out += `<line x1="${(C + r1 * Math.cos(a)).toFixed(1)}" y1="${(C + r1 * Math.sin(a)).toFixed(1)}"
-          x2="${(C + r2 * Math.cos(a)).toFixed(1)}" y2="${(C + r2 * Math.sin(a)).toFixed(1)}"
-          stroke="${t.mid}" stroke-width="${2.6 + step * 0.4}" stroke-linecap="round"/>
-          <line x1="${(C + r1 * Math.cos(a)).toFixed(1)}" y1="${(C + r1 * Math.sin(a)).toFixed(1)}"
-          x2="${(C + r2 * Math.cos(a)).toFixed(1)}" y2="${(C + r2 * Math.sin(a)).toFixed(1)}"
-          stroke="${t.hot}" stroke-width="1" stroke-linecap="round" opacity=".9"/>`;
+    } else if (step === 6) {
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+        const x = C + r * Math.cos(a), y = C + r * Math.sin(a);
+        out += `<rect x="${(x - 3).toFixed(1)}" y="${(y - 3).toFixed(1)}" width="6" height="6"
+          transform="rotate(45 ${x.toFixed(1)} ${y.toFixed(1)})" fill="${t.light}"
+          stroke="${t.edge}" stroke-width=".9"/>`;
+      }
+    } else if (step === 7) {
+      out += `<circle cx="${C}" cy="${C}" r="${r}" fill="none" stroke="${t.light}"
+        stroke-width="2" stroke-dasharray="5 4" opacity=".9"/>
+        <circle cx="${C}" cy="${C}" r="${r - 4}" fill="none" stroke="${t.light}"
+        stroke-width="1.4" stroke-dasharray="2 5" opacity=".7"/>`;
+    } else if (step === 8) {
+      for (const dir of [-1, 1]) {
+        for (let i = 0; i < 3; i++) {
+          out += `<path d="M${C + dir * (r - 2)} ${C + i * 6 - 6}
+            q${dir * 12} -2 ${dir * 16} -8 q${-dir * 8} 1 ${-dir * 12} 3z"
+            fill="${t.mid}" stroke="${t.edge}" stroke-width="1"/>`;
+        }
+      }
+    } else {
+      for (let i = 0; i < 12; i++) {
+        const a = (Math.PI * 2 * i) / 12 - Math.PI / 2;
+        const long = i % 3 === 0;
+        out += `<line x1="${(C + r * Math.cos(a)).toFixed(1)}" y1="${(C + r * Math.sin(a)).toFixed(1)}"
+          x2="${(C + (r + (long ? 10 : 5)) * Math.cos(a)).toFixed(1)}"
+          y2="${(C + (r + (long ? 10 : 5)) * Math.sin(a)).toFixed(1)}"
+          stroke="${t.light}" stroke-width="${long ? 3 : 2}" stroke-linecap="round"/>`;
       }
     }
     return out;
   }
 
+  let seq = 0;
+
   A.levelCrest = function (n, opts) {
     const o = opts || {};
     const size = o.size || 96;
-    const t = TIERS[tierIndex(n)];
-    const id = 'cr' + (++seq);
-    const p = (n - 1) / 19;
-    const r = BASE + 1.5 * p;                 // the face grows a little
-    const blur = 2.4 + 2.2 * p;               // halo: tight, so edges stay crisp
-    const haloOp = 0.22 + 0.16 * p;
+    const step = Math.max(0, Math.min(9, (n - 1) % 10));
+    const stageIdx = Math.min(9, Math.floor((n - 1) / 10));
+    const family = ['gray', 'bronze', 'copper', 'silver', 'gold', 'jade',
+      'sapphire', 'amethyst', 'crimson', 'prism'][stageIdx];
+    const t = METALS[family];
+    const id = 'bd' + (++seq);
+    const C = 50, r = 30;                 // the dome
 
     let svg = `<defs>
-        <linearGradient id="${id}m" x1=".2" y1="0" x2=".8" y2="1">
-          <stop offset="0" stop-color="${t.hot}"/>
-          <stop offset=".35" stop-color="${t.mid}"/>
-          <stop offset=".72" stop-color="${t.dark}"/>
+        <radialGradient id="${id}g" cx=".38" cy=".3" r=".85">
+          <stop offset="0" stop-color="${t.light}"/>
+          <stop offset=".45" stop-color="${t.glass}"/>
+          <stop offset="1" stop-color="${t.mid}"/>
+        </radialGradient>
+        <linearGradient id="${id}m" x1=".15" y1="0" x2=".85" y2="1">
+          <stop offset="0" stop-color="${t.light}"/>
+          <stop offset=".4" stop-color="${t.mid}"/>
+          <stop offset=".75" stop-color="${t.deep}"/>
           <stop offset="1" stop-color="${t.mid}"/>
         </linearGradient>
-        <radialGradient id="${id}c" cx=".5" cy=".42" r=".62">
-          <stop offset="0" stop-color="${t.dark}"/>
-          <stop offset=".72" stop-color="#08060f"/>
-          <stop offset="1" stop-color="#000"/>
+        <radialGradient id="${id}s" cx=".5" cy=".5" r=".5">
+          <stop offset=".6" stop-color="${t.mid}" stop-opacity="0"/>
+          <stop offset=".88" stop-color="${t.mid}" stop-opacity=".45"/>
+          <stop offset="1" stop-color="${t.mid}" stop-opacity="0"/>
         </radialGradient>
-        <radialGradient id="${id}h" cx=".5" cy=".5" r=".5">
-          <stop offset=".55" stop-color="${t.glow}" stop-opacity="0"/>
-          <stop offset=".82" stop-color="${t.glow}" stop-opacity=".55"/>
-          <stop offset="1" stop-color="${t.glow}" stop-opacity="0"/>
-        </radialGradient>
-        <filter id="${id}f" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="${blur.toFixed(2)}"/>
-        </filter>
       </defs>
 
-      <circle cx="${C}" cy="${C}" r="${27 + 2 * p}" fill="url(#${id}h)"
-              filter="url(#${id}f)" opacity="${haloOp.toFixed(2)}"/>
+      <circle cx="${C}" cy="${C - 4}" r="42" fill="url(#${id}s)"/>`;
 
-      <circle cx="${C}" cy="${C}" r="${r}" fill="url(#${id}c)"/>
-      <circle cx="${C}" cy="${C}" r="${r}" fill="none" stroke="${t.accent}"
-        stroke-width="1.2" opacity=".5"/>
-      ${edge(n, t, r, id)}
-      <circle cx="${C}" cy="${C}" r="${r - 5}" fill="none" stroke="${t.glow}"
-        stroke-width="1" opacity=".3" stroke-dasharray="2 3"/>`;
+    /* the decorated ring, then the metal band over it */
+    svg += ring(step, t, 33);
+    svg += `<circle cx="${C}" cy="${C - 4}" r="33" fill="none" stroke="url(#${id}m)"
+        stroke-width="7"/>
+      <circle cx="${C}" cy="${C - 4}" r="36.5" fill="none" stroke="${t.deep}"
+        stroke-width="1.4" opacity=".85"/>
+      <circle cx="${C}" cy="${C - 4}" r="29.5" fill="none" stroke="${t.light}"
+        stroke-width="1.2" opacity=".75"/>`;
 
-    const digits = String(n).length;
-    const numSize = digits > 1 ? 20 + 2 * p : 23 + 2 * p;
-    svg += `<text x="${C}" y="${C - 2}" text-anchor="middle" dominant-baseline="middle"
-        font-family="Archivo Black, Arial Black, sans-serif" font-size="${numSize.toFixed(1)}"
-        fill="#fff" stroke="#05030c" stroke-width="2.4" paint-order="stroke">${n}</text>
-      <text x="${C}" y="${C + (digits > 1 ? 12 : 11)}" text-anchor="middle"
-        font-family="Archivo Black, Arial Black, sans-serif" font-size="5"
-        letter-spacing="1.6" fill="${t.hot}" opacity=".95">LEVEL</text>`;
+    /* the glassy dome */
+    svg += `<circle cx="${C}" cy="${C - 4}" r="${r - 4}" fill="url(#${id}g)"
+        stroke="${t.edge}" stroke-width="1.6"/>
+      <ellipse cx="${C - 7}" cy="${C - 18}" rx="13" ry="8" fill="#fff" opacity=".38"/>
+      <circle cx="${C}" cy="${C - 4}" r="${r - 4}" fill="none" stroke="#fff"
+        stroke-width=".9" opacity=".45"/>`;
 
-    // tier stars along the foot, plus one per level inside the tier
-    const st = Math.min(7, tierIndex(n) + 1 + ((n - 1) % 4) * 0.0);
-    for (let i = 0; i < st; i++) {
-      const x = C + (i - (st - 1) / 2) * 7;
-      svg += `<path d="M${x} ${C + 17}l1.4 2.8 3.1.4-2.2 2.1.5 3-2.8-1.6-2.8 1.6.5-3-2.2-2.1 3.1-.4z"
-                fill="${t.accent}" stroke="#05030c" stroke-width=".5"/>`;
-    }
+    /* the motif, tinted to the family so it always reads */
+    svg += `<g opacity=".95">${motif(step, t)}</g>`;
 
-    return `<svg class="crest crest-${t.name} crest-n${n}${o.locked ? ' locked' : ''}"
+    /* the plate with the number */
+    svg += `<rect x="${C - 17}" y="70" width="34" height="17" rx="8.5" fill="${t.deep}"
+        stroke="${t.mid}" stroke-width="1.6"/>
+      <text x="${C}" y="${80.5}" text-anchor="middle" dominant-baseline="middle"
+        font-family="Archivo Black, Arial Black, sans-serif" font-size="12"
+        fill="${t.light}">${n}</text>`;
+
+    return `<svg class="crest badge-${family}${o.locked ? ' locked' : ''}"
       width="${size}" height="${size}" viewBox="0 0 100 100" role="img"
-      aria-label="Level ${n}, ${t.name} crest">${svg}</svg>`;
+      aria-label="Level ${n} badge, ${family}">${svg}</svg>`;
   };
 
-  A.crestTier = (n) => TIERS[tierIndex(n)].name;
-  A.crestGlow = (n) => TIERS[tierIndex(n)].glow;
+  A.crestTier = (n) => ['gray', 'bronze', 'copper', 'silver', 'gold', 'jade',
+    'sapphire', 'amethyst', 'crimson', 'prism'][Math.min(9, Math.floor((n - 1) / 10))];
+  A.crestGlow = (n) => METALS[A.crestTier(n)].mid;
 })();

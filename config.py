@@ -164,7 +164,7 @@ def level_badges() -> list[dict]:
     out = []
     for l in _levels.LEVELS:
         out.append(dict(
-            id="level-%02d" % l["n"],
+            id="level-%03d" % l["n"],
             name="Level %d · %s" % (l["n"], l["title"]),
             game="platform", icon=l["emblem"],
             desc=("Reach level %d (%s XP)." % (l["n"], format(l["xp"], ","))
@@ -174,6 +174,13 @@ def level_badges() -> list[dict]:
 
 
 LEVEL_BY_N = {l["n"]: l for l in _levels.LEVELS}
+
+# the ten colour stages, as one row each, for the Home strip
+STAGE_SUMMARY = [
+    {"name": name, "metal": metal, "from": i * 10 + 1, "to": (i + 1) * 10,
+     "xp": _levels.LEVELS[i * 10]["xp"]}
+    for i, (name, metal) in enumerate(_levels.STAGES)
+]
 
 BADGES = level_badges() + [
     # --- platform -----------------------------------------------------------

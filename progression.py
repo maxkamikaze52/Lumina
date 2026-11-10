@@ -194,10 +194,11 @@ def public_badge(bid: str, unlocked_at: float | None) -> dict:
            "at": unlocked_at}
     # a level badge carries its crest data, so the client can draw the tier
     if bid.startswith("level-"):
-        lv = config.LEVEL_BY_N[int(bid.split("-")[1])]
+        lv = config.LEVEL_BY_N[int(bid.split("-")[1])]  # 3-digit ids, e.g. level-044
         out["level"] = lv["n"]
         out["title"] = lv["title"]
         out["xp"] = lv["xp"]
+        out["metal"] = lv["metal"]
     return out
 
 
@@ -464,6 +465,7 @@ def stats(pid: str) -> dict:
                   "xp": cls["xp"], "toNext": cls["toNext"], "pct": cls["pct"],
                   "next": (cls["next"]["n"] if cls.get("next") else None)},
         "levels": config.CLASSES,
+        "stages": config.STAGE_SUMMARY,
         "studio": {"avg": avg, "class": config.studio_class(avg), "runs": len(studio)},
         "perContinent": per_cont,
         "words": {"seen": len(words), "mastered": sum(1 for w in words if w["box"] >= 4),
