@@ -7,16 +7,21 @@
   'use strict';
   const A = window.ART = window.ART || {};
 
-  /* A CIRCLE-CROPPED HEAD, for placing inside a badge.  The character SVG is
-     scaled and shifted so only the head fills the frame. */
+  /* A CIRCLE-CROPPED BUST, for placing inside a badge.
+     The avatar is drawn in a 112x212 box with the face between y=18 (hair) and
+     y=88 (chin) and the shoulders starting at y=100, so the window is a square
+     from y=12 to y=94: the whole head, centred, with the top of the outfit
+     showing at the bottom.  Anything tighter cuts the chin; anything looser
+     shows the body. */
   A.avatarHead = function (equipped, opts) {
     const o = opts || {};
     const label = o.label || 'Player character';
     const svg = (window.ART.avatar(equipped, { background: false, label }) || '');
-    // the avatar is drawn in a 112x212 box with the head around y=52; zoom in on it
-    return svg.replace('<svg class="avatar"', '<svg class="avatar avatar-head"')
-      // head AND shoulders / the top of the outfit, so the badge shows who it is
-      .replace('viewBox="0 0 112 212"', 'viewBox="13 2 86 92" preserveAspectRatio="xMidYMid slice"');
+    return svg
+      .replace(/<ellipse cx="56" cy="206"[^>]*\/>/, '')   // drop the ground shadow
+      .replace('<svg class="avatar"', '<svg class="avatar avatar-head"')
+      .replace('viewBox="0 0 112 212"',
+               'viewBox="14 11 84 84" preserveAspectRatio="xMidYMid slice"');
   };
 
   A.avatarFrame = function (level, opts) {
