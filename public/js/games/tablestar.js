@@ -300,177 +300,209 @@
   }
 
   /* ------------------------------------------------------------- menu --- */
-  /* Play from the library: take over the screen with TableStar's own world. */
-  App.openGame = async function (game) {
-    App.playGame(game);
-  };
+  /* Clicking a card SELECTS that section and the section's own panel opens
+     below it — nothing launches until you press PLAY inside the panel. */
+  let TS_TAB = 'studio';
 
-  function open() {
-    App.enterWorld('tablestar');
-    showMenu();
-  }
   function showMenu() {
     const main = App.stage();
-    const s = App.state.stats.summary;
     main.innerHTML = `<div class="stack ts">
       <div class="world-title">
         <span class="badge-pill">Maths at speed</span>
-        <span class="small muted">Garage: learn · Studio: 60 s, all tables and all divisions</span>
+        <span class="small muted">Pick a section, look at how you are doing, then press PLAY</span>
       </div>
       <div class="giant">PICK A <em>STAGE</em></div>
-      <div class="tilebar">
-        <button class="tiletab on" data-tab="play">${icon('play')} Single player</button>
-        <button class="tiletab" data-tab="speed">${icon('bolt')} Speed ranks</button>
-      </div>
-      <div id="ts-panel">
-        <div id="ts-plan"><div class="card flat muted">Reading your Garage path…</div></div>
-        <div class="tilegrid" style="margin-top:20px">
-          ${ART.tile({ art: 'studio', name: 'STUDIO', sub: 'All tables × and ÷ · ranked', label: '#ffb36b', action: 'data-mode="studio"' })}
-          ${ART.tile({ art: 'garage', name: 'GARAGE', sub: 'Test, then study what bites', label: '#ffe08a', action: 'data-mode="garage"' })}
-          ${ART.tile({ art: 'speed', name: 'SOUNDCHECK', sub: '25 questions · 2–12', label: '#a8f0c8', action: 'data-mode="sound"' })}
-          ${ART.tile({ art: 'gig', name: 'GIG', sub: 'All tables · mix of × and ÷', label: '#c9b6ff', action: 'data-mode="sound"' })}
-        </div>
 
-        <div class="playband" style="margin-top:20px">
-          <div>
-            <div class="giant" style="font-size:clamp(26px,4vw,42px)">STUDIO</div>
-            <div class="meta" style="margin-top:8px">
-              <span>Tables: <b>All tables</b></span>
-              <span>Mode: <b>× and ÷</b></span>
-              <span><b>1 XP per correct answer</b></span>
-            </div>
-          </div>
-          <button class="btn jade" data-mode="studio" style="font-size:18px;padding:16px 28px">${icon('play')} PLAY</button>
-        </div>
-
-        <section class="grid g2" style="margin-top:20px">
-          <div class="card">
-            <div class="eyebrow">Your numbers</div>
-            <div class="statline" style="margin-top:10px">
-              <div><b>${s.ts.runs}</b><span>Games</span></div>
-              <div><b>${s.ts.mult}</b><span>× correct</span></div>
-              <div><b>${s.ts.div}</b><span>÷ correct</span></div>
-            </div>
-            <div class="divider"></div>
-            <div class="between"><span class="small muted">Speed rank</span>
-              <b class="pill amber">${esc(s.ts.studio.name)}</b></div>
-            <p class="small muted" style="margin-top:8px">${s.ts.avg ? s.ts.avg.toFixed(2) + 's per correct answer, averaged over your last ten Studio games.' : 'Finish a Studio game to get on the bill.'}</p>
-            <button class="btn ghost sm block" style="margin-top:12px" data-tab="speed">See the speed ranks</button>
-          </div>
-          <div class="card">
-            <div class="eyebrow">How it works</div>
-            <p class="small" style="margin-top:8px"><b>Garage</b> — where you learn. A 3-minute test over every table,
-              then study of the tables it found weak, then the test again. Not optional.</p>
-            <p class="small muted" style="margin-top:6px">Three good tests in a row and every table and division
-              is unlocked for good.</p>
-            <p class="small" style="margin-top:10px"><b>Studio</b> — where you race. Always all the times
-              tables and all the divisions; your rank is your average seconds per answer.</p>
-          </div>
-        </section>
+      <div class="tilegrid" id="ts-cards">
+        ${ART.tile({ art: 'studio', name: 'STUDIO', sub: 'All tables × and ÷ · ranked', label: '#ffb36b', action: 'data-tab="studio"' })}
+        ${ART.tile({ art: 'garage', name: 'GARAGE', sub: 'Test, then study what bites', label: '#ffe08a', action: 'data-tab="garage"' })}
+        ${ART.tile({ art: 'speed', name: 'SOUNDCHECK', sub: '25 questions · 2–12', label: '#a8f0c8', action: 'data-tab="sound"' })}
       </div>
-      <div id="ts-speed" hidden></div>
+
+      <div id="ts-tab"></div>
     </div>`;
     main_el = main;
-    main.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
-    loadPlan();
-    main.querySelectorAll('.tilebar [data-tab]').forEach((b) => {
-      b.onclick = async () => {
-        main.querySelectorAll('.tilebar [data-tab]').forEach((x) => x.classList.toggle('on', x === b));
-        const isSpeed = b.dataset.tab === 'speed';
-        main.querySelector('#ts-panel').hidden = isSpeed;
-        const host = main.querySelector('#ts-speed');
-        host.hidden = !isSpeed;
-        if (isSpeed) {
-          host.innerHTML = '<div class="card flat muted">Loading the ranks…</div>';
-          const d = await App.API.get('/api/studio');
-          if (!PLAN) { try { PLAN = await App.API.get('/api/tablestar/plan'); } catch (e) {} }
-          host.innerHTML = rankLadder(d, PLAN);
-          host.querySelectorAll('[data-mode]').forEach((x) => { x.onclick = () => start(x.dataset.mode); });
-        }
-      };
+    main.querySelectorAll('#ts-cards [data-tab]').forEach((b) => {
+      b.onclick = () => { TS_TAB = b.dataset.tab; showMenu(); };
     });
+    showTab(TS_TAB, main);
   }
 
-  /* ------------------------------------------------------ rank ladder --- */
-  /* Studio Speed, drawn the way the Studio does it: the seconds run down the
-     left, the ranks from fastest at the top to slowest at the bottom, and your
-     own average marked on the scale.  Each rank is the badge you earn. */
-  function rankLadder(d, plan) {
-    const ranks = (plan && plan.ranks) || [
-      { name: 'Rock Hero', max: 1.5 }, { name: 'Rock Legend', max: 2 },
-      { name: 'Rock Star', max: 2.6 }, { name: 'Headliner', max: 3.4 },
-      { name: 'Support Act', max: 4.5 }, { name: 'Breakthrough Artist', max: 6 },
-      { name: 'Unsigned Act', max: 9 }];
+  function showTab(tab, main) {
+    main.querySelectorAll('#ts-cards [data-tab]').forEach((b) => {
+      const on = b.dataset.tab === tab;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on);
+    });
+    const host = main.querySelector('#ts-tab');
+    host.innerHTML = '<div class="card flat muted">Loading…</div>';
+    if (tab === 'garage') garageTab(host);
+    else if (tab === 'studio') studioTab(host);
+    else soundTab(host);
+  }
+
+  /* --------------------------------------------------- STUDIO section --- */
+  /* The ranks exactly as the Studio's own scale: seconds down the left, the
+     fastest rank at the top, your average marked, and the games you played. */
+  async function studioTab(host) {
+    let d = {}, plan = PLAN;
+    try { d = await App.API.get('/api/studio'); } catch (e) {}
+    if (!plan) { try { plan = PLAN = await App.API.get('/api/tablestar/plan'); } catch (e) {} }
+    const ranks = (plan && plan.ranks) || [];
     const mine = d.class || {};
-    const rows = ranks.map((r) => `<div class="rank-row ${r.id && r.id === mine.id ? 'on' : ''}">
+    const rows = ranks.map((r) => {
+      const isMe = r.id && r.id === mine.id;
+      return `<div class="rank-row ${isMe ? 'on' : ''}"${isMe ? ' aria-current="true"' : ''}>
         <span class="rank-sec">${r.max}s</span>
         <span class="rank-badge">${icon(r.icon || 'bolt')}</span>
         <span class="rank-name">${esc(r.name)}</span>
-        ${r.id && r.id === mine.id && d.avg ? `<span class="rank-you">${d.avg}s</span>` : ''}
-      </div>`).join('');
-    return `<div class="card rank-card">
+        ${isMe && d.avg ? `<span class="rank-you">you: ${d.avg}s</span>` : ''}
+      </div>`;
+    }).join('');
+    const recent = (d.history || []).slice(0, 8);
+    host.innerHTML = `<div class="card rank-card">
       <div class="between">
-        <div><div class="eyebrow">Studio speed</div>
-          <div class="giant" style="font-size:clamp(24px,3.4vw,36px)">${esc(mine.name || 'Unranked')}</div></div>
-        <span class="pill amber">${d.runs}/10 games${d.remaining ? ` · ${d.remaining} to go` : ''}</span>
+        <div><div class="eyebrow">Studio · your speed</div>
+          <h2 style="margin-top:4px">${esc(mine.name || 'Unranked')}</h2></div>
+        <span class="pill amber">${d.runs || 0}/10 games${d.remaining ? ` · ${d.remaining} to go` : ''}</span>
       </div>
-      <p class="small muted" style="margin-top:8px">${d.avg ? `Your average is <b>${d.avg}s</b> per correct answer — the average of your last ten Studio games.` : 'Finish a Studio game with correct answers in it.'}
+      <p class="small muted" style="margin-top:6px">
+        ${d.avg ? `Your average is <b>${d.avg}s</b> per correct answer, taken over your last ten Studio games.` : 'Finish a Studio game with correct answers in it and you will be put on the bill.'}
         ${mine.toNext != null && mine.next ? ` Shave <b>${mine.toNext}s</b> per answer to reach ${esc(mine.next.name)}.` : ''}</p>
-      <div class="rank-ladder">${rows}</div>
-      <p class="small muted" style="margin-top:10px">Each rank is a badge: reach it and it lands in your collection.</p>
-      <div class="row" style="margin-top:12px"><button class="btn jade" data-mode="studio">${icon('play')} Play Studio</button>
-        <button class="btn ghost" data-mode="garage">${icon('play')} Go to the Garage</button></div>
+      <div class="rank-ladder">${rows || '<p class="small muted">Ranks are loading.</p>'}</div>
+      <p class="small muted" style="margin-top:10px">Every rank is also a badge — reach it and it joins your collection.</p>
+      <div class="row" style="margin-top:14px">
+        <button class="btn jade big" data-mode="studio">${icon('play')} PLAY STUDIO</button>
+        <span class="small muted">60 seconds · every table 1–12 · × and ÷ · answer with ENTER</span>
+      </div>
     </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="eyebrow">Your past games</div>
+      ${recent.length ? `<table class="lb ts-history"><thead><tr>
+          <th>When</th><th>Correct</th><th>Accuracy</th><th>Per answer</th><th class="hide-sm">XP</th></tr></thead><tbody>
+        ${recent.map((r) => `<tr>
+          <td class="small">${esc(when(r.at))}</td>
+          <td class="num">${r.correct}</td>
+          <td class="num">${Math.round(r.accuracy || 0)}%</td>
+          <td class="num">${r.avg}s</td>
+          <td class="num hide-sm">+${num(r.xp || 0)}</td></tr>`).join('')}
+        </tbody></table>` : '<p class="small muted" style="margin-top:8px">No Studio games yet. Your first one is one click away.</p>'}
+    </div>
+
     <div class="card" style="margin-top:16px">
       <div class="eyebrow">Everyone's average</div>
       <table class="lb"><thead><tr><th>#</th><th>Player</th><th>Avg</th><th class="hide-sm">Rank</th></tr></thead><tbody>
-        ${d.board.length ? d.board.slice(0, 10).map((r) => `<tr class="${r.id === App.state.player.id ? 'me' : ''}">
+        ${d.board && d.board.length ? d.board.slice(0, 10).map((r) => `<tr class="${r.id === App.state.player.id ? 'me' : ''}">
           <td class="rank">${r.rank}</td>
           <td><div class="who"><span class="face">${ART.avatar(r.character, { background: false })}</span>${esc(r.name)}</div></td>
           <td class="num">${r.avg}s</td><td class="hide-sm">${esc(r.class)}</td></tr>`).join('')
           : '<tr><td colspan="4" class="small muted" style="padding:16px">Nobody has a Studio game in yet. Yours could be the first.</td></tr>'}
       </tbody></table>
     </div>`;
+    host.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
   }
 
-  /* ----------------------------------------------- the Garage path UI --- */
-  async function loadPlan() {
-    const host = main_el && main_el.querySelector('#ts-plan');
-    if (!host) return;
-    try { PLAN = await App.API.get('/api/tablestar/plan'); } catch (e) { return; }
-    const p = PLAN;
+  function when(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts * 1000);
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' +
+           d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /* ---------------------------------------------------- GARAGE section --- */
+  /* Learn side: the forced path, then the full board of every multiplication
+     and every division as a heat map — red is bad, green is good, grey is not
+     tried yet, exactly like a times-tables grid. */
+  async function garageTab(host) {
+    let p = PLAN;
+    if (!p) { try { p = PLAN = await App.API.get('/api/tablestar/plan'); } catch (e) {} }
+    if (!p) { host.innerHTML = '<div class="card flat muted">The Garage path could not be loaded.</div>'; return; }
     const steps = [
-      { t: '3-minute test', d: 'Every table, 1-12, all at once.' },
+      { t: '3-minute test', d: 'Every table, 1–12, all at once.' },
       { t: 'Study the weak tables', d: 'Until those facts are secure.' },
       { t: 'All tables + all divisions', d: 'Earned with three good tests in a row.' }
     ];
     const order = p.stage === 'mastered' ? 2 : p.stage === 'study' ? 1 : 0;
-    const grid = p.tableGrid.map((t) => {
-      const hot = (p.targetTables || []).includes(t.table);
-      const weak = t.accuracy == null || t.accuracy < 0.7;
-      return `<span class="tt ${hot ? 'hot' : ''} ${weak ? 'weak' : ''}" title="table ${t.table}">${t.table}</span>`;
-    }).join('');
     host.innerHTML = `<div class="card garage-card">
       <div class="between">
         <div><div class="eyebrow">Garage · the learning path</div>
-          <h3 style="margin-top:4px">${esc(p.cta)}</h3></div>
+          <h2 style="margin-top:4px">${esc(p.cta)}</h2></div>
         <span class="pill ${p.mastered ? 'jade' : 'amber'}">${p.mastered ? 'Unlocked' : `Good tests in a row ${p.goodStreak}/${p.goodNeeded}`}</span>
       </div>
-      <p class="small muted" style="margin-top:8px">${esc(p.detail)}</p>
+      <p class="small muted">${esc(p.detail)}</p>
       <div class="steps">${steps.map((s, i) => `<div class="step ${i === order ? 'on' : ''} ${i < order ? 'done' : ''}">
         <b>${i + 1}</b><span>${esc(s.t)}</span></div>`).join('')}</div>
-      <div class="between" style="margin-top:16px">
-        <div class="small muted">Tables to study</div>
-        <div class="small muted">${p.secure}/${p.total} facts secure</div>
-      </div>
-      <div class="ttgrid">${grid}</div>
-      <div class="row" style="margin-top:14px">
-        <button class="btn ${p.ready ? 'jade' : 'ghost'}" data-mode="garage" ${p.ready ? '' : 'disabled'}>
+      <div class="row" style="margin-top:16px">
+        <button class="btn jade big" data-mode="garage" ${p.ready ? '' : 'disabled'}>
           ${icon('play')} ${esc(p.ready ? p.cta : 'Study round unfinished')}</button>
-        <button class="btn ghost" data-mode="studio">${icon('bolt')} Studio (speed)</button>
+        <span class="small muted">${p.seconds}s a round · ${p.secure}/${p.total} facts secure${p.targetTables.length ? ' · studying tables ' + p.targetTables.join(', ') : ''}</span>
       </div>
-      ${p.lastTest ? `<p class="small muted" style="margin-top:10px">Last test: ${Math.round(p.lastTest.accuracy * 100)}% at
-        ${p.lastTest.perAnswer}s per answer${p.lastTest.excellent ? ' — excellent' : ''}.</p>` : ''}
+      ${p.lastTest ? `<p class="small muted" style="margin-top:10px">Last test: <b>${Math.round(p.lastTest.accuracy * 100)}%</b>
+        at ${p.lastTest.perAnswer}s an answer${p.lastTest.excellent ? ' — excellent' : ''}.</p>` : ''}
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="between"><div><div class="eyebrow">Times tables</div>
+        <h3 style="margin-top:2px">Every multiplication</h3></div>
+        ${heatKey()}</div>
+      <div class="heatmap">${heatGrid(p.mulHeat, '×')}</div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="between"><div><div class="eyebrow">Divisions</div>
+        <h3 style="margin-top:2px">Every division</h3></div>
+        ${heatKey()}</div>
+      <div class="heatmap">${heatGrid(p.divHeat, '÷')}</div>
+    </div>`;
+    host.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
+  }
+
+  function heatKey() {
+    return `<div class="heat-key small muted"><span class="sw red"></span>struggling
+      <span class="sw amber"></span>getting there
+      <span class="sw green"></span>secure
+      <span class="sw grey"></span>not tried</div>`;
+  }
+
+  /* one cell per fact, coloured by how it has actually gone */
+  function heatGrid(cells, op) {
+    if (!cells || !cells.length) return '<p class="small muted">No data yet.</p>';
+    const head = `<div class="heat-row heat-head"><span class="heat-lab"></span>
+      ${[...Array(12)].map((_, i) => `<span class="heat-col">${i + 1}</span>`).join('')}</div>`;
+    let body = '';
+    for (let a = 1; a <= 12; a++) {
+      body += `<div class="heat-row"><span class="heat-lab">${a}${op}</span>`;
+      for (let b = 1; b <= 12; b++) {
+        const c = cells.find((x) => x.a === a && x.b === b) || {};
+        const cls = c.secure ? 'green' : c.seen === 0 ? 'grey'
+          : (c.acc == null ? 'grey' : c.acc >= 0.8 ? 'amber' : 'red');
+        const label = `${a} ${op === '×' ? 'times' : 'divided by'} ${b}: ` +
+          (c.seen ? `${Math.round((c.acc || 0) * 100)}% right in ${c.seen} go${c.seen === 1 ? '' : 'es'}` : 'not tried yet');
+        body += `<span class="heat-cell ${cls}" title="${esc(label)}">${op === '×' ? a * b : a * b}</span>`;
+      }
+      body += '</div>';
+    }
+    return head + body;
+  }
+
+  /* ------------------------------------------------- SOUNDCHECK section --- */
+  function soundTab(host) {
+    const s = App.state.stats.summary;
+    host.innerHTML = `<div class="card">
+      <div class="eyebrow">Soundcheck</div>
+      <h2 style="margin-top:4px">A quick warm-up</h2>
+      <p class="small muted">25 questions from tables 2–12, multiplication and division mixed.
+        No rank, no path — just a warm-up before the Garage or the Studio.</p>
+      <div class="statline" style="margin-top:14px">
+        <div><b>${s.ts.runs}</b><span>Games played</span></div>
+        <div><b>${s.ts.mult}</b><span>× correct</span></div>
+        <div><b>${s.ts.div}</b><span>÷ correct</span></div>
+      </div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn jade big" data-mode="sound">${icon('play')} PLAY SOUNDCHECK</button>
+        <span class="small muted">60 seconds · answer with ENTER</span>
+      </div>
     </div>`;
     host.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
   }

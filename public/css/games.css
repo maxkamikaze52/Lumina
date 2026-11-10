@@ -212,3 +212,24 @@
 .tt.weak{background:rgba(255,111,145,.16);color:#ffc0cd}
 .tt.hot{background:rgba(255,179,107,.3);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,179,107,.6)}
 @media (max-width:700px){.ttgrid{grid-template-columns:repeat(6,1fr)}}
+
+/* ---- Garage heat maps: every multiplication and every division ---------- */
+.heatmap{display:flex;flex-direction:column;gap:4px;margin-top:14px;overflow-x:auto}
+.heat-row{display:grid;grid-template-columns:44px repeat(12,minmax(34px,1fr));gap:4px;align-items:center}
+.heat-head .heat-col,.heat-head .heat-lab{font-size:13px;color:var(--muted);text-align:center;font-weight:700}
+.heat-lab{font-family:var(--display);font-weight:700;font-size:14px;color:var(--muted);text-align:right;padding-right:4px}
+.heat-cell{display:grid;place-items:center;height:34px;border-radius:8px;font-size:13px;font-weight:700;
+  font-variant-numeric:tabular-nums;background:rgba(255,255,255,.07);color:#e8ecfb}
+.heat-cell.green{background:#2ea36b;color:#eafff3}
+.heat-cell.amber{background:#c8912a;color:#fff8e6}
+.heat-cell.red{background:#c2413f;color:#ffeaea}
+.heat-cell.grey{background:rgba(255,255,255,.09);color:#9fabc9}
+.heat-key{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.heat-key .sw{width:13px;height:13px;border-radius:4px;display:inline-block;margin-left:8px}
+.heat-key .sw.red{background:#c2413f} .heat-key .sw.amber{background:#c8912a}
+.heat-key .sw.green{background:#2ea36b} .heat-key .sw.grey{background:rgba(255,255,255,.16)}
+@media (max-width:760px){
+  .heat-row{grid-template-columns:34px repeat(12,minmax(26px,1fr));gap:2px}
+  .heat-cell{height:28px;font-size:11px;border-radius:6px}
+  .heat-lab{font-size:12px}
+}

@@ -23,7 +23,7 @@ body{
     radial-gradient(800px 480px at 4% 2%, #d9f0ff 0%, transparent 60%),
     radial-gradient(700px 420px at 50% 108%, #e2fbef 0%, transparent 62%),
     #fdf7ee;
-  color:var(--ink); font-size:16.5px;
+  color:var(--ink); font-size:17.5px;
 }
 body::before{opacity:.55;
   background-image:radial-gradient(rgba(35,48,92,.13) 1px,transparent 1px);
@@ -158,3 +158,12 @@ input::placeholder{color:#a3aecb}
 .dock{background:rgba(255,255,255,.96);border-top:2px solid #eef2fb}
 .dock button{color:#7b88ad}
 .dock button.on{color:#e8862a}
+
+/* ---- readability: explanations were too small -------------------------- */
+.small{font-size:15px;line-height:1.55}
+.eyebrow{font-size:12.5px}
+.muted{color:#67759c}
+.card .small.muted,.card p.small{font-size:15px;line-height:1.6}
+.tile-label span{font-size:13.5px}
+.btn.big{padding:16px 28px;font-size:17px;border-radius:14px}
+.ts-history td,.ts-history th{font-size:14px}

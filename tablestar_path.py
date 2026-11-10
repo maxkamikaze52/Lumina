@@ -136,6 +136,29 @@ def _targets_done(pid: str, targets: list[str]) -> bool:
     return all(_secure(rows.get(k)) for k in targets)
 
 
+def heatmap(pid: str, kind: str = "m") -> list[dict]:
+    """The full 12x12 board for a colour map: every fact, how it has gone.
+
+    `kind` is "m" for multiplication or "d" for division; division facts are
+    stored against the same canonical pair, so the two maps line up.
+    """
+    rows = _rows(pid)
+    out = []
+    for a in range(1, 13):
+        for b in range(1, 13):
+            r = rows.get(f"{kind}:{min(a, b)}x{max(a, b)}")
+            c = (r["correct"] or 0) if r else 0
+            w = (r["wrong"] or 0) if r else 0
+            seen = c + w
+            out.append({
+                "a": a, "b": b, "seen": seen,
+                "acc": round(c / seen, 2) if seen else None,
+                "secure": _secure(r),
+                "ms": round(r["ms"]) if r and r["ms"] else 0,
+            })
+    return out
+
+
 def plan(pid: str) -> dict:
     """The Garage: what you must do next, and why."""
     m = _meta(pid)
@@ -194,6 +217,8 @@ def plan(pid: str) -> dict:
         "weakest": ranked[:4],
         "tableGrid": [{"table": t["table"], "accuracy": t["accuracy"],
                        "wrong": t["wrong"], "secure": t["secure"]} for t in ranked],
+        "mulHeat": heatmap(pid, "m"),
+        "divHeat": heatmap(pid, "d"),
         "judge": {"good": GOOD_ACCURACY, "excellent": EXCELLENT_ACCURACY,
                   "perAnswer": EXCELLENT_PER_ANSWER, "minAnswers": GOOD_MIN_ANSWERS},
     }
