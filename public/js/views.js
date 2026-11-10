@@ -92,7 +92,7 @@
         <div class="hero-figure"><div class="ring"></div><div class="ring b"></div>
           <div class="framed-avatar">
             ${ART.avatarFrame(cls.n, { size: 240 })}
-            <div class="framed-inner">${ART.avatar(p.character, { label: p.name + ' character' })}</div>
+            <div class="framed-inner">${ART.avatarHead(p.character, { label: p.name + ' character' })}</div>
           </div>
         </div>
       </section>
@@ -310,7 +310,7 @@
         <div class="between" style="align-items:flex-start">
           <div class="row" style="gap:18px;align-items:center;flex-wrap:nowrap">
             <div class="framed-avatar small">${ART.avatarFrame(cls.n, { size: 96 })}
-              <div class="framed-inner">${ART.avatar(p.character, { background: false })}</div></div>
+              <div class="framed-inner">${ART.avatarHead(p.character, { label: p.name + ' character' })}</div></div>
             <div><h1 style="font-size:30px">${esc(p.name)}</h1>
               <div class="row" style="gap:8px;margin-top:6px">
                 <span class="pill amber">${esc(cls.name)}</span>

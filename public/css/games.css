@@ -810,3 +810,33 @@
 .framed-avatar .framed-inner svg.avatar{width:100%;height:100%}
 .framed-avatar.small{width:96px}
 .framed-avatar.small .framed-inner{width:56%;height:56%}
+
+/* ---- the level ladder: readable cards, centred badge, no stretched columns -- */
+.lvl-ladder{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));
+  gap:10px;align-items:stretch}
+.lvl-card{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:6px;text-align:center;padding:12px 8px 10px;border-radius:12px;
+  background:#fff;border:3px solid #e4ebf8;min-height:0}
+.lvl-card svg.crest{display:block;width:100%;max-width:86px;height:auto;margin:0 auto}
+.lvl-card b{font-family:var(--metal);font-size:11.5px;letter-spacing:.02em;
+  color:#141d3d;text-transform:uppercase;line-height:1.15;word-break:break-word}
+.lvl-card span{font-size:11.5px;font-weight:700;color:#6d7a99}
+.lvl-card.todo{background:#f3f6fc}
+.lvl-card.todo b{color:#3a4566}
+.lvl-card.me{background:#fffdf3;border-color:#120a26}
+/* dark theme */
+:root[data-theme="dark"] .lvl-card{background:#151d2e;border-color:#243050}
+:root[data-theme="dark"] .lvl-card b{color:#f2f5ff}
+:root[data-theme="dark"] .lvl-card span{color:#9aa6c6}
+:root[data-theme="dark"] .lvl-card.todo{background:#121a2b}
+:root[data-theme="dark"] .lvl-card.todo b{color:#c8d2ea}
+:root[data-theme="dark"] .stage-head b{color:#f2f5ff}
+:root[data-theme="dark"] .stage-head span{color:#9aa6c6}
+:root[data-theme="dark"] .stage-head{border-bottom-color:#243050}
+
+/* the head fills the badge opening; no body, no empty space around it */
+.framed-avatar .framed-inner{width:58%;height:58%;border-radius:50%;overflow:hidden;
+  background:radial-gradient(circle at 50% 40%,#2a2050,#150e2a);
+  box-shadow:inset 0 0 0 3px rgba(10,8,24,.9), inset 0 0 18px rgba(0,0,0,.6)}
+.framed-avatar .framed-inner svg.avatar-head{width:100%;height:100%;display:block}
+.framed-avatar.small .framed-inner{width:58%;height:58%}
