@@ -683,3 +683,15 @@
 .lvl-pip.me svg.crest{filter:drop-shadow(0 0 12px rgba(255,210,74,.75))}
 .lvl-pip svg.crest.locked,.lvl-card .crest.locked{filter:saturate(.3) brightness(.9)}
 .lvl-card.locked svg.crest{filter:saturate(.25) brightness(.92)}
+
+/* ---- crests: louder on the board, and the one you hold really glows ---- */
+.lvl-card{padding:16px 10px 14px}
+.lvl-card svg.crest{width:100%;max-width:132px;height:auto}
+.lvl-pip svg.crest{width:100%;max-width:52px;height:auto}
+.badge.crest-badge svg.crest{width:112px;height:auto}
+/* held level: a bloom in the tier's own colour (set inline by the view) */
+.lvl-card.me svg.crest{filter:drop-shadow(0 0 14px var(--glow,#ffd24a)) drop-shadow(0 0 28px var(--glow,#ffd24a))}
+.lvl-pip.me svg.crest{filter:drop-shadow(0 0 10px var(--glow,#ffd24a))}
+.lvl-card.me{border-color:#120a26;box-shadow:0 6px 0 #120a26, 0 0 0 4px var(--glow,#ffd24a)}
+.lvl-card:not(.me) svg.crest{filter:saturate(.72)}
+.lvl-card.todo svg.crest{opacity:.62}

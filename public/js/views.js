@@ -78,7 +78,7 @@
             <div class="lvl-strip">
               ${(s.stats.levels || []).map((l) => `<span class="lvl-pip ${l.n <= cls.n ? 'on' : ''}
                 ${l.n === cls.n ? 'me' : ''}" title="Level ${l.n} · ${esc(l.title)} — ${num(l.xp)} XP">
-                ${ART.levelCrest(l.n, { size: l.n === cls.n ? 58 : 44, locked: l.n > cls.n })}</span>`).join('')}
+                <span style="display:contents;--glow:${ART.crestGlow(l.n)}">${ART.levelCrest(l.n, { size: l.n === cls.n ? 58 : 44, locked: l.n > cls.n })}</span></span>`).join('')}
             </div>
             <div class="statline">
               <div><b>${num(p.starbits)}</b><span>Starbits</span></div>
@@ -321,8 +321,9 @@
         <div class="divider"></div>
         <h3 style="margin-bottom:10px">The 20 levels</h3>
         <div class="lvl-ladder">${s.classes.map((c, i) => `<div class="lvl-card ${i < classIdx ? 'done' : i === classIdx ? 'me' : 'todo'}"
+          style="--glow:${ART.crestGlow(c.n)}"
           title="Level ${c.n} · ${esc(c.title)} — ${num(c.xp)} XP">
-          ${ART.levelCrest(c.n, { size: 84, locked: c.n > cls.n })}
+          ${ART.levelCrest(c.n, { size: 132, locked: c.n > cls.n })}
           <b>${esc(c.title)}</b>
           <span>${c.n === 1 ? 'start' : num(c.xp) + ' XP'}</span></div>`).join('')}</div>
       </section>
