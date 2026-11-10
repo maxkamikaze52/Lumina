@@ -109,14 +109,29 @@
   function nextQuestion() {
     if (!g) return;
     if (performance.now() >= g.endsAt) return finish();
-    let q = makeQuestion(g.pool, g.ops), guard = 0;
-    while (q.text === g.lastText && guard++ < 6) q = makeQuestion(g.pool, g.ops);
+    // the question is always decided one step ahead, so a small preview of the
+    // *next* one can sit above and to the right of what you are answering
+    let q = g.nextQ, guard = 0;
+    while (!q || q.text === g.lastText) {
+      if (guard++ > 8) break;
+      q = makeQuestion(g.pool, g.ops);
+    }
     g.q = q; g.lastText = q.text; g.typed = ''; g.busy = false; g.t0 = performance.now();
+    let nq = makeQuestion(g.pool, g.ops), g2 = 0;
+    while (nq.text === q.text && g2++ < 8) nq = makeQuestion(g.pool, g.ops);
+    g.nextQ = nq;
+
     const el = main_el.querySelector('#ts-q');
     el.innerHTML = q.op === 'mul'
       ? `${q.a}<span class="op">×</span>${q.b}`
       : `${q.a}<span class="op">÷</span>${q.b}`;
     el.setAttribute('aria-label', `${q.text} equals`);
+    const nxt = main_el.querySelector('#ts-next');
+    if (nxt) {
+      nxt.innerHTML = `<span class="lbl">next</span>` +
+        (nq.op === 'mul' ? `${nq.a}<span class="op">×</span>${nq.b}`
+                         : `${nq.a}<span class="op">÷</span>${nq.b}`);
+    }
     const box = main_el.querySelector('#ts-ans');
     box.textContent = ''; box.className = 'ts-ans blank';
     const fb = main_el.querySelector('#ts-feedback');
@@ -279,7 +294,8 @@
       g = {
         mode, stage, pool: pool.length ? pool : [2], ops, round, sessionId: r.sessionId,
         tag: 'ts-' + r.sessionId, startedAt: performance.now(), endsAt: performance.now() + round,
-        typed: '', results: [], facts: [], ok: 0, streak: 0, best: 0, busy: false, t0: 0, iv: null
+        typed: '', results: [], facts: [], ok: 0, streak: 0, best: 0, busy: false, t0: 0, iv: null,
+        nextQ: null
       };
       drawGame();
     } catch (e) { App.toast(e.message, 'x'); }
@@ -295,6 +311,7 @@
             <span class="small muted" id="ts-streak">&nbsp;</span>
           </div>
           <div class="ts-timer"><i id="ts-bar"></i></div>
+          <div class="ts-next" id="ts-next" aria-hidden="true"></div>
           <div class="ts-q" id="ts-q">&nbsp;</div>
           <div class="ts-ans blank" id="ts-ans" aria-live="polite"></div>
           <div class="ts-feedback" id="ts-feedback"></div>

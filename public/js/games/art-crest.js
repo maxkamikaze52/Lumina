@@ -1,131 +1,269 @@
 /* Astrolab — the level badge.
-   One ornate emblem per level, in the language of a ranked-badge sheet: a glassy
-   dome in the middle, a thick decorated ring around it, and a motif inside.  The
-   colour family changes every ten levels and the motif changes every level, so
-   no two badges in the ladder look the same.  The level number sits on a plate
-   at the foot of the badge, never lost in the ornament.
+   100 levels, and every one of them is a *different* badge:
+     - the SHAPE of the plate changes with the stage (circle, shield, hexagon,
+       star, octagon, flower, gear, gem, cross, sunburst);
+     - the MOTIF inside changes every single level (10 motifs x 10 variants);
+     - the ORNAMENT on the rim changes every level;
+     - the colour family changes every ten levels.
+   The number sits on a plate at the foot so it never fights the art.
 */
 (function () {
   'use strict';
   const A = window.ART = window.ART || {};
 
-  /* ten colour families, ten steps each */
-  const METALS = {
-    gray:     { deep: '#1d2430', mid: '#8f9bb0', light: '#eef2f8', glass: '#cfd8e6', edge: '#5d6779' },
-    bronze:   { deep: '#3a1d08', mid: '#c2762e', light: '#ffd8a6', glass: '#f0c08a', edge: '#8a4d15' },
-    copper:   { deep: '#3d1409', mid: '#d0642f', light: '#ffc9a0', glass: '#f2a97e', edge: '#8f3312' },
-    silver:   { deep: '#1b2432', mid: '#cfdaea', light: '#ffffff', glass: '#e6eefb', edge: '#7d8ba1' },
-    gold:     { deep: '#3c2a02', mid: '#e8b crowd', light: '#fff3c0', glass: '#ffe493', edge: '#8c6600' },
-    jade:     { deep: '#04291f', mid: '#39c98d', light: '#d6fff0', glass: '#9df0cb', edge: '#0d6b4d' },
-    sapphire: { deep: '#05193d', mid: '#3f8ce8', light: '#d4e8ff', glass: '#93c6ff', edge: '#0e4a8f' },
-    amethyst: { deep: '#240b3d', mid: '#a06ee8', light: '#ecd9ff', glass: '#cda9ff', edge: '#5f2a94' },
-    crimson:  { deep: '#3d0512', mid: '#e0405f', light: '#ffd6df', glass: '#ff9db1', edge: '#8c1230' },
-    prism:    { deep: '#1a1038', mid: '#ff7ad9', light: '#e8f6ff', glass: '#ffd9a8', edge: '#7a3bc0' }
+  const M = {
+    gray:     { deep:'#141a24', mid:'#7c8798', light:'#eef2f8', glass:'#c3cddd', edge:'#4d5666' },
+    bronze:   { deep:'#3a1d08', mid:'#b8692a', light:'#ffcf9a', glass:'#e8a86e', edge:'#7d4310' },
+    copper:   { deep:'#3d1409', mid:'#c25526', light:'#ffc093', glass:'#e89567', edge:'#82290d' },
+    silver:   { deep:'#1b2432', mid:'#b9c7da', light:'#ffffff', glass:'#dee9f8', edge:'#6b7a90' },
+    gold:     { deep:'#3c2a02', mid:'#dcae2e', light:'#fff2b8', glass:'#ffdf85', edge:'#7d5c00' },
+    jade:     { deep:'#04291f', mid:'#2fbb82', light:'#c9ffe9', glass:'#8ce8c0', edge:'#0a5c42' },
+    sapphire: { deep:'#05193d', mid:'#357fe0', light:'#cbe4ff', glass:'#84bcff', edge:'#0b3f80' },
+    amethyst: { deep:'#240b3d', mid:'#9660e0', light:'#e6d2ff', glass:'#c39dff', edge:'#542383' },
+    crimson:  { deep:'#3d0512', mid:'#d43555', light:'#ffcbd8', glass:'#ff8fa6', edge:'#7d0f28' },
+    prism:    { deep:'#1a1038', mid:'#f06ad0', light:'#e8f6ff', glass:'#ffd19a', edge:'#6a2fb0' }
   };
-  /* gold above is fixed for clarity */
-  METALS.gold = { deep: '#3c2a02', mid: '#e8b93a', light: '#fff3c0', glass: '#ffe493', edge: '#8c6600' };
+  const FAMILIES = ['gray','bronze','copper','silver','gold','jade','sapphire','amethyst','crimson','prism'];
 
-  /* the ring decoration for each step inside a stage */
-  const RING = ['plain', 'studded', 'notched', 'twisted', 'scalloped', 'spiked',
-    'gemmed', 'braided', 'winged', 'crowned'];
+  /* ---------- the plate shape: one per stage ---------- */
+  function plate(stage, t, id) {
+    const C = 50;
+    if (stage === 0) return `<circle cx="${C}" cy="${C - 3}" r="34" fill="url(#${id}m)"/>`;
+    if (stage === 1) return `<path d="M50 8l30 8v26c0 16-13 27-30 35-17-8-30-19-30-35V16z"
+      fill="url(#${id}m)"/>`;                                        // shield
+    if (stage === 2) {                                                 // hexagon
+      const p = [];
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+        p.push((C + 34 * Math.cos(a)).toFixed(1) + ',' + (C - 3 + 34 * Math.sin(a)).toFixed(1));
+      }
+      return `<polygon points="${p.join(' ')}" fill="url(#${id}m)"/>`;
+    }
+    if (stage === 3) {                                                 // 8-point star
+      const p = [];
+      for (let i = 0; i < 16; i++) {
+        const a = (Math.PI * 2 * i) / 16 - Math.PI / 2;
+        const r = i % 2 ? 26 : 36;
+        p.push((C + r * Math.cos(a)).toFixed(1) + ',' + (C - 3 + r * Math.sin(a)).toFixed(1));
+      }
+      return `<polygon points="${p.join(' ')}" fill="url(#${id}m)"/>`;
+    }
+    if (stage === 4) {                                                 // octagon
+      const p = [];
+      for (let i = 0; i < 8; i++) {
+        const a = (Math.PI * 2 * i) / 8 - Math.PI / 8;
+        p.push((C + 34 * Math.cos(a)).toFixed(1) + ',' + (C - 3 + 34 * Math.sin(a)).toFixed(1));
+      }
+      return `<polygon points="${p.join(' ')}" fill="url(#${id}m)"/>`;
+    }
+    if (stage === 5) {                                                 // flower
+      let d = '';
+      for (let i = 0; i < 12; i++) {
+        const a = (Math.PI * 2 * i) / 12;
+        const r = i % 2 ? 30 : 36;
+        d += (i ? 'L' : 'M') + (C + r * Math.cos(a)).toFixed(1) + ' '
+           + (C - 3 + r * Math.sin(a)).toFixed(1);
+      }
+      return `<path d="${d}Z" fill="url(#${id}m)" stroke="${t.edge}" stroke-width="1.4"/>`;
+    }
+    if (stage === 6) {                                                 // gear
+      let d = '';
+      const teeth = 14;
+      for (let i = 0; i < teeth * 2; i++) {
+        const a = (Math.PI * i) / teeth;
+        const r = i % 2 ? 30 : 35.5;
+        d += (i ? 'L' : 'M') + (C + r * Math.cos(a)).toFixed(1) + ' '
+           + (C - 3 + r * Math.sin(a)).toFixed(1);
+      }
+      return `<path d="${d}Z" fill="url(#${id}m)"/>`;
+    }
+    if (stage === 7) {                                                 // gem
+      return `<path d="M50 6l26 14v24c0 14-12 22-26 26-14-4-26-12-26-26V20z"
+        fill="url(#${id}m)"/><path d="M50 6l26 14H24z" fill="${t.light}" opacity=".35"/>`;
+    }
+    if (stage === 8) {                                                 // cross / four points
+      return `<path d="M50 6l9 20 20 3-14 15 3 21-18-11-18 11 3-21-14-15 20-3z"
+        fill="url(#${id}m)"/>`;
+    }
+    return `<g fill="url(#${id}m)">` + Array.from({ length: 20 }, (_, i) => {
+      const a = (Math.PI * 2 * i) / 20 - Math.PI / 2;
+      const r = i % 2 ? 24 : 37;
+      return `<path d="M50 47L${(50 + r * Math.cos(a - 0.16)).toFixed(1)} ${(47 + r * Math.sin(a - 0.16)).toFixed(1)}
+        L${(50 + r * Math.cos(a + 0.16)).toFixed(1)} ${(47 + r * Math.sin(a + 0.16)).toFixed(1)}z"/>`;
+    }).join('') + '</g>';
+  }
 
-  /* the motif drawn inside the dome, one per level */
-  function motif(step, t) {
-    const c = '#ffffff', s = t.edge;
-    switch (step) {
-      case 0: return `<circle cx="50" cy="46" r="13" fill="none" stroke="${c}" stroke-width="2.6" opacity=".92"/>
-        <circle cx="50" cy="46" r="5" fill="${c}" opacity=".9"/>`;
-      case 1: return `<path d="M36 34h28v24H36z" fill="none" stroke="${c}" stroke-width="2.6"/>
-        <path d="M50 34v24M36 46h28" stroke="${c}" stroke-width="2"/>`;
-      case 2: return `<path d="M42 30h16v8l-4 22h-8l-4-22z" fill="${c}" opacity=".9"/>`;
-      case 3: return `<path d="M50 30l6 14 14 2-10 10 2 14-12-6-12 6 2-14-10-10 14-2z"
-        fill="${c}" opacity=".92"/>`;
-      case 4: return `<path d="M50 62V32M50 40l-10-6M50 40l10-6M50 50l-11-6M50 50l11-6"
-        stroke="${c}" stroke-width="2.8" stroke-linecap="round" fill="none"/>`;
-      case 5: return `<path d="M34 58c0-11 7-20 16-20s16 9 16 20z" fill="${c}" opacity=".9"/>
-        <rect x="34" y="58" width="32" height="5" rx="2" fill="${c}"/>`;
-      case 6: return `<path d="M50 30c-9 6-14 12-14 20 0 6 6 10 14 10s14-4 14-10c0-8-5-14-14-20z"
-        fill="${c}" opacity=".88"/><circle cx="50" cy="50" r="4" fill="${s}"/>`;
-      case 7: return `<path d="M50 28l7 12h-14zM36 52l12-7v14zM64 52l-12-7v14z"
-        fill="${c}" opacity=".9"/><circle cx="50" cy="48" r="3.4" fill="${s}"/>`;
-      case 8: return `<path d="M38 60c-4-14 2-26 12-30 10 4 16 16 12 30z" fill="${c}" opacity=".9"/>
-        <path d="M50 34v26" stroke="${s}" stroke-width="2"/>`;
-      default: return `<path d="M50 26l5 11 12 1-9 9 3 12-11-6-11 6 3-12-9-9 12-1z"
-        fill="${c}"/><circle cx="50" cy="52" r="16" fill="none" stroke="${c}"
-        stroke-width="1.6" opacity=".65"/>`;
+  /* ---------- the motif: 10 families x 10 variants = 100 ---------- */
+  function motif(step, variant, t) {
+    const w = '#fff', e = t.edge;
+    const base = step;                       // 0..9
+    const v = variant;                       // 0..9
+    const grow = 1 + v * 0.055;
+    const k = (x) => (x * grow).toFixed(2);
+
+    // each motif family is drawn once, and the variant changes its count,
+    // its fill or its inner detail, so 1..100 never repeat
+    switch (base) {
+      case 0: { // RINGS
+        const rings = 1 + v;
+        let out = '';
+        for (let i = 0; i < rings; i++) {
+          out += `<circle cx="50" cy="44" r="${(k(6 + i * 3.2))}" fill="none"
+            stroke="${w}" stroke-width="${2.6 - i * 0.16}" opacity="${0.95 - i * 0.06}"/>`;
+        }
+        return out + (v >= 5 ? `<circle cx="50" cy="44" r="2.4" fill="${w}"/>` : '');
+      }
+      case 1: { // GRID / BOOK
+        let out = `<rect x="${50 - k(13)}" y="${44 - k(12)}" width="${k(26)}" height="${k(24)}"
+          fill="none" stroke="${w}" stroke-width="2.8" rx="${v > 4 ? 4 : 0}"/>`;
+        for (let i = 1; i <= v; i++) {
+          out += `<line x1="${50 - k(13)}" y1="${(44 - k(12) + i * (k(24) / (v + 1))).toFixed(1)}"
+            x2="${50 + k(13)}" y2="${(44 - k(12) + i * (k(24) / (v + 1))).toFixed(1)}"
+            stroke="${w}" stroke-width="1.8"/>`;
+        }
+        return out;
+      }
+      case 2: { // QUILL
+        let out = `<path d="M${50 - k(11)} ${44 + k(12)} Q50 ${44 - k(14)} ${50 + k(13)} ${44 - k(14)}
+          Q${50 + k(4)} ${44} ${50 - k(11)} ${44 + k(12)}z" fill="${w}" opacity=".92"/>`;
+        if (v >= 3) out += `<line x1="${50 - k(10)}" y1="${44 + k(11)}" x2="${50 + k(6)}"
+          y2="${44 - k(10)}" stroke="${e}" stroke-width="1.6"/>`;
+        if (v >= 6) out += `<circle cx="${50 + k(12)}" cy="${44 - k(11)}" r="2" fill="${w}"/>`;
+        return out;
+      }
+      case 3: { // STAR, points = v + 5
+        const pts = 5 + v;
+        let d = '';
+        for (let i = 0; i < pts * 2; i++) {
+          const a = (Math.PI * i) / pts - Math.PI / 2;
+          const r = i % 2 ? k(6) : k(16);
+          d += (i ? 'L' : 'M') + (50 + r * Math.cos(a)).toFixed(1) + ' '
+             + (44 + r * Math.sin(a)).toFixed(1);
+        }
+        return `<path d="${d}Z" fill="${w}" opacity=".94"/>`;
+      }
+      case 4: { // LAUREL / LEAVES
+        let out = '';
+        for (let side of [-1, 1]) {
+          for (let i = 0; i < 2 + v; i++) {
+            const y = 44 + 10 - i * (k(20) / (2 + v));
+            out += `<ellipse cx="${50 + side * (k(6) + i * 1.4)}" cy="${y.toFixed(1)}"
+              rx="${3.4}" ry="${2.2}" transform="rotate(${side * (28 + i * 6)} ${50 + side * (k(6) + i * 1.4)} ${y.toFixed(1)})"
+              fill="${w}" opacity="${0.95 - i * 0.07}"/>`;
+          }
+        }
+        return out + (v >= 7 ? `<circle cx="50" cy="44" r="3" fill="${w}"/>` : '');
+      }
+      case 5: { // TROPHY / CUP
+        const wide = k(15 + v * 0.6);
+        let out = `<path d="M${50 - wide / 2} ${44 - k(11)}h${wide}v${k(8)}
+          a${wide / 2} ${k(8)} 0 0 1 -${wide} 0z" fill="${w}" opacity=".94"/>
+          <rect x="${50 - k(2)}" y="${44 + k(4)}" width="${k(4)}" height="${k(6)}" fill="${w}"/>
+          <rect x="${50 - k(7)}" y="${44 + k(9)}" width="${k(14)}" height="${k(3)}" rx="1.5" fill="${w}"/>`;
+        if (v >= 4) out += `<circle cx="${50}" cy="${44 - k(6)}" r="${1.8 + v * 0.12}" fill="${e}"
+          opacity=".5"/>`;
+        return out;
+      }
+      case 6: { // FLASK / DROP
+        const drop = v % 2 === 0;
+        if (drop) {
+          return `<path d="M50 ${44 - k(15)}c-${k(9)} ${k(11)} -${k(11)} ${k(15)} 0 ${k(19)}
+            c${k(11)} -${k(4)} ${k(9)} -${k(8)} 0 -${k(19)}z" fill="${w}" opacity=".92"/>
+            <ellipse cx="46" cy="${44 + k(2)}" rx="2.4" ry="3.6" fill="${e}" opacity=".35"/>`;
+        }
+        return `<path d="M${50 - k(8)} ${44 - k(12)}h${k(16)}v${k(5)}l${k(5)} ${k(11)}
+          a3 3 0 0 1 -3 4h-${k(20)}a3 3 0 0 1 -3 -4l${k(5)} -${k(11)}z"
+          fill="${w}" opacity=".92"/><circle cx="50" cy="${44 + k(4)}" r="${2 + v * 0.12}"
+          fill="${e}" opacity=".45"/>`;
+      }
+      case 7: { // SHARDS
+        let out = '';
+        const n = 3 + v;
+        for (let i = 0; i < n; i++) {
+          const a = (Math.PI * 2 * i) / n - Math.PI / 2;
+          const r1 = k(5), r2 = k(15);
+          out += `<path d="M${(50 + r1 * Math.cos(a)).toFixed(1)} ${(44 + r1 * Math.sin(a)).toFixed(1)}
+            L${(50 + r2 * Math.cos(a - .22)).toFixed(1)} ${(44 + r2 * Math.sin(a - .22)).toFixed(1)}
+            L${(50 + r2 * Math.cos(a + .22)).toFixed(1)} ${(44 + r2 * Math.sin(a + .22)).toFixed(1)}z"
+            fill="${w}" opacity="${0.95 - i * 0.04}"/>`;
+        }
+        return out;
+      }
+      case 8: { // CROWN / WINGS
+        if (v < 5) {
+          const sp = 2 + v;
+          let out = '';
+          for (let i = 0; i < sp; i++) {
+            const x = 50 + (i - (sp - 1) / 2) * k(7);
+            out += `<path d="M${x} ${44 + k(8)}l${k(2.6)} ${-k(9)} ${k(2.6)} ${k(9)}"
+              fill="${w}" opacity=".95"/>`;
+          }
+          return out + `<rect x="${50 - k(12)}" y="${44 + k(7)}" width="${k(24)}"
+            height="${k(4)}" rx="2" fill="${w}"/>`;
+        }
+        let out = '';
+        for (let side of [-1, 1]) {
+          for (let i = 0; i < 3; i++) {
+            out += `<path d="M${50 + side * k(8)} ${44 + (i - 1) * 5}
+              q${side * k(9)} -1 ${side * k(12)} -${4 + i}z"
+              fill="${w}" opacity="${0.9 - i * 0.1}"/>`;
+          }
+        }
+        return out;
+      }
+      default: { // BURST / SUN
+        let out = '';
+        const rays = 6 + v * 2;
+        for (let i = 0; i < rays; i++) {
+          const a = (Math.PI * 2 * i) / rays - Math.PI / 2;
+          out += `<line x1="${(50 + k(7) * Math.cos(a)).toFixed(1)}" y1="${(44 + k(7) * Math.sin(a)).toFixed(1)}"
+            x2="${(50 + k(15) * Math.cos(a)).toFixed(1)}" y2="${(44 + k(15) * Math.sin(a)).toFixed(1)}"
+            stroke="${w}" stroke-width="${v > 5 ? 2.4 : 2.8}" stroke-linecap="round"/>`;
+        }
+        return out + `<circle cx="50" cy="44" r="${(4 + v * 0.35).toFixed(1)}" fill="${w}"/>`;
+      }
     }
   }
 
-  /* the ring ornament, drawn as a path or a set of studs around r */
-  function ring(step, t, r) {
-    const C = 50;
+  /* ---------- rim ornament: one per level, cycling a bigger set ---------- */
+  function rim(step, n, t) {
+    const C = 50, r = 37;
     let out = '';
-    if (step === 1) {
+    const kind = n % 6;
+    if (kind === 0) {
       for (let i = 0; i < 12; i++) {
         const a = (Math.PI * 2 * i) / 12 - Math.PI / 2;
-        out += `<circle cx="${(C + r * Math.cos(a)).toFixed(1)}" cy="${(C + r * Math.sin(a)).toFixed(1)}"
-          r="2.6" fill="${t.light}" stroke="${t.edge}" stroke-width=".7"/>`;
+        out += `<circle cx="${(C + r * Math.cos(a)).toFixed(1)}" cy="${(47 + r * Math.sin(a)).toFixed(1)}"
+          r="2.2" fill="${t.light}" stroke="${t.edge}" stroke-width=".6"/>`;
       }
-    } else if (step === 2) {
-      const pts = [];
-      for (let i = 0; i < 16; i++) {
-        const a = (Math.PI * 2 * i) / 16;
-        const rr = i % 2 ? r - 3 : r + 1;
-        pts.push((C + rr * Math.cos(a)).toFixed(1) + ',' + (C + rr * Math.sin(a)).toFixed(1));
-      }
-      out += `<polygon points="${pts.join(' ')}" fill="none" stroke="${t.light}"
-        stroke-width="2" opacity=".9"/>`;
-    } else if (step === 3) {
-      for (let i = 0; i < 8; i++) {
-        const a = (Math.PI * 2 * i) / 8;
-        out += `<path d="M${(C + (r - 4) * Math.cos(a)).toFixed(1)} ${(C + (r - 4) * Math.sin(a)).toFixed(1)}
-          q${(3 * Math.cos(a + 1)).toFixed(1)} ${(3 * Math.sin(a + 1)).toFixed(1)}
-          ${(4 * Math.cos(a)).toFixed(1)} ${(4 * Math.sin(a)).toFixed(1)}"
-          stroke="${t.light}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-      }
-    } else if (step === 4) {
+    } else if (kind === 1) {
+      out += `<circle cx="${C}" cy="47" r="${r}" fill="none" stroke="${t.light}"
+        stroke-width="1.8" stroke-dasharray="5 4" opacity=".8"/>`;
+    } else if (kind === 2) {
       for (let i = 0; i < 10; i++) {
         const a = (Math.PI * 2 * i) / 10 - Math.PI / 2;
-        out += `<circle cx="${(C + (r + 1) * Math.cos(a)).toFixed(1)}"
-          cy="${(C + (r + 1) * Math.sin(a)).toFixed(1)}" r="4.2" fill="${t.mid}"
-          stroke="${t.edge}" stroke-width="1"/>`;
+        out += `<line x1="${(C + (r - 4) * Math.cos(a)).toFixed(1)}" y1="${(47 + (r - 4) * Math.sin(a)).toFixed(1)}"
+          x2="${(C + (r + 2) * Math.cos(a)).toFixed(1)}" y2="${(47 + (r + 2) * Math.sin(a)).toFixed(1)}"
+          stroke="${t.light}" stroke-width="1.8" opacity=".75"/>`;
       }
-    } else if (step === 5) {
-      for (let i = 0; i < 10; i++) {
-        const a = (Math.PI * 2 * i) / 10 - Math.PI / 2;
-        out += `<line x1="${(C + r * Math.cos(a)).toFixed(1)}" y1="${(C + r * Math.sin(a)).toFixed(1)}"
-          x2="${(C + (r + 6) * Math.cos(a)).toFixed(1)}" y2="${(C + (r + 6) * Math.sin(a)).toFixed(1)}"
-          stroke="${t.light}" stroke-width="2.6" stroke-linecap="round"/>`;
-      }
-    } else if (step === 6) {
+    } else if (kind === 3) {
       for (let i = 0; i < 6; i++) {
         const a = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-        const x = C + r * Math.cos(a), y = C + r * Math.sin(a);
-        out += `<rect x="${(x - 3).toFixed(1)}" y="${(y - 3).toFixed(1)}" width="6" height="6"
+        const x = C + r * Math.cos(a), y = 47 + r * Math.sin(a);
+        out += `<rect x="${(x - 2.4).toFixed(1)}" y="${(y - 2.4).toFixed(1)}" width="4.8" height="4.8"
           transform="rotate(45 ${x.toFixed(1)} ${y.toFixed(1)})" fill="${t.light}"
-          stroke="${t.edge}" stroke-width=".9"/>`;
+          stroke="${t.edge}" stroke-width=".7"/>`;
       }
-    } else if (step === 7) {
-      out += `<circle cx="${C}" cy="${C}" r="${r}" fill="none" stroke="${t.light}"
-        stroke-width="2" stroke-dasharray="5 4" opacity=".9"/>
-        <circle cx="${C}" cy="${C}" r="${r - 4}" fill="none" stroke="${t.light}"
-        stroke-width="1.4" stroke-dasharray="2 5" opacity=".7"/>`;
-    } else if (step === 8) {
-      for (const dir of [-1, 1]) {
-        for (let i = 0; i < 3; i++) {
-          out += `<path d="M${C + dir * (r - 2)} ${C + i * 6 - 6}
-            q${dir * 12} -2 ${dir * 16} -8 q${-dir * 8} 1 ${-dir * 12} 3z"
-            fill="${t.mid}" stroke="${t.edge}" stroke-width="1"/>`;
-        }
-      }
+    } else if (kind === 4) {
+      out += `<circle cx="${C}" cy="47" r="${r}" fill="none" stroke="${t.mid}"
+        stroke-width="2.4" opacity=".9"/>
+        <circle cx="${C}" cy="47" r="${r - 3}" fill="none" stroke="${t.light}"
+        stroke-width="1.2" opacity=".7"/>`;
     } else {
-      for (let i = 0; i < 12; i++) {
-        const a = (Math.PI * 2 * i) / 12 - Math.PI / 2;
-        const long = i % 3 === 0;
-        out += `<line x1="${(C + r * Math.cos(a)).toFixed(1)}" y1="${(C + r * Math.sin(a)).toFixed(1)}"
-          x2="${(C + (r + (long ? 10 : 5)) * Math.cos(a)).toFixed(1)}"
-          y2="${(C + (r + (long ? 10 : 5)) * Math.sin(a)).toFixed(1)}"
-          stroke="${t.light}" stroke-width="${long ? 3 : 2}" stroke-linecap="round"/>`;
+      for (let i = 0; i < 16; i++) {
+        const a = (Math.PI * 2 * i) / 16;
+        out += `<circle cx="${(C + r * Math.cos(a)).toFixed(1)}" cy="${(47 + r * Math.sin(a)).toFixed(1)}"
+          r="1.3" fill="${t.light}" opacity=".8"/>`;
       }
     }
     return out;
@@ -136,67 +274,42 @@
   A.levelCrest = function (n, opts) {
     const o = opts || {};
     const size = o.size || 96;
-    const step = Math.max(0, Math.min(9, (n - 1) % 10));
-    const stageIdx = Math.min(9, Math.floor((n - 1) / 10));
-    const family = ['gray', 'bronze', 'copper', 'silver', 'gold', 'jade',
-      'sapphire', 'amethyst', 'crimson', 'prism'][stageIdx];
-    const t = METALS[family];
+    const idx = Math.max(1, Math.min(100, n)) - 1;
+    const stage = Math.min(9, Math.floor(idx / 10));
+    const step = idx % 10;                       // position in the stage
+    const family = FAMILIES[stage];
+    const t = M[family];
     const id = 'bd' + (++seq);
-    const C = 50, r = 30;                 // the dome
 
     let svg = `<defs>
-        <radialGradient id="${id}g" cx=".38" cy=".3" r=".85">
-          <stop offset="0" stop-color="${t.light}"/>
-          <stop offset=".45" stop-color="${t.glass}"/>
-          <stop offset="1" stop-color="${t.mid}"/>
-        </radialGradient>
         <linearGradient id="${id}m" x1=".15" y1="0" x2=".85" y2="1">
           <stop offset="0" stop-color="${t.light}"/>
-          <stop offset=".4" stop-color="${t.mid}"/>
-          <stop offset=".75" stop-color="${t.deep}"/>
+          <stop offset=".42" stop-color="${t.mid}"/>
+          <stop offset=".74" stop-color="${t.deep}"/>
           <stop offset="1" stop-color="${t.mid}"/>
         </linearGradient>
-        <radialGradient id="${id}s" cx=".5" cy=".5" r=".5">
-          <stop offset=".6" stop-color="${t.mid}" stop-opacity="0"/>
-          <stop offset=".88" stop-color="${t.mid}" stop-opacity=".45"/>
-          <stop offset="1" stop-color="${t.mid}" stop-opacity="0"/>
+        <radialGradient id="${id}g" cx=".36" cy=".28" r=".88">
+          <stop offset="0" stop-color="${t.light}"/>
+          <stop offset=".45" stop-color="${t.glass}"/>
+          <stop offset="1" stop-color="${t.deep}"/>
         </radialGradient>
       </defs>
-
-      <circle cx="${C}" cy="${C - 4}" r="42" fill="url(#${id}s)"/>`;
-
-    /* the decorated ring, then the metal band over it */
-    svg += ring(step, t, 33);
-    svg += `<circle cx="${C}" cy="${C - 4}" r="33" fill="none" stroke="url(#${id}m)"
-        stroke-width="7"/>
-      <circle cx="${C}" cy="${C - 4}" r="36.5" fill="none" stroke="${t.deep}"
-        stroke-width="1.4" opacity=".85"/>
-      <circle cx="${C}" cy="${C - 4}" r="29.5" fill="none" stroke="${t.light}"
-        stroke-width="1.2" opacity=".75"/>`;
-
-    /* the glassy dome */
-    svg += `<circle cx="${C}" cy="${C - 4}" r="${r - 4}" fill="url(#${id}g)"
-        stroke="${t.edge}" stroke-width="1.6"/>
-      <ellipse cx="${C - 7}" cy="${C - 18}" rx="13" ry="8" fill="#fff" opacity=".38"/>
-      <circle cx="${C}" cy="${C - 4}" r="${r - 4}" fill="none" stroke="#fff"
-        stroke-width=".9" opacity=".45"/>`;
-
-    /* the motif, tinted to the family so it always reads */
-    svg += `<g opacity=".95">${motif(step, t)}</g>`;
-
-    /* the plate with the number */
-    svg += `<rect x="${C - 17}" y="70" width="34" height="17" rx="8.5" fill="${t.deep}"
-        stroke="${t.mid}" stroke-width="1.6"/>
-      <text x="${C}" y="${80.5}" text-anchor="middle" dominant-baseline="middle"
-        font-family="Archivo Black, Arial Black, sans-serif" font-size="12"
+      ${plate(stage, t, id)}
+      <circle cx="50" cy="44" r="24" fill="url(#${id}g)" stroke="${t.edge}" stroke-width="1.4"/>
+      <ellipse cx="43" cy="34" rx="10" ry="6" fill="#fff" opacity=".3"/>
+      ${motif(step, n % 10 === 0 ? 9 : n % 10, t)}
+      ${rim(step, n, t)}
+      <rect x="30" y="74" width="40" height="16" rx="8" fill="${t.deep}"
+        stroke="${t.mid}" stroke-width="1.5"/>
+      <text x="50" y="82.4" text-anchor="middle" dominant-baseline="middle"
+        font-family="Archivo Black, Arial Black, sans-serif" font-size="11.5"
         fill="${t.light}">${n}</text>`;
 
-    return `<svg class="crest badge-${family}${o.locked ? ' locked' : ''}"
+    return `<svg class="crest badge-${family} eg-${stage}-${step}${o.locked ? ' locked' : ''}"
       width="${size}" height="${size}" viewBox="0 0 100 100" role="img"
-      aria-label="Level ${n} badge, ${family}">${svg}</svg>`;
+      aria-label="Level ${n} badge, ${family}, design ${stage + 1}-${step + 1}">${svg}</svg>`;
   };
 
-  A.crestTier = (n) => ['gray', 'bronze', 'copper', 'silver', 'gold', 'jade',
-    'sapphire', 'amethyst', 'crimson', 'prism'][Math.min(9, Math.floor((n - 1) / 10))];
-  A.crestGlow = (n) => METALS[A.crestTier(n)].mid;
+  A.crestTier = (n) => FAMILIES[Math.min(9, Math.floor((Math.max(1, n) - 1) / 10))];
+  A.crestGlow = (n) => M[A.crestTier(n)].mid;
 })();
