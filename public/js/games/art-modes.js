@@ -42,102 +42,91 @@
   const vignette = (id) => `<rect width="320" height="160" fill="url(#${id}v)"/>`;
 
   /* ------------------------------------------------------------------ GARAGE */
-  /* A Strat-style electric guitar.  The body is built as a UNION of overlapping
-     shapes drawn twice — once with a thick ink outline, once filled without a
-     stroke — which gives one clean double-cutaway silhouette (two horns, a
-     waist, two rounded bouts) with no internal seams.  That silhouette is what
-     makes it read as an electric guitar rather than an acoustic blob. */
-  const BODY_PARTS = [
-    [-4, 40, 31, 23],    // lower bout
-    [-4, 16, 19, 13],    // waist
-    [-4, -2, 25, 15],    // upper bout
-    [-26, -18, 10, 13],  // left horn (longer)
-    [14, -14, 9, 11]     // right horn
-  ];
-  const partEll = (p, attrs) => '<ellipse cx="' + p[0] + '" cy="' + p[1] +
-    '" rx="' + p[2] + '" ry="' + p[3] + '" ' + attrs + '/>';
+  /* A flat-cartoon Stratocaster: red-orange body, big cream pickguard, three
+     slanted single coils, two knobs, tremolo arm, thick navy outline.  The body
+     and pickguard paths were generated from measured outlines, so the shape
+     really is a double cutaway with a waist. */
+  const G_BODY = 'M -3.0 -63.0 Q -10.0 -62.0 -19.0 -61.0 Q -28.0 -60.0 -36.0 -53.0 Q -44.0 -46.0 -46.0 -38.0 Q -48.0 -30.0 -44.0 -25.0 Q -40.0 -20.0 -34.0 -17.0 Q -28.0 -14.0 -26.0 -7.0 Q -24.0 0.0 -26.0 7.0 Q -28.0 14.0 -31.0 20.0 Q -34.0 26.0 -33.0 33.0 Q -32.0 40.0 -26.0 46.0 Q -20.0 52.0 -11.0 55.0 Q -2.0 58.0 7.0 56.0 Q 16.0 54.0 23.0 48.0 Q 30.0 42.0 33.0 34.0 Q 36.0 26.0 35.0 19.0 Q 34.0 12.0 32.0 5.0 Q 30.0 -2.0 33.0 -8.0 Q 36.0 -14.0 40.0 -17.0 Q 44.0 -20.0 45.0 -26.0 Q 46.0 -32.0 42.0 -40.0 Q 38.0 -48.0 30.0 -54.0 Q 22.0 -60.0 13.0 -62.0 Q 4.0 -64.0 -3.0 -63.0 Z';
+  const G_GUARD = 'M -30.0 2.0 Q -30.0 -6.0 -22.0 -10.0 Q -14.0 -14.0 -2.0 -13.0 Q 10.0 -12.0 18.0 -8.0 Q 26.0 -4.0 28.0 3.0 Q 30.0 10.0 29.0 19.0 Q 28.0 28.0 23.0 36.0 Q 18.0 44.0 9.0 47.0 Q 0.0 50.0 -9.0 47.0 Q -18.0 44.0 -23.0 36.0 Q -28.0 28.0 -29.0 19.0 Q -30.0 10.0 -30.0 2.0 Z';
 
   function guitar() {
-    const union = (attrs) => BODY_PARTS.map((p) => partEll(p, attrs)).join('');
-    const pickup = (y) => '<g transform="rotate(-5 -2 ' + y + ')">' +
-      '<rect x="-16" y="' + y + '" width="30" height="7" rx="2.5" fill="#f2ecff" stroke="' + INK + '" stroke-width="1.8"/>' +
-      '<circle cx="-9" cy="' + (y + 3.5) + '" r="1" fill="#6b6290"/>' +
-      '<circle cx="-2" cy="' + (y + 3.5) + '" r="1" fill="#6b6290"/>' +
-      '<circle cx="6" cy="' + (y + 3.5) + '" r="1" fill="#6b6290"/></g>';
-    return '<g transform="translate(154 86) rotate(-18) scale(1.05)">' +
-      '<defs>' +
-      '<linearGradient id="gb" x1=".1" y1="0" x2=".9" y2="1">' +
-      '<stop offset="0" stop-color="#ff8394"/><stop offset=".35" stop-color="#e63a56"/>' +
-      '<stop offset=".72" stop-color="#b41f3b"/><stop offset="1" stop-color="#780f24"/></linearGradient>' +
-      '<linearGradient id="gn" x1="0" y1="0" x2="1" y2="0">' +
-      '<stop offset="0" stop-color="#f2c894"/><stop offset=".5" stop-color="#cb8a48"/>' +
-      '<stop offset="1" stop-color="#7d4a1e"/></linearGradient>' +
-      '<linearGradient id="gm" x1="0" y1="0" x2="1" y2="0">' +
-      '<stop offset="0" stop-color="#efeaf9"/><stop offset=".5" stop-color="#a49cc8"/>' +
-      '<stop offset="1" stop-color="#5b5480"/></linearGradient>' +
-      '<linearGradient id="gf" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0" stop-color="#2e1d16"/><stop offset="1" stop-color="#160d0a"/>' +
-      '</linearGradient>' +
-      '</defs>' +
+    const pickup = (y, tilt) => '<g transform="rotate(' + tilt + ' -2 ' + y + ')">' +
+      '<rect x="-17" y="' + y + '" width="32" height="8" rx="3" fill="#f6f1ff" ' +
+      'stroke="' + INK + '" stroke-width="2"/>' +
+      '<circle cx="-10" cy="' + (y + 4) + '" r="1.1" fill="#7a719e"/>' +
+      '<circle cx="-2" cy="' + (y + 4) + '" r="1.1" fill="#7a719e"/>' +
+      '<circle cx="7" cy="' + (y + 4) + '" r="1.1" fill="#7a719e"/></g>';
+    const knob = (x, y, r) => '<circle cx="' + x + '" cy="' + y + '" r="' + r +
+      '" fill="#fff9f2" stroke="' + INK + '" stroke-width="2"/>' +
+      '<path d="M' + (x - r * 0.6) + ' ' + y + 'h' + (r * 1.2) + '" stroke="' + INK +
+      '" stroke-width="1.2" opacity=".55"/>';
+    const s = [];
+    s.push('<g transform="translate(206 128) rotate(-22) scale(.5)">');
+    s.push('<ellipse cx="0" cy="62" rx="54" ry="8" fill="#000" opacity=".45"/>');
 
-      '<ellipse cx="4" cy="84" rx="54" ry="10" fill="#000" opacity=".5"/>' +
+    // neck + fretboard + frets + inlays, all above the body
+    s.push('<rect x="-13" y="-238" width="26" height="182" fill="#e0ab6c" stroke="' + INK +
+      '" stroke-width="5"/>');
+    s.push('<rect x="-9.5" y="-236" width="19" height="176" fill="#241611" stroke="' + INK +
+      '" stroke-width="2"/>');
+    const frets = [-214, -196, -179, -163, -148, -134, -121, -109, -98, -88, -79, -71];
+    s.push('<g stroke="#d9d2ea" stroke-width="1.8" opacity=".92">' +
+      frets.map((y) => '<line x1="-9.5" y1="' + y + '" x2="9.5" y2="' + y + '"/>').join('') +
+      '</g>');
+    s.push('<g fill="#fffaf0" opacity=".9">' +
+      [-205, -171, -140, -113, -93, -75].map((y) =>
+        '<circle cx="0" cy="' + y + '" r="2.2"/>').join('') +
+      '<rect x="-2.6" y="-156" width="5.2" height="9" rx="2"/></g>');
 
-      /* neck first, so the body covers its join */
-      '<rect x="-11" y="-112" width="22" height="92" fill="url(#gn)" stroke="' + INK + '" stroke-width="4"/>' +
-      '<rect x="-8" y="-110" width="16" height="88" fill="url(#gf)" stroke="' + INK + '" stroke-width="1.6"/>' +
-      '<g stroke="#d8d2e8" stroke-width="1.5" opacity=".9">' +
-      '<line x1="-8" y1="-100" x2="8" y2="-100"/><line x1="-8" y1="-89" x2="8" y2="-89"/>' +
-      '<line x1="-8" y1="-78" x2="8" y2="-78"/><line x1="-8" y1="-67" x2="8" y2="-67"/>' +
-      '<line x1="-8" y1="-56" x2="8" y2="-56"/><line x1="-8" y1="-45" x2="8" y2="-45"/>' +
-      '<line x1="-8" y1="-34" x2="8" y2="-34"/></g>' +
-      '<g fill="#fff8e6" opacity=".85">' +
-      '<circle cx="0" cy="-95" r="1.7"/><circle cx="0" cy="-73" r="1.7"/>' +
-      '<circle cx="0" cy="-51" r="1.7"/><circle cx="0" cy="-29" r="1.7"/></g>' +
+    // headstock: 6 in a row on one side, Strat style
+    s.push('<path d="M-13 -238h26l13 -30c2 -8 -3 -14 -11 -14h-30c-8 0 -13 6 -11 14z" ' +
+      'fill="#1d1334" stroke="' + INK + '" stroke-width="5" stroke-linejoin="round"/>');
+    s.push('<g class="gt-pegs" fill="#ffd77a" stroke="' + INK + '" stroke-width="1.4">' +
+      [-268, -256, -244].map((y) => '<circle cx="-22" cy="' + y + '" r="3.6"/>').join('') +
+      [-268, -256, -244].map((y) => '<circle cx="20" cy="' + y + '" r="3.6"/>').join('') +
+      '</g>');
+    s.push('<rect x="-13" y="-239" width="26" height="4" fill="#f2ead6" stroke="' + INK +
+      '" stroke-width="1.4"/>');
 
-      /* headstock: asymmetric, six pegs, like a Strat */
-      '<path d="M-11 -112h22l-4 -36c-6 -4 -14 -4 -19 0z" fill="#1b1230" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round"/>' +
-      '<g class="gt-pegs" fill="#ffd77a" stroke="' + INK + '" stroke-width="1.1">' +
-      '<circle cx="-9" cy="-122" r="2.8"/><circle cx="9" cy="-122" r="2.8"/>' +
-      '<circle cx="-10" cy="-132" r="2.8"/><circle cx="10" cy="-132" r="2.8"/>' +
-      '<circle cx="-11" cy="-142" r="2.8"/><circle cx="11" cy="-142" r="2.8"/></g>' +
-      '<rect x="-11" y="-113" width="22" height="3.4" fill="#efe6cf" stroke="' + INK + '" stroke-width="1.2"/>' +
+    // body: outline pass then fill pass
+    s.push('<path d="' + G_BODY + '" fill="' + INK + '" stroke="' + INK +
+      '" stroke-width="11" stroke-linejoin="round"/>');
+    s.push('<path class="gt-body" d="' + G_BODY + '" fill="#e8552b" stroke="' + INK + '" stroke-width="5"/>');
+    // rounded edge: a darker band inside the outline
+    s.push('<path d="' + G_BODY + '" fill="none" stroke="#b83a18" stroke-width="7" opacity=".55"/>');
 
-      /* the body: ink pass, then fill pass */
-      '<g transform="translate(0 -2)">' +
-      '<g class="gt-body" fill="' + INK + '" stroke="' + INK + '" stroke-width="9" stroke-linejoin="round">' +
-      union('') + '</g>' +
-      '<g fill="url(#gb)">' + union('') + '</g>' +
-      /* a soft inner shade so the body has a rounded edge */
-      '<g fill="#000" opacity=".10">' +
-      partEll([-4, 44, 26, 17], '') + partEll([-4, 22, 15, 8], '') + '</g>' +
-      '</g>' +
+    // the big cream pickguard
+    s.push('<path class="gt-guard" d="' + G_GUARD + '" fill="#fdf3de" stroke="' + INK + '" stroke-width="4"/>');
 
-      /* pickguard sweep, hardware, knobs */
-      '<path d="M-1 8c15 3 21 11 18 22-11 1-21-9-18-22z" fill="#fff8f2" opacity=".93" stroke="' + INK + '" stroke-width="1.6"/>' +
-      pickup(8) + pickup(20) + pickup(32) +
-      '<rect x="-18" y="40" width="34" height="9" rx="2.5" fill="url(#gm)" stroke="' + INK + '" stroke-width="2"/>' +
-      '<g stroke="' + INK + '" stroke-width="1" opacity=".65">' +
-      '<line x1="-13" y1="40" x2="-13" y2="49"/><line x1="-7" y1="40" x2="-7" y2="49"/>' +
-      '<line x1="-1" y1="40" x2="-1" y2="49"/><line x1="5" y1="40" x2="5" y2="49"/>' +
-      '<line x1="11" y1="40" x2="11" y2="49"/></g>' +
-      '<path d="M12 50l16 7 7 -7" fill="none" stroke="url(#gm)" stroke-width="3.4" stroke-linecap="round"/>' +
-      '<circle cx="12" cy="50" r="3.4" fill="#cbc3e6" stroke="' + INK + '" stroke-width="1.4"/>' +
-      '<g stroke="' + INK + '" stroke-width="1.6" fill="#fff8f2">' +
-      '<circle cx="16" cy="16" r="4.6"/><circle cx="-26" cy="36" r="4.6"/><circle cx="-26" cy="50" r="4.6"/></g>' +
-      '<g fill="#ffd77a"><circle cx="16" cy="16" r="1.5"/><circle cx="-26" cy="36" r="1.5"/><circle cx="-26" cy="50" r="1.5"/></g>' +
-      '<circle cx="-32" cy="58" r="3" fill="url(#gm)" stroke="' + INK + '" stroke-width="1.4"/>' +
-      '<circle cx="-34" cy="10" r="3" fill="url(#gm)" stroke="' + INK + '" stroke-width="1.4"/>' +
+    // three slanted single coils, bridge first
+    s.push(pickup(6, -7), pickup(20, -7), pickup(34, -7));
+    // bridge + tremolo
+    s.push('<rect x="-20" y="46" width="38" height="8" rx="2" fill="#cfc7e8" stroke="' + INK +
+      '" stroke-width="2.4"/>');
+    s.push('<g stroke="' + INK + '" stroke-width="1.1" opacity=".7">' +
+      [-15, -9, -3, 3, 9, 15].map((x) => '<line x1="' + x + '" y1="46" x2="' + x +
+        '" y2="54"/>').join('') + '</g>');
+    s.push('<path d="M16 50l14 12 10-4" fill="none" stroke="#cfc7e8" stroke-width="4" ' +
+      'stroke-linecap="round"/><circle cx="16" cy="50" r="4" fill="#9d93c4" stroke="' + INK +
+      '" stroke-width="1.6"/>');
+    // two knobs, on the guard, lower right
+    s.push(knob(16, 28, 5.6), knob(25, 38, 5.6));
+    // output jack + strap button
+    s.push('<circle cx="-34" cy="52" r="3.6" fill="#cfc7e8" stroke="' + INK +
+      '" stroke-width="1.6"/>');
+    s.push('<circle cx="-40" cy="-24" r="3.6" fill="#cfc7e8" stroke="' + INK +
+      '" stroke-width="1.6"/>');
 
-      /* six strings, from the saddles to the nut */
-      '<g class="gt-strings" stroke="#fff8ea" stroke-width="1.05" opacity=".9">' +
-      '<line x1="-13" y1="44" x2="-9" y2="-110"/><line x1="-7" y1="44" x2="-5" y2="-110"/>' +
-      '<line x1="-1" y1="44" x2="-1" y2="-110"/><line x1="5" y1="44" x2="3" y2="-110"/>' +
-      '<line x1="11" y1="44" x2="7" y2="-110"/></g>' +
+    // six strings, saddles to nut
+    s.push('<g class="gt-strings" stroke="#fffdf4" stroke-width="1.2" opacity=".92">' +
+      [-15, -9, -3, 3, 9, 15].map((x) => '<line x1="' + x + '" y1="47" x2="' +
+        (x * 0.62).toFixed(1) + '" y2="-238"/>').join('') + '</g>');
 
-      /* gloss */
-      '<path d="M-30 -14c6-6 14-9 22-8" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".38"/>' +
-      '<path d="M-24 54c9 4 20 2 25-4" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".2"/>' +
-      '</g>';
+    // gloss on the upper bout
+    s.push('<path d="M-40 -20c6-12 18-20 30-22" fill="none" stroke="#fff" stroke-width="5" ' +
+      'stroke-linecap="round" opacity=".3"/>');
+    s.push('</g>');
+    return s.join('');
   }
 
   /* ------------------------------------------------------------------ STUDIO */
