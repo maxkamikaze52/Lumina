@@ -49,7 +49,7 @@
 
   function hud(mode, stage) {
     const what = mode === 'studio' ? 'Studio · every table and every division'
-      : mode === 'garage' ? `Garage · ${stage === 'test' ? '3-minute test' : stage === 'study' ? 'study round' : 'full deck'}`
+      : mode === 'garage' ? `Garage · ${stage === 'test' ? 'the gig' : stage === 'study' ? 'learning round' : 'free play'}`
       : 'Soundcheck · 2–12';
     return `<div class="ts-hud"><span>${esc(what)} · answer as many as you can</span>
       <span id="ts-score">Correct 0</span></div>`;
@@ -224,13 +224,17 @@
 
   /* ------------------------------------------------------------ setup --- */
   /* STUDIO is always the full deck: every table 1-12, × and ÷, 60 seconds,
-     speed only.  GARAGE is the learning path: 3-minute tests and study rounds. */
+     speed only.  GARAGE is the learning path: a gig, then learning rounds. */
   async function start(mode) {
     try {
       const path = mode === 'garage' ? (PLAN || await App.API.get('/api/tablestar/plan')) : null;
       if (path) PLAN = path;
       const stage = mode === 'garage' ? (path.mode || 'test') : null;
-      if (path && !path.ready) { App.toast('Finish the study round first — then the test comes back.', 'x'); return; }
+      if (path && !path.ready) { App.toast('Finish the learning round first — then the next gig opens.', 'x'); return; }
+      if (path && path.locked && mode !== 'garage') {
+        App.toast('The Garage comes first: the gig, then what it exposes. Everything opens after that.', 'x');
+        return;
+      }
       const r = await App.API.post('/api/session/start',
         { game: 'tablestar', mode, difficulty: stage || mode,
           meta: { stage, tables: mode === 'studio' ? ALL_TABLES : (path ? path.targetTables : TS.tables),
@@ -300,23 +304,29 @@
   }
 
   /* ------------------------------------------------------------- menu --- */
+  /* Called by App.playGame: take over the screen with TableStar's world. */
+  App.openGame = async function (game) { App.playGame(game); };
+
+  function open() {
+    App.enterWorld('tablestar');
+    showMenu();
+  }
+
   /* Clicking a card SELECTS that section and the section's own panel opens
      below it — nothing launches until you press PLAY inside the panel. */
-  let TS_TAB = 'studio';
+  let TS_TAB = 'garage';
 
   function showMenu() {
     const main = App.stage();
     main.innerHTML = `<div class="stack ts">
       <div class="world-title">
         <span class="badge-pill">Maths at speed</span>
-        <span class="small muted">Pick a section, look at how you are doing, then press PLAY</span>
+        <span class="small muted">The Garage decides what you practise next</span>
       </div>
-      <div class="giant">PICK A <em>STAGE</em></div>
+      <div class="giant">YOUR <em>GIG</em></div>
 
       <div class="tilegrid" id="ts-cards">
-        ${ART.tile({ art: 'studio', name: 'STUDIO', sub: 'All tables × and ÷ · ranked', label: '#ffb36b', action: 'data-tab="studio"' })}
-        ${ART.tile({ art: 'garage', name: 'GARAGE', sub: 'Test, then study what bites', label: '#ffe08a', action: 'data-tab="garage"' })}
-        ${ART.tile({ art: 'speed', name: 'SOUNDCHECK', sub: '25 questions · 2–12', label: '#a8f0c8', action: 'data-tab="sound"' })}
+        ${ART.tile({ art: 'garage', name: 'THE GARAGE', sub: 'Gig, then learn what it exposes', label: '#ffe08a', action: 'data-tab="garage"' })}
       </div>
 
       <div id="ts-tab"></div>
@@ -419,26 +429,26 @@
     if (!p) { try { p = PLAN = await App.API.get('/api/tablestar/plan'); } catch (e) {} }
     if (!p) { host.innerHTML = '<div class="card flat muted">The Garage path could not be loaded.</div>'; return; }
     const steps = [
-      { t: '3-minute test', d: 'Every table, 1–12, all at once.' },
-      { t: 'Study the weak tables', d: 'Until those facts are secure.' },
-      { t: 'All tables + all divisions', d: 'Earned with three good tests in a row.' }
+      { t: 'The gig', d: 'Every table at once, to find your level.' },
+      { t: 'Learn what it exposes', d: 'Only the tables you struggled on.' },
+      { t: 'Another gig, then free play', d: 'All tables and divisions once you are secure.' }
     ];
     const order = p.stage === 'mastered' ? 2 : p.stage === 'study' ? 1 : 0;
     host.innerHTML = `<div class="card garage-card">
       <div class="between">
         <div><div class="eyebrow">Garage · the learning path</div>
           <h2 style="margin-top:4px">${esc(p.cta)}</h2></div>
-        <span class="pill ${p.mastered ? 'jade' : 'amber'}">${p.mastered ? 'Unlocked' : `Good tests in a row ${p.goodStreak}/${p.goodNeeded}`}</span>
+        <span class="pill ${p.mastered ? 'jade' : 'amber'}">${p.mastered ? 'Unlocked' : `Good gigs in a row ${p.goodStreak}/${p.goodNeeded}`}</span>
       </div>
       <p class="small muted">${esc(p.detail)}</p>
       <div class="steps">${steps.map((s, i) => `<div class="step ${i === order ? 'on' : ''} ${i < order ? 'done' : ''}">
         <b>${i + 1}</b><span>${esc(s.t)}</span></div>`).join('')}</div>
       <div class="row" style="margin-top:16px">
         <button class="btn jade big" data-mode="garage" ${p.ready ? '' : 'disabled'}>
-          ${icon('play')} ${esc(p.ready ? p.cta : 'Study round unfinished')}</button>
-        <span class="small muted">${p.seconds}s a round · ${p.secure}/${p.total} facts secure${p.targetTables.length ? ' · studying tables ' + p.targetTables.join(', ') : ''}</span>
+          ${icon('play')} ${esc(p.ready ? p.cta : 'Learning round unfinished')}</button>
+        <span class="small muted">${p.secure}/${p.total} facts secure${p.targetTables.length ? ' · learning tables ' + p.targetTables.join(', ') : ''}</span>
       </div>
-      ${p.lastTest ? `<p class="small muted" style="margin-top:10px">Last test: <b>${Math.round(p.lastTest.accuracy * 100)}%</b>
+      ${p.lastTest ? `<p class="small muted" style="margin-top:10px">Last gig: <b>${Math.round(p.lastTest.accuracy * 100)}%</b>
         at ${p.lastTest.perAnswer}s an answer${p.lastTest.excellent ? ' — excellent' : ''}.</p>` : ''}
     </div>
 

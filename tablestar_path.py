@@ -179,18 +179,17 @@ def plan(pid: str) -> dict:
             stage = "study"      # self-healing: the study round is not finished
 
     if stage == "test":
-        cta, detail = "Take the 3-minute test", (
-            "Three minutes, every table 1-12 at once. Whatever it exposes is what the "
-            "Garage makes you learn before it will test you again.")
+        cta, detail = "Play the gig", (
+            "Every table at once. Whatever the gig exposes is what the Garage makes you "
+            "learn before you are allowed another one.")
         secs, mode = TEST_SECONDS, "test"
     elif stage == "study":
-        detail = ("Study the tables the test found weak. You cannot take the test again "
-                  "until these facts are secure.")
-        cta, secs, mode = "Study the weak tables", STUDY_SECONDS, "study"
+        detail = ("Learn the tables the gig found weak. You cannot play another gig until "
+                  "these facts are secure.")
+        cta, secs, mode = "Learn the weak tables", STUDY_SECONDS, "study"
     else:
         cta, detail = "Everything is unlocked", (
-            "All the times tables and all the divisions, in the Garage and the Studio. "
-            "The test never comes back.")
+            "All the times tables and all the divisions, in the Garage and the Studio.")
         secs, mode = STUDY_SECONDS, "full"
 
     target_tables = [int(t) for t in targets]
@@ -207,6 +206,9 @@ def plan(pid: str) -> dict:
         "targetTables": target_tables,
         "targetsDone": done,
         "ready": stage != "study" or done,
+        # the learning curve is not optional: you must finish the gig path before
+        # the full-deck Studio or a free play is offered at all
+        "locked": not m["mastered"],
         "secure": secure, "total": total,
         "remaining": max(0, total - secure),
         "pct": round(secure / total * 100, 1) if total else 0,
