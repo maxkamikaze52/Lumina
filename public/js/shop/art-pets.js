@@ -49,87 +49,22 @@
     const SOFT = '<defs><radialGradient id="avSoft"><stop offset="0" stop-color="#000" stop-opacity=".34"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>';
     const accBack = acc && (acc.style === 'cape' || acc.style === 'wings');
     return `<svg class="avatar" viewBox="0 0 112 212" role="img" aria-label="${o.label || 'Player character'}">
-      ${DEFS}${SOFT}${bg}
+      ${DEFS}${bg}
       ${fx ? S.effect(fx.style, fx.colour) : ''}
       ${accBack ? S.accessory(acc.style, acc.colour) : ''}
       ${back ? S.back(back.style, back.colour) : ''}
       ${pet && pet.style === 'comet' ? '<circle cx="98" cy="134" r="28" fill="url(#petGlow)" opacity=".18"/>' : ''}
-      <!-- soft contact shadow, plus a tighter one right under the feet -->
-      <ellipse cx="56" cy="207" rx="36" ry="7" fill="url(#avSoft)"/>
-      <ellipse cx="56" cy="205" rx="20" ry="3.4" fill="rgba(0,0,0,.28)"/>
-
-      <!-- legs: two tapered limbs with a shadow between them, under the clothes -->
-      <path d="M48 150c-1 16-2 30-1 46" stroke="${sk}" stroke-width="15"
-        stroke-linecap="round" fill="none"/>
-      <path d="M64 150c1 16 2 30 1 46" stroke="${sk}" stroke-width="15"
-        stroke-linecap="round" fill="none"/>
-      <path d="M48 150c-1 16-2 30-1 46" stroke="rgba(0,0,0,.10)" stroke-width="5"
-        stroke-linecap="round" fill="none" transform="translate(4 0)"/>
-      <path d="M64 150c1 16 2 30 1 46" stroke="rgba(255,255,255,.14)" stroke-width="4"
-        stroke-linecap="round" fill="none" transform="translate(-3 0)"/>
-      <path d="M56 156v40" stroke="rgba(0,0,0,.16)" stroke-width="6" stroke-linecap="round"/>
-
-      <!-- neck: narrower than the head, with a shadow under the jaw -->
-      <path d="M50 72h12v24H50z" fill="${sk}"/>
-      <path d="M50 72v24h4V72z" fill="rgba(0,0,0,.07)"/>
-      <path d="M61 72v24h1V72z" fill="rgba(255,255,255,.12)"/>
-      <ellipse cx="56" cy="80" rx="7.4" ry="3.6" fill="rgba(0,0,0,.20)"/>
-
-      <!-- shoulders / upper chest, under the clothes -->
-      <path d="M38 94q18-7 36 0l6 24H32z" fill="${sk}"/>
-      <path d="M38 94q10-4 18-4" stroke="rgba(255,255,255,.16)" stroke-width="3"
-        fill="none" stroke-linecap="round"/>
-
+      ${SOFT}
+      ${S.body ? S.body(sk) : ''}
       ${bottom ? S.bottom(bottom.style, bottom.colour) : ''}
       ${shoes ? S.shoes(shoes.style, shoes.colour) : ''}
       ${top ? S.top(top.style, top.colour) : ''}
+      ${hair ? `<g fill="${hc ? hc.colour : '#3b2a20'}" class="av-hair">${S.hair(hair.style)}</g>` : ''}
+      ${eyes ? S.eyes(eyes.style, ec && ec.colour) : ''}
+      ${mouth ? S.mouth(mouth.style) : ''}
+      ${hat ? S.hat(hat.style, hat.colour) : ''}
+      ${acc && !accBack ? S.accessory(acc.style, acc.colour) : ''}
 
-      <!-- arms: shoulder, elbow, wrist and a hand, with a shadow side -->
-      <g class="av-arms">
-        <path d="M39 101c-5 10-7 22-6 33 1 8 2 13 3 16" stroke="${sk}" stroke-width="12"
-          stroke-linecap="round" fill="none"/>
-        <path d="M39 101c-5 10-7 22-6 33 1 8 2 13 3 16" stroke="rgba(255,255,255,.18)"
-          stroke-width="4" stroke-linecap="round" fill="none" transform="translate(-2 -1)"/>
-        <path d="M39 101c-5 10-7 22-6 33 1 8 2 13 3 16" stroke="rgba(0,0,0,.10)"
-          stroke-width="4" stroke-linecap="round" fill="none" transform="translate(4 2)"/>
-        <path d="M73 101c5 10 7 22 6 33-1 8-2 13-3 16" stroke="${sk}" stroke-width="12"
-          stroke-linecap="round" fill="none"/>
-        <path d="M73 101c5 10 7 22 6 33-1 8-2 13-3 16" stroke="rgba(255,255,255,.18)"
-          stroke-width="4" stroke-linecap="round" fill="none" transform="translate(2 -1)"/>
-        <path d="M73 101c5 10 7 22 6 33-1 8-2 13-3 16" stroke="rgba(0,0,0,.10)"
-          stroke-width="4" stroke-linecap="round" fill="none" transform="translate(-4 2)"/>
-        <!-- hands -->
-        <ellipse cx="35" cy="152" rx="5.6" ry="6.4" fill="${sk}"/>
-        <ellipse cx="38.4" cy="149" rx="2.2" ry="3" fill="${sk}"/>
-        <path d="M31 155a5 5 0 0 1 7 1" stroke="rgba(0,0,0,.14)" stroke-width="2"
-          fill="none" stroke-linecap="round"/>
-        <ellipse cx="77" cy="152" rx="5.6" ry="6.4" fill="${sk}"/>
-        <ellipse cx="73.6" cy="149" rx="2.2" ry="3" fill="${sk}"/>
-        <path d="M74 156a5 5 0 0 1 7-1" stroke="rgba(0,0,0,.14)" stroke-width="2"
-          fill="none" stroke-linecap="round"/>
-      </g>
-
-      <!-- head: scaled down for a more human proportion, shaded like a sphere -->
-      <g transform="translate(56 54) scale(.87) translate(-56 -54)">
-        <ellipse cx="32" cy="59" rx="4.4" ry="5.2" fill="${sk}"/>
-        <ellipse cx="34" cy="60.5" rx="2.4" ry="2.8" fill="rgba(0,0,0,.14)"/>
-        <ellipse cx="80" cy="59" rx="4.4" ry="5.2" fill="${sk}"/>
-        <ellipse cx="78" cy="60.5" rx="2.4" ry="2.8" fill="rgba(0,0,0,.14)"/>
-        <circle cx="56" cy="56" r="26" fill="${sk}"/>
-        <ellipse cx="46" cy="44" rx="17" ry="14" fill="#fff" opacity=".12"/>
-        <path d="M76 68a26 26 0 0 1-34 8" stroke="rgba(0,0,0,.10)" stroke-width="10"
-          fill="none" stroke-linecap="round"/>
-        <path d="M36 62a26 26 0 0 1 8-18" stroke="rgba(255,255,255,.16)" stroke-width="4"
-          fill="none" stroke-linecap="round"/>
-        <ellipse cx="56" cy="78" rx="12" ry="4" fill="rgba(0,0,0,.07)"/>
-        ${hair ? `<g fill="${hc ? hc.colour : '#3b2a20'}">${S.hair(hair.style)}</g>` : ''}
-        <path d="M34 40q22-12 44 0" stroke="rgba(0,0,0,.10)" stroke-width="4" fill="none"
-          stroke-linecap="round"/>
-        ${eyes ? S.eyes(eyes.style, ec && ec.colour) : ''}
-        ${mouth ? S.mouth(mouth.style) : ''}
-        ${hat ? S.hat(hat.style, hat.colour) : ''}
-        ${acc && !accBack ? S.accessory(acc.style, acc.colour) : ''}
-      </g>
       ${pet ? `<g transform="translate(98 138)">${S.pets(pet.style, pet.colour)}</g>` : ''}
     </svg>`;
   };
