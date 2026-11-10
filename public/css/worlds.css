@@ -56,8 +56,7 @@
     conic-gradient(from 265deg at 50% -14%, transparent 0deg, rgba(255,215,130,.16) 10deg, transparent 22deg)}
 .world-tablestar .world-bar{background:linear-gradient(180deg,rgba(20,10,40,.85),rgba(20,10,40,0))}
 .world-tablestar .logo{color:#ffd77a}
-.world-tablestar .world-bar{background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,0))}
-.world-tablestar .logo{color:#b8422a}
+.world-tablestar .logo{color:#ffd77a}
 .world-tablestar .ts-play{
   background:linear-gradient(170deg,#fffdf8,#fdf2e6);
   border:4px solid #fff;border-radius:18px;
@@ -160,7 +159,7 @@
 #world .mode-btn strong{color:#22305a}
 #world .mode-btn span{color:#67759c}
 #world .eyebrow{color:#8b97b8}
-#world h1,#world h2,#world h3{color:#22305a}
+#world h1,#world h2,#world h3{color:#f4f0ff}
 #world .small.muted,#world .muted{color:#67759c}
 #world .res-hero b{color:#22305a}
 #world .res-grid span{color:#8b97b8}
@@ -177,3 +176,30 @@
   #warp.go{animation:none;opacity:0}
   #world{transition:none;transform:none}
 }
+
+/* ---- TableStar: the venue art behind everything ------------------------ */
+.world-tablestar .venue{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.world-tablestar .venue svg{position:absolute;inset:0;width:100%;height:100%;display:block;
+  opacity:.85;filter:saturate(1.05)}
+.world-tablestar .venue::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(10,6,22,.55) 0%,rgba(10,6,22,.15) 38%,rgba(10,6,22,.72) 100%)}
+.world-tablestar .world-body,.world-tablestar .world-bar{position:relative;z-index:2}
+
+/* the artist name in the bar, outlined like a poster */
+.world-tablestar .logo{font-family:var(--metal);letter-spacing:.02em;font-size:22px;
+  -webkit-text-stroke:1.5px #120a26;text-shadow:0 3px 0 #120a26}
+.world-tablestar .world-back{background:#fff;color:#1a0f33;border:3px solid #120a26;
+  border-radius:8px;box-shadow:0 4px 0 #120a26;font-family:var(--metal);font-size:15px;padding:9px 18px}
+.world-tablestar .world-bits .w{background:rgba(10,6,22,.6);border:2px solid rgba(255,255,255,.22);
+  border-radius:8px;color:#fff}
+
+/* ---- the GIG wordmark: outlined, poster-y ------------------------------ */
+#world .giant{font-family:var(--metal);letter-spacing:.01em;line-height:.95;
+  -webkit-text-stroke:3px #120a26;text-shadow:0 5px 0 #120a26}
+.world-tablestar .giant{color:#2b1f52}
+.world-tablestar .giant em{color:#ff9a3c;font-style:normal;
+  -webkit-text-stroke:3px #120a26;text-shadow:0 5px 0 #120a26}
+
+/* mode cards on the dark floor: thick outline, flat poster face */
+.tile-card{border:4px solid #120a26;box-shadow:0 8px 0 #120a26, 0 22px 40px -24px rgba(0,0,0,.8)}
+.tile-card:hover{transform:translateY(-5px) rotate(-.4deg);box-shadow:0 12px 0 #120a26, 0 26px 46px -22px rgba(0,0,0,.85)}

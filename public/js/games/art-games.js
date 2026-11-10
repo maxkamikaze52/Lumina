@@ -193,3 +193,102 @@
     </button>`;
   };
 })();
+
+/* -------------------------------------------------------------------------
+   The TableStar venue: a dark hall, a lit stage with screens, haze and a
+   silhouette crowd with their hands up. Drawn once behind the world.
+   ------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+  const S = window.ART;
+
+  S.concert = function () {
+    // a simple hand-up silhouette, repeated at different sizes along the floor
+    const hand = (x, y, s, rot) => `
+      <g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">
+        <circle cx="0" cy="-34" r="15"/>
+        <path d="M-20 -18q20 -8 40 0v34h-40z"/>
+        <path d="M-15 -20l-9 -46 8 -2 11 40z"/>
+        <path d="M16 -20l11 -50 8 2 -9 52z"/>
+      </g>`;
+    const heads = [];
+    let x = -30, i = 0;
+    while (x < 1640) {
+      const s = 1.5 + (i % 3) * 0.22;
+      const y = 560 + (i % 2) * 16;
+      heads.push(hand(x, y, s, (i % 2 ? 6 : -5)));
+      x += 74 + (i % 4) * 12;
+      i++;
+    }
+    const spot = (x, color, rot, w) => `
+      <g transform="rotate(${rot} ${x} 0)" opacity=".55">
+        <polygon points="${x - 10},0 ${x + 10},0 ${x + w},620 ${x - w},620" fill="url(#beam-${color})"/>
+      </g>`;
+    return `<svg viewBox="0 0 1600 700" preserveAspectRatio="xMidYMax slice"
+      xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="beam-m" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ff6fd8" stop-opacity=".75"/>
+          <stop offset="1" stop-color="#ff6fd8" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="beam-b" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#6fb8ff" stop-opacity=".7"/>
+          <stop offset="1" stop-color="#6fb8ff" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="beam-o" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffb75e" stop-opacity=".7"/>
+          <stop offset="1" stop-color="#ffb75e" stop-opacity="0"/>
+        </linearGradient>
+        <radialGradient id="haze" cx=".5" cy=".1" r=".9">
+          <stop offset="0" stop-color="#7a5cff" stop-opacity=".38"/>
+          <stop offset="1" stop-color="#7a5cff" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="stageglow" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#ffe6b0" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#ffe6b0" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <rect width="1600" height="700" fill="#0a0616"/>
+      <ellipse cx="800" cy="120" rx="900" ry="420" fill="url(#haze)"/>
+
+      <!-- beams -->
+      ${spot(210, 'm', 7, 190)}
+      ${spot(470, 'b', 3, 150)}
+      ${spot(800, 'o', 0, 130)}
+      ${spot(1130, 'b', -3, 150)}
+      ${spot(1390, 'm', -7, 190)}
+
+      <!-- side speaker stacks -->
+      <g fill="#0d0a1c" stroke="#241a3f" stroke-width="3">
+        <rect x="60" y="150" width="120" height="360" rx="8"/>
+        <rect x="1420" y="150" width="120" height="360" rx="8"/>
+      </g>
+      <g fill="#3a2a63">
+        <circle cx="120" cy="220" r="16"/><circle cx="120" cy="290" r="16"/>
+        <circle cx="120" cy="360" r="16"/><circle cx="120" cy="430" r="16"/>
+        <circle cx="1480" cy="220" r="16"/><circle cx="1480" cy="290" r="16"/>
+        <circle cx="1480" cy="360" r="16"/><circle cx="1480" cy="430" r="16"/>
+      </g>
+
+      <!-- stage -->
+      <ellipse cx="800" cy="520" rx="520" ry="130" fill="url(#stageglow)"/>
+      <g>
+        <rect x="520" y="300" width="560" height="150" rx="10" fill="#150f2b" stroke="#2c2148" stroke-width="3"/>
+        <rect x="548" y="322" width="230" height="106" rx="6" fill="#221641" opacity=".9"/>
+        <rect x="822" y="322" width="230" height="106" rx="6" fill="#221641" opacity=".9"/>
+        <!-- performer silhouettes on the stage -->
+        <g fill="#05030c">
+          <circle cx="700" cy="372" r="15"/><path d="M676 400h48v50h-48z"/>
+          <circle cx="900" cy="366" r="17"/><path d="M874 396h52v54h-52z"/>
+          <path d="M896 350l34 -28 6 8 -32 26z"/>
+        </g>
+        <rect x="500" y="450" width="600" height="16" rx="4" fill="#0b0718"/>
+      </g>
+
+      <!-- crowd, silhouetted against the light -->
+      <g fill="#05030c">${heads.join('')}</g>
+      <rect y="596" width="1600" height="104" fill="#05030c"/>
+    </svg>`;
+  };
+})();

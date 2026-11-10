@@ -324,6 +324,12 @@
 
   function open() {
     App.enterWorld('tablestar');
+    // the venue: a dark hall, a lit stage and a crowd with their hands up
+    const host = document.getElementById('world');
+    if (host && !host.querySelector('.venue')) {
+      host.insertAdjacentHTML('afterbegin',
+        `<div class="venue" aria-hidden="true">${ART.concert()}</div>`);
+    }
     showMenu();
   }
 
