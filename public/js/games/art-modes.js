@@ -42,84 +42,102 @@
   const vignette = (id) => `<rect width="320" height="160" fill="url(#${id}v)"/>`;
 
   /* ------------------------------------------------------------------ GARAGE */
+  /* A Strat-style electric guitar.  The body is built as a UNION of overlapping
+     shapes drawn twice — once with a thick ink outline, once filled without a
+     stroke — which gives one clean double-cutaway silhouette (two horns, a
+     waist, two rounded bouts) with no internal seams.  That silhouette is what
+     makes it read as an electric guitar rather than an acoustic blob. */
+  const BODY_PARTS = [
+    [-4, 40, 31, 23],    // lower bout
+    [-4, 16, 19, 13],    // waist
+    [-4, -2, 25, 15],    // upper bout
+    [-26, -18, 10, 13],  // left horn (longer)
+    [14, -14, 9, 11]     // right horn
+  ];
+  const partEll = (p, attrs) => '<ellipse cx="' + p[0] + '" cy="' + p[1] +
+    '" rx="' + p[2] + '" ry="' + p[3] + '" ' + attrs + '/>';
+
   function guitar() {
-    return `<g transform="translate(150 84) rotate(-16)">
-      <!-- floor shadow -->
-      <ellipse cx="6" cy="74" rx="46" ry="9" fill="#000" opacity=".45"/>
-      <!-- strap button -->
-      <circle cx="-44" cy="18" r="3.2" fill="${INK}"/>
+    const union = (attrs) => BODY_PARTS.map((p) => partEll(p, attrs)).join('');
+    const pickup = (y) => '<g transform="rotate(-5 -2 ' + y + ')">' +
+      '<rect x="-16" y="' + y + '" width="30" height="7" rx="2.5" fill="#f2ecff" stroke="' + INK + '" stroke-width="1.8"/>' +
+      '<circle cx="-9" cy="' + (y + 3.5) + '" r="1" fill="#6b6290"/>' +
+      '<circle cx="-2" cy="' + (y + 3.5) + '" r="1" fill="#6b6290"/>' +
+      '<circle cx="6" cy="' + (y + 3.5) + '" r="1" fill="#6b6290"/></g>';
+    return '<g transform="translate(154 86) rotate(-18) scale(1.05)">' +
+      '<defs>' +
+      '<linearGradient id="gb" x1=".1" y1="0" x2=".9" y2="1">' +
+      '<stop offset="0" stop-color="#ff8394"/><stop offset=".35" stop-color="#e63a56"/>' +
+      '<stop offset=".72" stop-color="#b41f3b"/><stop offset="1" stop-color="#780f24"/></linearGradient>' +
+      '<linearGradient id="gn" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#f2c894"/><stop offset=".5" stop-color="#cb8a48"/>' +
+      '<stop offset="1" stop-color="#7d4a1e"/></linearGradient>' +
+      '<linearGradient id="gm" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#efeaf9"/><stop offset=".5" stop-color="#a49cc8"/>' +
+      '<stop offset="1" stop-color="#5b5480"/></linearGradient>' +
+      '<linearGradient id="gf" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#2e1d16"/><stop offset="1" stop-color="#160d0a"/>' +
+      '</linearGradient>' +
+      '</defs>' +
 
-      <!-- body, gradient + gloss -->
-      <defs>
-        <linearGradient id="gbody" x1="0" y1="0" x2="0.4" y2="1">
-          <stop offset="0" stop-color="#ff6f81"/><stop offset=".5" stop-color="#e8455e"/>
-          <stop offset="1" stop-color="#a51f38"/>
-        </linearGradient>
-        <linearGradient id="gneck" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#e8b47a"/><stop offset=".55" stop-color="#c98b4a"/>
-          <stop offset="1" stop-color="#8f5c28"/>
-        </linearGradient>
-      </defs>
-      <path d="M-8 -4c-26 -4 -40 10 -38 26 1 12 10 16 12 24 3 14 16 22 30 20
-               12-1 20-9 22-18 2-10-2-16 2-24 5-11-4-24-28-28z"
-        fill="url(#gbody)" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
-      <!-- edge highlight along the top bout -->
-      <path d="M-30 -1c-10 3-15 11-14 20" fill="none" stroke="#ffc2cb" stroke-width="3"
-        stroke-linecap="round" opacity=".8"/>
-      <!-- gloss streak -->
-      <path d="M-18 44c8 2 16-1 20-8" fill="none" stroke="#fff" stroke-width="4"
-        stroke-linecap="round" opacity=".28"/>
-      <!-- waist cutaway -->
-      <path d="M-42 32c7 4 11 11 13 19" fill="none" stroke="${INK}" stroke-width="3"
-        opacity=".45"/>
-      <!-- pickguard -->
-      <path d="M2 8c11 2 13 13 8 21-7-4-11-13-8-21z" fill="#fff8f0" opacity=".92"
-        stroke="${INK}" stroke-width="2"/>
-      <!-- sound hole + rosette rings -->
-      <circle cx="-6" cy="12" r="12" fill="#120a1e"/>
-      <circle cx="-6" cy="12" r="12" fill="none" stroke="${INK}" stroke-width="2"/>
-      <circle cx="-6" cy="12" r="15" fill="none" stroke="#ffd77a" stroke-width="2.4"/>
-      <circle cx="-6" cy="12" r="17.5" fill="none" stroke="#fff3cf" stroke-width="1"
-        opacity=".7"/>
-      <!-- pickup + bridge + tailpiece -->
-      <rect x="-18" y="26" width="26" height="7" rx="3" fill="#2a1f45" stroke="${INK}" stroke-width="2"/>
-      <rect x="-14" y="28" width="4" height="3" fill="#8f86b8"/><rect x="-6" y="28" width="4" height="3" fill="#8f86b8"/>
-      <rect x="-16" y="35" width="22" height="5" rx="2" fill="#cbb9ff" stroke="${INK}" stroke-width="2"/>
-      <rect x="-18" y="42" width="26" height="4" rx="2" fill="#9a8ac9"/>
-      <!-- knobs -->
-      <circle cx="15" cy="30" r="4" fill="${INK}"/><circle cx="15" cy="30" r="1.6" fill="#ffd77a"/>
-      <circle cx="23" cy="23" r="4" fill="${INK}"/><circle cx="23" cy="23" r="1.6" fill="#ffd77a"/>
+      '<ellipse cx="4" cy="84" rx="54" ry="10" fill="#000" opacity=".5"/>' +
 
-      <!-- neck -->
-      <rect x="-8" y="-84" width="17" height="86" rx="3" fill="url(#gneck)"
-        stroke="${INK}" stroke-width="4"/>
-      <!-- fretboard + frets + inlays -->
-      <rect x="-5.5" y="-82" width="12" height="80" fill="#2a1a12" opacity=".55"/>
-      <g stroke="#cbb9a0" stroke-width="1.8" opacity=".95">
-        <line x1="-8" y1="-72" x2="9" y2="-72"/><line x1="-8" y1="-62" x2="9" y2="-62"/>
-        <line x1="-8" y1="-52" x2="9" y2="-52"/><line x1="-8" y1="-41" x2="9" y2="-41"/>
-        <line x1="-8" y1="-29" x2="9" y2="-29"/><line x1="-8" y1="-17" x2="9" y2="-17"/>
-      </g>
-      <g fill="#fff8e0" opacity=".9">
-        <circle cx="0.5" cy="-67" r="1.8"/><circle cx="0.5" cy="-47" r="1.8"/>
-        <circle cx="0.5" cy="-23" r="1.8"/>
-      </g>
-      <!-- strings from tailpiece to nut -->
-      <g stroke="#fff6e2" stroke-width="1.05" opacity=".95">
-        <line x1="-13" y1="42" x2="-5" y2="-82"/><line x1="-9" y1="42" x2="-2" y2="-82"/>
-        <line x1="-5" y1="42" x2="1" y2="-82"/><line x1="-1" y1="42" x2="4" y2="-82"/>
-        <line x1="3" y1="42" x2="7" y2="-82"/>
-      </g>
-      <!-- nut -->
-      <rect x="-9" y="-84" width="19" height="3" fill="#efe6cf" stroke="${INK}" stroke-width="1.4"/>
-      <!-- headstock + pegs -->
-      <path d="M-9 -85h19l5 -26h-29z" fill="#20143c" stroke="${INK}" stroke-width="4"
-        stroke-linejoin="round"/>
-      <g fill="#ffd77a" stroke="${INK}" stroke-width="1.2">
-        <circle cx="-4" cy="-96" r="3"/><circle cx="5" cy="-96" r="3"/>
-        <circle cx="-2" cy="-105" r="3"/><circle cx="7" cy="-105" r="3"/>
-      </g>
-    </g>`;
+      /* neck first, so the body covers its join */
+      '<rect x="-11" y="-112" width="22" height="92" fill="url(#gn)" stroke="' + INK + '" stroke-width="4"/>' +
+      '<rect x="-8" y="-110" width="16" height="88" fill="url(#gf)" stroke="' + INK + '" stroke-width="1.6"/>' +
+      '<g stroke="#d8d2e8" stroke-width="1.5" opacity=".9">' +
+      '<line x1="-8" y1="-100" x2="8" y2="-100"/><line x1="-8" y1="-89" x2="8" y2="-89"/>' +
+      '<line x1="-8" y1="-78" x2="8" y2="-78"/><line x1="-8" y1="-67" x2="8" y2="-67"/>' +
+      '<line x1="-8" y1="-56" x2="8" y2="-56"/><line x1="-8" y1="-45" x2="8" y2="-45"/>' +
+      '<line x1="-8" y1="-34" x2="8" y2="-34"/></g>' +
+      '<g fill="#fff8e6" opacity=".85">' +
+      '<circle cx="0" cy="-95" r="1.7"/><circle cx="0" cy="-73" r="1.7"/>' +
+      '<circle cx="0" cy="-51" r="1.7"/><circle cx="0" cy="-29" r="1.7"/></g>' +
+
+      /* headstock: asymmetric, six pegs, like a Strat */
+      '<path d="M-11 -112h22l-4 -36c-6 -4 -14 -4 -19 0z" fill="#1b1230" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round"/>' +
+      '<g class="gt-pegs" fill="#ffd77a" stroke="' + INK + '" stroke-width="1.1">' +
+      '<circle cx="-9" cy="-122" r="2.8"/><circle cx="9" cy="-122" r="2.8"/>' +
+      '<circle cx="-10" cy="-132" r="2.8"/><circle cx="10" cy="-132" r="2.8"/>' +
+      '<circle cx="-11" cy="-142" r="2.8"/><circle cx="11" cy="-142" r="2.8"/></g>' +
+      '<rect x="-11" y="-113" width="22" height="3.4" fill="#efe6cf" stroke="' + INK + '" stroke-width="1.2"/>' +
+
+      /* the body: ink pass, then fill pass */
+      '<g transform="translate(0 -2)">' +
+      '<g class="gt-body" fill="' + INK + '" stroke="' + INK + '" stroke-width="9" stroke-linejoin="round">' +
+      union('') + '</g>' +
+      '<g fill="url(#gb)">' + union('') + '</g>' +
+      /* a soft inner shade so the body has a rounded edge */
+      '<g fill="#000" opacity=".10">' +
+      partEll([-4, 44, 26, 17], '') + partEll([-4, 22, 15, 8], '') + '</g>' +
+      '</g>' +
+
+      /* pickguard sweep, hardware, knobs */
+      '<path d="M-1 8c15 3 21 11 18 22-11 1-21-9-18-22z" fill="#fff8f2" opacity=".93" stroke="' + INK + '" stroke-width="1.6"/>' +
+      pickup(8) + pickup(20) + pickup(32) +
+      '<rect x="-18" y="40" width="34" height="9" rx="2.5" fill="url(#gm)" stroke="' + INK + '" stroke-width="2"/>' +
+      '<g stroke="' + INK + '" stroke-width="1" opacity=".65">' +
+      '<line x1="-13" y1="40" x2="-13" y2="49"/><line x1="-7" y1="40" x2="-7" y2="49"/>' +
+      '<line x1="-1" y1="40" x2="-1" y2="49"/><line x1="5" y1="40" x2="5" y2="49"/>' +
+      '<line x1="11" y1="40" x2="11" y2="49"/></g>' +
+      '<path d="M12 50l16 7 7 -7" fill="none" stroke="url(#gm)" stroke-width="3.4" stroke-linecap="round"/>' +
+      '<circle cx="12" cy="50" r="3.4" fill="#cbc3e6" stroke="' + INK + '" stroke-width="1.4"/>' +
+      '<g stroke="' + INK + '" stroke-width="1.6" fill="#fff8f2">' +
+      '<circle cx="16" cy="16" r="4.6"/><circle cx="-26" cy="36" r="4.6"/><circle cx="-26" cy="50" r="4.6"/></g>' +
+      '<g fill="#ffd77a"><circle cx="16" cy="16" r="1.5"/><circle cx="-26" cy="36" r="1.5"/><circle cx="-26" cy="50" r="1.5"/></g>' +
+      '<circle cx="-32" cy="58" r="3" fill="url(#gm)" stroke="' + INK + '" stroke-width="1.4"/>' +
+      '<circle cx="-34" cy="10" r="3" fill="url(#gm)" stroke="' + INK + '" stroke-width="1.4"/>' +
+
+      /* six strings, from the saddles to the nut */
+      '<g class="gt-strings" stroke="#fff8ea" stroke-width="1.05" opacity=".9">' +
+      '<line x1="-13" y1="44" x2="-9" y2="-110"/><line x1="-7" y1="44" x2="-5" y2="-110"/>' +
+      '<line x1="-1" y1="44" x2="-1" y2="-110"/><line x1="5" y1="44" x2="3" y2="-110"/>' +
+      '<line x1="11" y1="44" x2="7" y2="-110"/></g>' +
+
+      /* gloss */
+      '<path d="M-30 -14c6-6 14-9 22-8" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".38"/>' +
+      '<path d="M-24 54c9 4 20 2 25-4" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".2"/>' +
+      '</g>';
   }
 
   /* ------------------------------------------------------------------ STUDIO */
