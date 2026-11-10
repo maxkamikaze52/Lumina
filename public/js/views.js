@@ -76,7 +76,7 @@
               <span><b class="num">${num(p.xp)}</b> XP${cls.next ? ` · ${num(cls.toNext)} to go` : ''}</span></div>
             <div class="track lvl"><i style="width:${cls.pct}%"></i></div>
             <div class="lvl-strip">
-              ${(s.stats.stages || []).map((st) => `<span class="lvl-pip stage ${st.from <= cls.n ? 'on' : ''}
+              ${(s.stats.stages || []).map((st) => `<span class="lvl-pip pip ${st.from <= cls.n ? 'on' : ''}
                 ${st.from <= cls.n && cls.n <= st.to ? 'me' : ''}"
                 title="${esc(st.name)} · levels ${st.from}–${st.to}">
                 <span style="display:contents;--glow:${ART.crestGlow(st.to)}">${ART.levelCrest(st.to, { size: 46, locked: st.from > cls.n })}</span></span>`).join('')}

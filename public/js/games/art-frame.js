@@ -15,7 +15,8 @@
     const svg = (window.ART.avatar(equipped, { background: false, label }) || '');
     // the avatar is drawn in a 112x212 box with the head around y=52; zoom in on it
     return svg.replace('<svg class="avatar"', '<svg class="avatar avatar-head"')
-      .replace('viewBox="0 0 112 212"', 'viewBox="18 6 76 76" preserveAspectRatio="xMidYMid slice"');
+      // head AND shoulders / the top of the outfit, so the badge shows who it is
+      .replace('viewBox="0 0 112 212"', 'viewBox="13 2 86 92" preserveAspectRatio="xMidYMid slice"');
   };
 
   A.avatarFrame = function (level, opts) {
