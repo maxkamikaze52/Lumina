@@ -1,0 +1,19 @@
+# the local database holds real player data — never publish it
+data/astrolab.db
+data/*.db
+backups/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# editors / OS
+.DS_Store
+.vscode/
+.idea/
+
+# scratch copies
+*.bak
+*.orig

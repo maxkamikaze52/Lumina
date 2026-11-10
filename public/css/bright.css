@@ -1,0 +1,160 @@
+/* Astrolab — bright, childlike layer.
+   Loaded last: repaints the shell in daylight colours and adds the full-screen
+   "world" that each game takes over when you press Play. */
+:root{
+  --ink:#23305c;          /* deep blue text on light paper */
+  --ink2:#ffffff;
+  --ink3:#eef3fd;
+  --line:#dbe4f6;
+  --paper:#23305c;
+  --cream:#fffaf0;
+  --muted:#67759c;
+  --jade:#17bd93; --amber:#ffbe2e; --coral:#ff7a59; --sky:#4aa8ff;
+  --rose:#ff6f9c; --plum:#a97bff; --lime:#9be15d;
+  --ts:#ff7a59; --sb:#17bd93; --wq:#4aa8ff;
+  --shadow:0 12px 0 -6px rgba(35,48,92,.10), 0 18px 40px -22px rgba(35,48,92,.35);
+  --edge:1px solid #e4ebfa;
+  --display:"Fredoka","Bricolage Grotesque",system-ui,sans-serif;
+  --font:"Outfit",system-ui,sans-serif;
+}
+body{
+  background:
+    radial-gradient(900px 520px at 88% -6%, #ffe9c9 0%, transparent 62%),
+    radial-gradient(800px 480px at 4% 2%, #d9f0ff 0%, transparent 60%),
+    radial-gradient(700px 420px at 50% 108%, #e2fbef 0%, transparent 62%),
+    #fdf7ee;
+  color:var(--ink); font-size:16.5px;
+}
+body::before{opacity:.55;
+  background-image:radial-gradient(rgba(35,48,92,.13) 1px,transparent 1px);
+  background-size:26px 26px;
+  mask-image:radial-gradient(circle at 50% 20%,#000 15%,transparent 72%)}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;letter-spacing:-.01em;color:#22305a}
+h1{font-weight:700}
+.eyebrow{color:#7b88ad}
+.muted{color:var(--muted)}
+.lead{color:#4c5c85}
+
+/* ---------- app shell ---------- */
+.topbar{background:rgba(255,255,255,.86);border-bottom:1px solid #eaf0fb;
+  box-shadow:0 4px 18px -12px rgba(35,48,92,.25)}
+.brand-word{color:#22305a;font-family:var(--display);font-weight:700;font-size:22px}
+.tab{color:#6b7899;font-weight:600}
+.tab:hover{color:#22305a;background:#eef3fd}
+.tab.on{background:#22305a;color:#fff}
+.chip{background:#fff;border:2px solid #e8eefb;color:#22305a;box-shadow:0 3px 0 #e8eefb}
+.xp b{color:#12a37f} .bits b{color:#e09a00}
+.chip .lbl{color:#8b97b8}
+.avatar-btn{background:#fff;border:3px solid #fff;box-shadow:0 4px 12px -4px rgba(35,48,92,.3)}
+
+/* cards */
+.card{background:#fff;border:2px solid #eef2fb;border-radius:24px;box-shadow:var(--shadow)}
+.card.flat{background:#f7faff;border:2px solid #e9effb;box-shadow:none}
+.empty{border:2px dashed #d9e3f6;color:#7b88ad;background:#fbfdff}
+
+/* buttons: chunky and pressable */
+.btn{background:#22305a;color:#fff;border-radius:16px;font-family:var(--display);font-weight:600;
+  box-shadow:0 4px 0 #16203f;padding:13px 22px;transition:transform .12s,box-shadow .12s,filter .12s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 0 #16203f;filter:brightness(1.06)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #16203f}
+.btn.ghost{background:#fff;color:#22305a;border:2px solid #e5ecfa;box-shadow:0 4px 0 #e5ecfa}
+.btn.ghost:hover{background:#f6f9ff}
+.btn.jade{background:var(--jade);color:#04372c;box-shadow:0 4px 0 #0e9c79}
+.btn.amber{background:var(--amber);color:#3a2a00;box-shadow:0 4px 0 #d99c10}
+.btn.coral{background:var(--coral);color:#fff;box-shadow:0 4px 0 #d9532f}
+.btn.sm{border-radius:13px;box-shadow:0 3px 0 rgba(35,48,92,.25)}
+.btn.jade.sm{box-shadow:0 3px 0 #0e9c79}
+
+/* hero */
+.hero{
+  background:
+    radial-gradient(520px 260px at 86% 8%, #ffe6a8 0%, transparent 62%),
+    radial-gradient(460px 240px at 2% 96%, #c9ecff 0%, transparent 64%),
+    linear-gradient(150deg,#fff8ea,#eef8ff 58%,#e9fbef);
+  border:3px solid #fff; box-shadow:0 18px 40px -26px rgba(35,48,92,.4), 0 2px 0 #ffe9c2 inset}
+.hero h1{color:#1f2a52}
+.hero h1 em{color:#e8862a;font-family:var(--display);font-style:normal;font-weight:700}
+.hero::after{opacity:.5;background-image:radial-gradient(rgba(35,48,92,.12) 1px,transparent 1px)}
+.hero-figure .ring{border-color:rgba(35,48,92,.16)}
+.hero-figure .ring.b{border-color:rgba(23,189,147,.35)}
+.classbar .track{background:#e7eefb}
+.statline div span{color:#7b88ad}
+.pill{background:#f2f6ff;border:2px solid #e6ecfa;color:#4c5c85}
+.pill.jade{background:#e4fbf3;color:#0d8f6d;border-color:#bff0e2}
+.pill.amber{background:#fff6de;color:#a87300;border-color:#ffe2a1}
+.pill.coral{background:#ffeee7;color:#c9482a;border-color:#ffd2c2}
+.pill.rose{background:#ffeaf1;color:#c53f68;border-color:#ffd0df}
+.track i{background:linear-gradient(90deg,var(--jade),var(--amber))}
+
+/* game cards on the library page */
+.game-card{background:#fff;border:3px solid #fff;border-radius:26px;
+  box-shadow:0 14px 0 -8px rgba(35,48,92,.09), 0 22px 44px -26px rgba(35,48,92,.4)}
+.game-card:hover{transform:translateY(-6px) rotate(-.4deg)}
+.game-art{height:184px}
+.game-body{padding:20px}
+.game-body h3{font-size:26px;color:#22305a}
+.game-tag{font-size:12px;letter-spacing:.12em}
+.game-card .meter{background:#eef3fd;height:9px}
+.game-meta{color:#7b88ad}
+.game-meta b{color:#22305a}
+.medal{background:#fff7e4;border:2px solid #ffe3a6}
+.medal svg{color:#e09a00}
+
+/* leaderboard / badges / tables on light */
+.lb th{color:#8b97b8;border-bottom:2px solid #eef2fb}
+.lb td{border-bottom:1px solid #f1f5fd;color:#3d4a72}
+.lb tr.me td{background:#e9fbf5}
+.lb .face{background:#eef3fd}
+.lb .rank{color:#94a1c0}
+.lb tr:nth-child(1) .rank{color:#e09a00}
+.lb tr:nth-child(2) .rank{color:#8b97b8}
+.lb tr:nth-child(3) .rank{color:#e07a52}
+.pod{background:#fff;border:2px solid #eef2fb;box-shadow:0 10px 0 -6px rgba(35,48,92,.08)}
+.pod.first{background:linear-gradient(180deg,#fff6da,#fffdf6);border-color:#ffe1a3}
+.pod .face{background:#eef3fd}
+.pod .rangep,.pod .val{color:#8b97b8}
+.segbar{background:#eef3fd;border:2px solid #e1e9f8}
+.segbar button{color:#67759c}
+.segbar button.on{background:#22305a;color:#fff}
+.badge{background:#fbfdff;border:2px solid #eef2fb}
+.badge .hex{background:linear-gradient(160deg,#fff3d2,#ffe8d8);border:2px solid #ffe0ad}
+.badge .hex svg{color:#e09a00}
+.badge b{color:#22305a}
+.badge.locked{opacity:.55}
+.badge.locked .hex{background:#f3f6fc;border-color:#e6ecf8}
+.badge.new::after{background:var(--jade);color:#04372c}
+.divider{background:#eef2fb}
+
+/* store + wardrobe */
+.shop-item{background:#fff;border:2px solid #eef2fb;box-shadow:0 6px 0 -4px rgba(35,48,92,.07)}
+.shop-item:hover{border-color:#cfe0ff}
+.shop-thumb{background:radial-gradient(circle at 50% 38%,#eaf3ff,#dce9fb)}
+.shop-item b{color:#22305a}
+.shop-item .price{color:#d78a00}
+.swatch{background:#fbfdff;border:2px solid #eef2fb;color:#67759c}
+.swatch.on{border-color:var(--jade);background:#e9fbf5;color:#0d8f6d;font-weight:600}
+.stage{background:radial-gradient(circle at 50% 28%,#fff4d6,#e8f4ff);border:3px solid #fff;
+  box-shadow:0 14px 0 -8px rgba(35,48,92,.08), 0 18px 40px -26px rgba(35,48,92,.35)}
+.stage .halo{background:radial-gradient(circle,rgba(255,190,46,.35),transparent 70%)}
+.slot-tabs button{background:#eef3fd;color:#67759c}
+.slot-tabs button.on{background:#22305a;color:#fff}
+.filters .pill{background:#fff;border:2px solid #e8eefb;color:#4c5c85}
+.filters .pill.jade{background:#e4fbf3;border-color:#bff0e2;color:#0d8f6d}
+.filters .pill.amber{background:#fff6de;border-color:#ffe2a1;color:#a87300}
+
+/* room editor chrome (the room itself keeps its own colours) */
+.room-canvas{border:4px solid #fff;box-shadow:0 16px 0 -8px rgba(35,48,92,.1), 0 22px 44px -28px rgba(35,48,92,.4)}
+.tray button{background:#fff;border:2px solid #eef2fb}
+.room-side .card.flat{background:#fff}
+
+/* modal + toasts */
+.modal{background:rgba(35,48,92,.45)}
+.modal .sheet{background:#fff;border:3px solid #fff;box-shadow:0 30px 60px -28px rgba(35,48,92,.55)}
+.toast{background:#fff;border:2px solid #eef2fb;color:#22305a;box-shadow:0 12px 26px -14px rgba(35,48,92,.45)}
+.toast svg{color:#12a37f}
+input,select{color:#22305a!important}
+input::placeholder{color:#a3aecb}
+.skip:focus{background:#22305a;color:#fff}
+.dock{background:rgba(255,255,255,.96);border-top:2px solid #eef2fb}
+.dock button{color:#7b88ad}
+.dock button.on{color:#e8862a}

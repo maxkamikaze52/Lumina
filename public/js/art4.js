@@ -1,0 +1,195 @@
+/* Astrolab — poster art for the mode tiles. Flat shapes, thick outlines. */
+(function () {
+  'use strict';
+  const S = window.ART;
+  const O = '#22305c';
+  const OL = 'stroke="#22305c" stroke-width="5" stroke-linejoin="round"';
+
+  const star = (x, y, r, c) => `<path d="M${x} ${y - r}l${r * .3} ${r * .65} ${r * .72} -.1-${r * .55} ${r * .48} ${r * .2} ${r * .7}-${r * .67} -.36-${r * .67} .36 ${r * .2} -.7-${r * .55} -.48 ${r * .72} .1z" fill="${c}" ${OL} stroke-width="3"/>`;
+
+  S.poster = function (kind) {
+    switch (kind) {
+      /* ---------- TableStar ---------- */
+      case 'gig':
+        return `<rect width="320" height="160" fill="#a06bff"/>
+          <path d="M0 118c60-26 96 22 160 4s104-38 160-10v48H0z" fill="#7f4be0"/>
+          ${star(40, 34, 15, '#ffc93c')}${star(276, 46, 12, '#ffc93c')}${star(232, 24, 9, '#fff')}
+          <g transform="translate(160 96)">
+            <rect x="-30" y="-46" width="60" height="14" rx="4" fill="#22305c"/>
+            <circle cx="-14" cy="-38" r="12" fill="#5b6ee1" ${OL} stroke-width="4"/>
+            <circle cx="16" cy="-38" r="12" fill="#5b6ee1" ${OL} stroke-width="4"/>
+            <rect x="-70" y="-30" width="30" height="20" rx="4" fill="#fff" ${OL} stroke-width="4"/>
+            <rect x="42" y="-30" width="30" height="20" rx="4" fill="#fff" ${OL} stroke-width="4"/>
+            <path d="M18-20l-30 10 26 6-22 26" fill="none" stroke="#ff4d5e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="-6" y="30" font-family="Fredoka,sans-serif" font-size="30" font-weight="700" fill="#fff" text-anchor="middle">×12</text>
+          </g>`;
+      case 'studio':
+        return `<rect width="320" height="160" fill="#ff8a3d"/>
+          <path d="M0 0h320v46H0z" fill="#ffa95c"/>
+          <g transform="translate(64 82)">
+            <rect x="-22" y="-30" width="44" height="60" rx="22" fill="#fff" ${OL}/>
+            <path d="M-22 2h44" stroke="${O}" stroke-width="4"/>
+            <path d="M0 30v22M-22 60h44" stroke="${O}" stroke-width="6" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(210 78)">
+            <rect x="-52" y="-56" width="104" height="72" rx="12" fill="#22305c" ${OL}/>
+            <path d="M-38-38l26 26-26 26" fill="none" stroke="#ffc93c" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6-38l26 26-26 26" fill="none" stroke="#2ecc71" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="-16" y="16" width="32" height="10" rx="3" fill="#22305c"/>
+            <path d="M-52 34h104" stroke="${O}" stroke-width="6" stroke-linecap="round"/>
+          </g>
+          ${star(270, 34, 12, '#ffc93c')}`;
+      case 'soundcheck':
+        return `<rect width="320" height="160" fill="#2ecc71"/>
+          <g transform="translate(160 82)">
+            <path d="M-70-14h26l30-26v80l-30-26h-26z" fill="#fff" ${OL}/>
+            <path d="M-4-30c16 10 16 50 0 60M14-42c26 16 26 68 0 84" fill="none" stroke="#22305c" stroke-width="6" stroke-linecap="round"/>
+            <path d="M56-46l-18 26h16l-14 26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          ${star(42, 40, 13, '#ffc93c')}${star(282, 48, 11, '#fff')}
+          <circle cx="60" cy="126" r="9" fill="#ff4d5e" stroke="${O}" stroke-width="4"/><circle cx="260" cy="126" r="9" fill="#3a9bff" stroke="${O}" stroke-width="4"/>`;
+      case 'garage':
+        return `<rect width="320" height="160" fill="#ffc93c"/>
+          <path d="M0 120h320v40H0z" fill="#e8a92a"/>
+          <g transform="translate(120 84) rotate(-12)">
+            <rect x="-10" y="-58" width="20" height="34" rx="3" fill="#b9793f" ${OL} stroke-width="4"/>
+            <rect x="-9" y="-24" width="18" height="52" fill="#8a5a2b" ${OL} stroke-width="4"/>
+            <ellipse cx="0" cy="4" rx="22" ry="18" fill="#ff4d5e" ${OL} stroke-width="4"/>
+            <ellipse cx="0" cy="34" rx="30" ry="26" fill="#ff4d5e" ${OL} stroke-width="4"/>
+            <circle cx="0" cy="18" r="9" fill="#22305c" stroke="#ffc93c" stroke-width="3"/>
+          </g>
+          <g transform="translate(228 92)">
+            <rect x="-42" y="-40" width="84" height="66" rx="8" fill="#22305c" ${OL}/>
+            <circle cx="-16" cy="-8" r="15" fill="#3d4a72" stroke="${O}" stroke-width="4"/>
+            <circle cx="18" cy="-8" r="15" fill="#3d4a72" stroke="${O}" stroke-width="4"/>
+            <circle cx="-16" cy="-8" r="5" fill="#ffc93c"/><circle cx="18" cy="-8" r="5" fill="#ffc93c"/>
+            <rect x="-34" y="14" width="68" height="6" rx="3" fill="#5b6ee1"/>
+          </g>`;
+      case 'speed':
+        return `<rect width="320" height="160" fill="#3a9bff"/>
+          <g transform="translate(160 84)">
+            <circle r="54" fill="#fff" ${OL}/>
+            <path d="M0-30v32l22 14" fill="none" stroke="#22305c" stroke-width="8" stroke-linecap="round"/>
+            <circle r="6" fill="#22305c"/>
+          </g>
+          ${star(40, 36, 13, '#ffc93c')}${star(280, 40, 11, '#ffc93c')}
+          <path d="M40 128h44M236 128h44" stroke="#fff" stroke-width="8" stroke-linecap="round"/>`;
+
+      /* ---------- Spellbound ---------- */
+      case 'practice':
+        return `<rect width="320" height="160" fill="#22c8a5"/>
+          <g transform="translate(160 80)">
+            <rect x="-64" y="-40" width="128" height="72" rx="14" fill="#fff" ${OL}/>
+            <path d="M-40-12h34M-40 6h58" stroke="${O}" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="42" cy="-6" r="18" fill="#ffc93c" ${OL} stroke-width="4"/>
+            <path d="M36-6l4 5 8-9" fill="none" stroke="${O}" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(66 96)">
+            <path d="M-16-18h32l-4 22a12 12 0 01-24 0z" fill="#fff" ${OL} stroke-width="4"/>
+            <path d="M0 4v14M-12 18h24" stroke="${O}" stroke-width="5" stroke-linecap="round"/>
+          </g>
+          ${star(276, 38, 12, '#ffc93c')}`;
+      case 'builder':
+        return `<rect width="320" height="160" fill="#ffc93c"/>
+          ${['C', 'A', 'T'].map((c, i) => `<g transform="translate(${86 + i * 62} 80) rotate(${i === 1 ? 8 : -6})">
+            <rect x="-24" y="-30" width="48" height="60" rx="8" fill="#fff" ${OL}/>
+            <text y="12" font-family="Fredoka,sans-serif" font-size="32" font-weight="700" fill="#22305c" text-anchor="middle">${c}</text></g>`).join('')}
+          <path d="M232 108c14 0 22 8 22 18" fill="none" stroke="${O}" stroke-width="5" stroke-linecap="round" stroke-dasharray="7 7"/>
+          ${star(44, 36, 12, '#ff8a3d')}`;
+      case 'missing':
+        return `<rect width="320" height="160" fill="#ff6fae"/>
+          <g transform="translate(160 80)">
+            <rect x="-110" y="-34" width="220" height="68" rx="12" fill="#fff" ${OL}/>
+            ${[0, 1, 2, 3, 4, 5].map((i) => `<text x="${-86 + i * 34}" y="12" font-family="Fredoka,sans-serif" font-size="30" font-weight="700" fill="${i === 2 || i === 4 ? '#ff6fae' : '#22305c'}" text-anchor="middle">${i === 2 || i === 4 ? '_' : 'SPELL'[i]}</text>`).join('')}
+          </g>
+          ${star(48, 38, 12, '#ffc93c')}${star(272, 42, 10, '#fff')}`;
+      case 'review':
+        return `<rect width="320" height="160" fill="#a06bff"/>
+          <g transform="translate(160 82)">
+            <path d="M-54-44h108v66l-24 20H-54z" fill="#fff" ${OL}/>
+            <path d="M-32-22h56M-32-4h40M-32 14h28" stroke="#22305c" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="52" cy="26" r="24" fill="#ffc93c" ${OL} stroke-width="4"/>
+            <path d="M52 12v16l10 6" fill="none" stroke="${O}" stroke-width="4" stroke-linecap="round"/>
+          </g>`;
+      case 'lists':
+        return `<rect width="320" height="160" fill="#3a9bff"/>
+          ${[0, 1, 2].map((i) => `<g transform="translate(${72 + i * 66} ${76 + (i % 2) * 8}) rotate(${i * 4 - 4})">
+            <rect x="-26" y="-34" width="52" height="68" rx="8" fill="#fff" ${OL} stroke-width="4"/>
+            <path d="M-14-16h28M-14-2h28M-14 12h18" stroke="#22305c" stroke-width="4" stroke-linecap="round"/></g>`).join('')}
+          ${star(270, 36, 11, '#ffc93c')}`;
+
+      /* ---------- WorldQuest ---------- */
+      case 'locate':
+        return `<rect width="320" height="160" fill="#cfe9ff"/>
+          <g transform="translate(150 84)">
+            <circle r="56" fill="#2ecc71" ${OL}/>
+            <path d="M-56-14h26l10 18-8 22 14 16M4-56l6 22 20 10-6 22M30 22l16 12" fill="none" stroke="#22305c" stroke-width="5" stroke-linejoin="round"/>
+            <circle cx="52" cy="26" r="16" fill="#ff4d5e" ${OL} stroke-width="5"/>
+            <path d="M52 16v12l8 6" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(258 54)"><path d="M0-20c11 0 18 8 18 18 0 13-18 28-18 28S-18 11-18-2c0-10 7-18 18-18z" fill="#ff4d5e" ${OL} stroke-width="4"/><circle cx="0" cy="-2" r="6" fill="#fff"/></g>
+          ${star(46, 38, 12, '#ffc93c')}`;
+      case 'identify':
+        return `<rect width="320" height="160" fill="#ffc93c"/>
+          <g transform="translate(160 84)">
+            <path d="M-96-40l34-12 30 14 34-12 32 10-4 62-34 12-30-14-34 12-30-10z" fill="#2ecc71" ${OL} stroke-width="4"/>
+            <path d="M-62-46v66M-2-38v66M64-44v66" stroke="${O}" stroke-width="4"/>
+            <circle cx="-30" cy="2" r="17" fill="#ff4d5e" ${OL} stroke-width="4"/>
+            <text x="-30" y="9" font-family="Fredoka,sans-serif" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">?</text>
+          </g>`;
+      case 'capital':
+        return `<rect width="320" height="160" fill="#a06bff"/>
+          <g transform="translate(150 88)">
+            <path d="M-54 24h108v10H-54z" fill="#fff" ${OL} stroke-width="4"/>
+            <rect x="-14" y="-52" width="28" height="76" fill="#fff" ${OL} stroke-width="4"/>
+            <path d="M-14-52l14-16 14 16z" fill="#ffc93c" ${OL} stroke-width="4"/>
+            <path d="M-40 24V-8h18v32M22 24V-8h18v32" fill="#e7eefc" ${OL} stroke-width="4"/>
+            <circle cx="0" cy="-22" r="7" fill="#ffc93c" stroke="${O}" stroke-width="3"/>
+          </g>
+          ${star(272, 40, 12, '#ffc93c')}${star(46, 34, 11, '#fff')}`;
+      case 'flag':
+        return `<rect width="320" height="160" fill="#3a9bff"/>
+          <g transform="translate(160 80)">
+            <path d="M-58-48v96" stroke="${O}" stroke-width="7" stroke-linecap="round"/>
+            <path d="M-58-48h104v54H-58z" fill="#ff4d5e" ${OL}/>
+            <path d="M-40-30h30l12 12-12 12h-30z" fill="#fff" ${OL} stroke-width="3"/>
+            <circle cx="18" cy="-12" r="10" fill="#ffc93c" stroke="${O}" stroke-width="3"/>
+          </g>
+          ${star(276, 36, 12, '#ffc93c')}${star(46, 120, 10, '#fff')}`;
+      case 'marathon':
+        return `<rect width="320" height="160" fill="#ff8a3d"/>
+          <g transform="translate(160 84)">
+            <circle r="54" fill="#fff" ${OL}/>
+            <path d="M0-54a54 54 0 0128 100" fill="#2ecc71" ${OL} stroke-width="4"/>
+            <path d="M-6-28l22 28-22 28" fill="none" stroke="${O}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          ${star(44, 38, 12, '#ffc93c')}${star(276, 42, 10, '#fff')}`;
+      case 'challenge':
+        return `<rect width="320" height="160" fill="#22305c"/>
+          <g transform="translate(160 86)">
+            <circle r="52" fill="#2ecc71" ${OL}/>
+            <path d="M-52-12h22l8 14-6 18 12 14M10-52l4 20 18 8-4 18M28 16l14 12" fill="none" stroke="#22305c" stroke-width="4"/>
+            <path d="M-26-64l8-20 20 10 20-10 8 20z" fill="#ffc93c" ${OL} stroke-width="4"/>
+            <circle cx="-26" cy="-70" r="3" fill="#ff4d5e"/>
+          </g>
+          ${star(42, 40, 13, '#ffc93c')}${star(278, 44, 12, '#ffc93c')}${star(258, 120, 9, '#fff')}`;
+      case 'europe': case 'asia': case 'africa': case 'americas': case 'oceania':
+        return `<rect width="320" height="160" fill="#cfe9ff"/><text x="160" y="100" font-size="60" text-anchor="middle">${kind === 'europe' ? '🇪🇺' : kind === 'asia' ? '🌏' : kind === 'africa' ? '🌍' : kind === 'americas' ? '🌎' : '🏝️'}</text>`;
+      default:
+        return `<rect width="320" height="160" fill="#cfe9ff"/>${star(160, 80, 30, '#ffc93c')}`;
+    }
+  };
+
+  /* a labelled mode tile, the way the game menus are laid out */
+  S.tile = function (opts) {
+    const o = opts || {};
+    return `<button class="tile-card ${o.on ? 'on' : ''}" ${o.action || ''} aria-pressed="${!!o.on}">
+      <div class="tile-art" style="--a1:${o.a1 || '#cfe9ff'};--a2:${o.a2 || '#fff3c4'}"><svg
+        viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true">${S.poster(o.art)}</svg></div>
+      <div class="tile-label" style="--label:${o.label || '#ffc93c'}">
+        <b>${o.name}</b><span>${o.sub || ''}</span></div>
+      ${o.on ? `<span class="tile-check">${window.icon('check')}</span>` : ''}
+    </button>`;
+  };
+})();
