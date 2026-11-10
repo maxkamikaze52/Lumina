@@ -1,94 +1,133 @@
 /* Astrolab — the level crest.
-   One SVG per level, built from the level number, so a badge *develops* as you
-   climb instead of being a number on a flat tile: bronze laurel at 1, iron ring
-   at 5, wings at 8, gems at 12, star points at 16, full crown at 20.
-   The number always sits in the middle.
+   One SVG per level, built from the level number.  It develops as you climb:
+   a bronze laurel at 1, wings from 5, gems set in the rim from 9, starburst
+   spikes from 16, and a full crown at 20.  The rim gets heavier and the glow
+   gets hotter with every level, and the glow colour changes with each tier.
+   The number is always dead centre — small, so the crest around it can be big.
 */
 (function () {
   'use strict';
   const A = window.ART = window.ART || {};
 
-  // progression tiers: colour, metal, and what gets added at each stage
+  // five tiers: metal, glow colour, and how loud the glow is allowed to get
   const TIERS = [
-    { name: 'bronze', rim: '#b87333', face: '#3a2312', glow: '#e2955a', ink: '#ffe6c9' },
-    { name: 'silver', rim: '#b9c4d4', face: '#2a3140', glow: '#dbe7f7', ink: '#f2f7ff' },
-    { name: 'gold', rim: '#e8b13a', face: '#3a2a06', glow: '#ffd868', ink: '#fff7dd' },
-    { name: 'plasma', rim: '#ff5f8d', face: '#34102a', glow: '#ff8fb3', ink: '#ffe9f1' },
-    { name: 'legend', rim: '#7cf7c4', face: '#08281f', glow: '#a8ffe0', ink: '#e8fff8' }
+    { name: 'bronze', light: '#8a4a12', mid: '#d98a3c', hot: '#ffc98a', glow: '#ff9d3c' },
+    { name: 'silver', light: '#5d6675', mid: '#cdd8e8', hot: '#ffffff', glow: '#9fd2ff' },
+    { name: 'gold', light: '#8a5c00', mid: '#ffd24a', hot: '#fff4b8', glow: '#ffd24a' },
+    { name: 'plasma', light: '#7c0f38', mid: '#ff5f8d', hot: '#ffd0e0', glow: '#ff4f86' },
+    { name: 'legend', light: '#0b6b4d', mid: '#7cf7c4', hot: '#e8fff8', glow: '#5cffc0' }
   ];
 
-  const tierOf = (n) => TIERS[Math.min(TIERS.length - 1, Math.floor((n - 1) / 4))];
-  const stars = (n) => Math.min(5, Math.floor((n - 1) / 4) + 1);
-  const wingCount = (n) => (n >= 8 ? (n >= 16 ? 3 : 2) : n >= 5 ? 1 : 0);
-  const gems = (n) => (n >= 12 ? Math.min(6, Math.floor((n - 12) / 2) + 2) : 0);
+  const tierIndex = (n) => Math.min(TIERS.length - 1, Math.floor((n - 1) / 4));
+  const wings = (n) => (n >= 16 ? 3 : n >= 8 ? 2 : n >= 5 ? 1 : 0);
+  const gems = (n) => (n >= 12 ? Math.min(8, Math.floor((n - 12) / 1) + 3) : n >= 9 ? 2 : 0);
+  const spikes = (n) => (n >= 16 ? 8 + (n - 16) : 0);
+  const stars = (n) => Math.min(5, tierIndex(n) + 1);
 
-  /* n = level (1-20), size in px, opts.locked dims it */
+  let seq = 0;
+
   A.levelCrest = function (n, opts) {
     const o = opts || {};
     const size = o.size || 96;
-    const t = tierOf(n);
-    const id = 'cr' + n + '-' + size;
-    const C = 50, R = 34;
+    const t = TIERS[tierIndex(n)];
+    const id = 'cr' + (++seq);
+    const C = 50;
+    const p = (n - 1) / 19;                     // 0 → 1 up the whole ladder
+    const glowBlur = 2.2 + 5.6 * p;             // the halo gets wider
+    const glowOp = 0.30 + 0.55 * p;             // and brighter
+    const rimW = 7.5 + 3.5 * p;                 // the metal rim gets heavier
+    const R = 30 + 3 * p;                       // and the face smaller
+    const dim = o.locked ? ' opacity=".82"' : '';
 
-    // the base disc, with a thick metal rim
-    let svg = `
-      <circle cx="${C}" cy="${C}" r="${R + 6}" fill="${t.rim}" opacity=".95"/>
-      <circle cx="${C}" cy="${C}" r="${R + 2}" fill="${t.face}"
-              stroke="${t.glow}" stroke-width="2.5"/>
-      <circle cx="${C}" cy="${C}" r="${R - 6}" fill="none" stroke="${t.glow}"
-              stroke-width="1" opacity=".45" stroke-dasharray="3 4"/>`;
+    // --- glow halo -------------------------------------------------------
+    let svg = `<defs>
+        <radialGradient id="${id}r" cx=".35" cy=".28" r=".85">
+          <stop offset="0" stop-color="${t.hot}"/>
+          <stop offset=".45" stop-color="${t.mid}"/>
+          <stop offset="1" stop-color="${t.light}"/>
+        </radialGradient>
+        <radialGradient id="${id}g" cx=".5" cy=".5" r=".5">
+          <stop offset=".55" stop-color="${t.glow}" stop-opacity="0"/>
+          <stop offset=".86" stop-color="${t.glow}" stop-opacity=".95"/>
+          <stop offset="1" stop-color="${t.glow}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${id}f" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="${glowBlur.toFixed(2)}"/>
+        </filter>
+      </defs>
+      <circle cx="${C}" cy="${C}" r="${40 + 5 * p}" fill="url(#${id}g)"
+              filter="url(#${id}f)" opacity="${glowOp.toFixed(2)}"/>`;
 
-    // 1. the shield silhouette strengthens: a pair of laurel arms from level 2
-    if (n >= 2) {
-      svg += `<path d="M16 62q6 20 34 26 28-6 34-26" fill="none" stroke="${t.rim}"
-                stroke-width="5" stroke-linecap="round" opacity=".95"/>`;
+    // --- the spikes, outside everything: the crest explodes at the top ----
+    const sp = spikes(n);
+    for (let i = 0; i < sp; i++) {
+      const a = (Math.PI * 2 * i) / sp - Math.PI / 2;
+      const r1 = 40, r2 = 45 + 4 * p;
+      svg += `<line x1="${(C + r1 * Math.cos(a)).toFixed(1)}" y1="${(C + r1 * Math.sin(a)).toFixed(1)}"
+        x2="${(C + r2 * Math.cos(a)).toFixed(1)}" y2="${(C + r2 * Math.sin(a)).toFixed(1)}"
+        stroke="${t.mid}" stroke-width="${2.6 + 1.4 * p}" stroke-linecap="round"
+        filter="url(#${id}f)" opacity=".85"/>`;
     }
-    // 2. wings on the sides, one pair at 5, two at 8, three at 16
-    const w = wingCount(n);
+
+    // --- wings, growing outward with the tier ----------------------------
+    const w = wings(n);
     for (let i = 0; i < w; i++) {
-      const dy = i * 9 - (w - 1) * 4.5;
-      svg += `<path d="M14 ${50 + dy}q-10 -6 -6 -14 6 4 10 6z" fill="${t.rim}" opacity=".9"/>
-              <path d="M86 ${50 + dy}q10 -6 6 -14-6 4-10 6z" fill="${t.rim}" opacity=".9"/>`;
+      const dy = (i - (w - 1) / 2) * 10;
+      const len = 12 + 3 * p;
+      svg += `<path d="M${C - 30} ${C + dy}q-${len} -3 -${len + 6} -${len * 0.7}
+                  q${len * 0.7} 1 ${len + 2} ${len * 0.5}z" fill="${t.mid}"
+                  stroke="${t.light}" stroke-width="1.2"/>
+              <path d="M${C + 30} ${C + dy}q${len} -3 ${len + 6} -${len * 0.7}
+                  q-${len * 0.7} 1 -${len + 2} ${len * 0.5}z" fill="${t.mid}"
+                  stroke="${t.light}" stroke-width="1.2"/>`;
     }
-    // 3. gems around the rim from level 12
+
+    // --- the heavy metal rim --------------------------------------------
+    svg += `<circle cx="${C}" cy="${C}" r="${40 - rimW / 2}" fill="none"
+              stroke="url(#${id}r)" stroke-width="${rimW.toFixed(1)}"/>
+            <circle cx="${C}" cy="${C}" r="${40 - rimW}" fill="none"
+              stroke="${t.light}" stroke-width="1.6" opacity=".85"/>
+            <circle cx="${C}" cy="${C}" r="${40 - 1}" fill="none"
+              stroke="${t.hot}" stroke-width="1.4" opacity=".7"/>`;
+
+    // --- the face --------------------------------------------------------
+    svg += `<circle cx="${C}" cy="${C}" r="${R - rimW / 2 + 2}" fill="#0d0a1a"/>
+            <circle cx="${C}" cy="${C}" r="${R - rimW / 2 + 2}" fill="none"
+              stroke="${t.glow}" stroke-width="1.2" opacity=".5"/>`;
+
+    // --- gems set into the rim ------------------------------------------
     const gm = gems(n);
     for (let i = 0; i < gm; i++) {
       const a = (Math.PI * 2 * i) / gm - Math.PI / 2;
-      const x = C + (R - 1) * Math.cos(a);
-      const y = C + (R - 1) * Math.sin(a);
-      svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4"
-                fill="${t.glow}" stroke="#120a26" stroke-width="1.2"/>`;
+      const rr = 40 - rimW / 2;
+      const x = C + rr * Math.cos(a), y = C + rr * Math.sin(a);
+      svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${2.6 + 0.9 * p}"
+                fill="${t.hot}" stroke="${t.light}" stroke-width="1"/>`;
     }
-    // 4. star points above from level 16 — the crest becomes a starburst
-    if (n >= 16) {
-      for (let i = 0; i < 8; i++) {
-        const a = (Math.PI * 2 * i) / 8;
-        const x1 = C + (R + 8) * Math.cos(a), y1 = C + (R + 8) * Math.sin(a);
-        const x2 = C + (R + 16) * Math.cos(a), y2 = C + (R + 16) * Math.sin(a);
-        svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}"
-                  y2="${y2.toFixed(1)}" stroke="${t.glow}" stroke-width="4" stroke-linecap="round"
-                  opacity=".95"/>`;
-      }
-    }
-    // 5. a tiny star row under the number, one per tier reached
+
+    // --- the number, small, in the middle -------------------------------
+    const digits = String(n).length;
+    const numSize = (digits > 1 ? 25 : 28) + 2 * p;
+    svg += `<text x="${C}" y="${C - 1}" text-anchor="middle" dominant-baseline="middle"
+        font-family="Archivo Black, Arial Black, sans-serif" font-size="${numSize.toFixed(1)}"
+        fill="#fff" stroke="#0d0a1a" stroke-width="2.2" paint-order="stroke">${n}</text>
+      <text x="${C}" y="${C + (digits > 1 ? 15 : 14)}" text-anchor="middle"
+        font-family="Archivo Black, Arial Black, sans-serif" font-size="6.2"
+        letter-spacing="1.8" fill="${t.hot}" opacity=".9">LEVEL</text>`;
+
+    // --- a star per tier reached, at the foot of the face ---------------
     const st = stars(n);
     for (let i = 0; i < st; i++) {
-      const x = C + (i - (st - 1) / 2) * 9;
-      svg += `<path d="M${x} 78l2.1 4.3 4.7.6-3.4 3.2.9 4.6-4.3-2.3-4.3 2.3.9-4.6-3.4-3.2 4.7-.6z"
-                fill="${t.glow}" opacity=".95" transform="translate(0 -2) scale(.62) translate(16 26)"/>`;
+      const x = C + (i - (st - 1) / 2) * 8.4;
+      svg += `<path d="M${x} ${C + 22}l1.7 3.4 3.8.5-2.7 2.6.7 3.7-3.5-1.9-3.5 1.9.7-3.7-2.7-2.6 3.8-.5z"
+                fill="${t.glow}" stroke="#0d0a1a" stroke-width=".6"/>`;
     }
-    // 6. the number, always dead centre
-    svg += `
-      <text x="${C}" y="${C + 2}" text-anchor="middle" dominant-baseline="middle"
-        font-family="Archivo Black, Arial Black, sans-serif" font-size="${n >= 10 ? 34 : 38}"
-        fill="${t.ink}" stroke="#120a26" stroke-width="1.4" paint-order="stroke">${n}</text>
-      <text x="${C}" y="${C + 24}" text-anchor="middle" font-family="Archivo Black, sans-serif"
-        font-size="8" letter-spacing="1.6" fill="${t.glow}" opacity=".85">LEVEL</text>`;
 
-    return `<svg class="crest ${o.locked ? 'locked' : ''}" width="${size}" height="${size}"
-      viewBox="0 0 100 100" role="img"
-      aria-label="Level ${n}, ${t.name} crest">${svg}</svg>`;
+    return `<svg class="crest crest-${t.name}${o.locked ? ' locked' : ''}"
+      width="${size}" height="${size}" viewBox="0 0 100 100" role="img"
+      aria-label="Level ${n}, ${t.name} crest"${dim}>${svg}</svg>`;
   };
 
-  A.crestTier = (n) => tierOf(n).name;
+  A.crestTier = (n) => TIERS[tierIndex(n)].name;
+  A.crestGlow = (n) => TIERS[tierIndex(n)].glow;
 })();

@@ -674,3 +674,12 @@
 .badge.crest-badge svg.crest{display:block;margin:0 auto 8px}
 .badge.crest-badge b{font-size:13px}
 .badge.crest-badge.locked{opacity:.55}
+
+/* ---- crest glow: colour per tier, and it blooms on the level you hold -- */
+.lvl-card svg.crest,.badge svg.crest{transition:filter .2s}
+.lvl-card.me svg.crest{filter:drop-shadow(0 0 10px rgba(255,210,74,.55))}
+.lvl-card.me.tier-plasma svg.crest{filter:drop-shadow(0 0 12px rgba(255,79,134,.6))}
+.lvl-pip.on svg.crest{filter:drop-shadow(0 0 6px rgba(255,210,74,.4))}
+.lvl-pip.me svg.crest{filter:drop-shadow(0 0 12px rgba(255,210,74,.75))}
+.lvl-pip svg.crest.locked,.lvl-card .crest.locked{filter:saturate(.3) brightness(.9)}
+.lvl-card.locked svg.crest{filter:saturate(.25) brightness(.92)}
