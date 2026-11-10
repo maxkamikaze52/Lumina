@@ -648,3 +648,29 @@
 .lock-tag{position:absolute;left:8px;bottom:8px;font-family:var(--metal);font-size:11px;
   letter-spacing:.08em;background:#120a26;color:#ffd43b;border:2px solid #ffd43b;
   border-radius:5px;padding:4px 8px}
+
+/* ---- level crests: pips on Home, cards on the Profile ------------------ */
+.lvl-pip{display:grid;place-items:center;padding:0;background:none;border:0;box-shadow:none;
+  min-width:0;height:auto;transition:transform .15s}
+.lvl-pip svg.crest{display:block;filter:saturate(.35) brightness(.92)}
+.lvl-pip.on svg.crest{filter:none}
+.lvl-pip.me{transform:translateY(-3px) scale(1.04)}
+.lvl-pip.me svg.crest{filter:drop-shadow(0 6px 14px rgba(255,205,60,.45))}
+.lvl-pip:hover{transform:translateY(-4px)}
+
+.lvl-ladder{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:14px}
+.lvl-card{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
+  padding:14px 10px 12px;border-radius:14px;background:#fff;border:3px solid #e4ebf8}
+.lvl-card svg.crest{display:block}
+.lvl-card b{font-family:var(--metal);font-size:13px;letter-spacing:.02em;color:#1d2a52;
+  text-transform:uppercase;line-height:1.15}
+.lvl-card span{font-size:12.5px;font-weight:700;color:#8a97b5}
+.lvl-card.todo{background:#f7f9fe;border-color:#eef2fb}
+.lvl-card.todo svg.crest{filter:saturate(.25) brightness(.95)}
+.lvl-card.me{border-color:#120a26;box-shadow:0 6px 0 #120a26;background:#fffdf3}
+.lvl-card.me b{color:#120a26}
+.lvl-card.done{border-color:#bfe3d2}
+.badge.crest-badge{padding-top:16px}
+.badge.crest-badge svg.crest{display:block;margin:0 auto 8px}
+.badge.crest-badge b{font-size:13px}
+.badge.crest-badge.locked{opacity:.55}

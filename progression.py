@@ -189,9 +189,16 @@ def evaluate_badges(pid: str) -> list[dict]:
 
 def public_badge(bid: str, unlocked_at: float | None) -> dict:
     b = config.BADGE_BY_ID[bid]
-    return {"id": bid, "name": b["name"], "desc": b["desc"], "game": b["game"],
-            "icon": b["icon"], "unlocked": unlocked_at is not None,
-            "at": unlocked_at}
+    out = {"id": bid, "name": b["name"], "desc": b["desc"], "game": b["game"],
+           "icon": b["icon"], "unlocked": unlocked_at is not None,
+           "at": unlocked_at}
+    # a level badge carries its crest data, so the client can draw the tier
+    if bid.startswith("level-"):
+        lv = config.LEVEL_BY_N[int(bid.split("-")[1])]
+        out["level"] = lv["n"]
+        out["title"] = lv["title"]
+        out["xp"] = lv["xp"]
+    return out
 
 
 def badge_list(pid: str) -> list[dict]:

@@ -173,6 +173,8 @@ def level_badges() -> list[dict]:
     return out
 
 
+LEVEL_BY_N = {l["n"]: l for l in _levels.LEVELS}
+
 BADGES = level_badges() + [
     # --- platform -----------------------------------------------------------
     dict(id="first-game", name="First Steps", game="platform", icon="spark",

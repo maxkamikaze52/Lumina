@@ -77,7 +77,8 @@
             <div class="track lvl"><i style="width:${cls.pct}%"></i></div>
             <div class="lvl-strip">
               ${(s.stats.levels || []).map((l) => `<span class="lvl-pip ${l.n <= cls.n ? 'on' : ''}
-                ${l.n === cls.n ? 'me' : ''}" title="Level ${l.n} · ${esc(l.title)} — ${num(l.xp)} XP">${l.n}</span>`).join('')}
+                ${l.n === cls.n ? 'me' : ''}" title="Level ${l.n} · ${esc(l.title)} — ${num(l.xp)} XP">
+                ${ART.levelCrest(l.n, { size: l.n === cls.n ? 58 : 44, locked: l.n > cls.n })}</span>`).join('')}
             </div>
             <div class="statline">
               <div><b>${num(p.starbits)}</b><span>Starbits</span></div>
@@ -319,8 +320,11 @@
           <span>${cls.next ? 'Level ' + cls.next.n + ' in ' + num(cls.toNext) + ' XP' : 'Top of the ladder'}</span></div></div>
         <div class="divider"></div>
         <h3 style="margin-bottom:10px">The 20 levels</h3>
-        <div class="row" style="gap:8px;flex-wrap:wrap">${s.classes.map((c, i) => `<span class="pill ${i < classIdx ? 'jade' : i === classIdx ? 'amber' : ''}"
-          title="Level ${c.n} · ${esc(c.title)} — ${num(c.xp)} XP">${icon(c.emblem)} ${c.n} ${esc(c.title)}</span>`).join('')}</div>
+        <div class="lvl-ladder">${s.classes.map((c, i) => `<div class="lvl-card ${i < classIdx ? 'done' : i === classIdx ? 'me' : 'todo'}"
+          title="Level ${c.n} · ${esc(c.title)} — ${num(c.xp)} XP">
+          ${ART.levelCrest(c.n, { size: 84, locked: c.n > cls.n })}
+          <b>${esc(c.title)}</b>
+          <span>${c.n === 1 ? 'start' : num(c.xp) + ' XP'}</span></div>`).join('')}</div>
       </section>
 
       <section class="grid g3">
@@ -351,8 +355,13 @@
         <div class="between"><h2 style="font-size:22px">${g === 'platform' ? 'Platform achievements' : App.LABEL[g] + ' badges'}</h2>
           <span class="small muted">${byGame[g].filter((b) => b.unlocked).length}/${byGame[g].length}</span></div>
         <div class="badge-grid" style="margin-top:12px">
-          ${byGame[g].map((b) => `<div class="badge ${b.unlocked ? '' : 'locked'}" title="${esc(b.desc)}">
-            <div class="hex">${icon(b.icon)}</div><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`).join('')}
+          ${byGame[g].map((b) => b.level
+            ? `<div class="badge crest-badge ${b.unlocked ? '' : 'locked'}" title="${esc(b.desc)}">
+                 ${ART.levelCrest(b.level, { size: 104, locked: !b.unlocked })}
+                 <b>${esc(b.title)}</b>
+                 <span>Level ${b.level} · ${(b.xp || 0).toLocaleString('en-GB')} XP</span></div>`
+            : `<div class="badge ${b.unlocked ? '' : 'locked'}" title="${esc(b.desc)}">
+                 <div class="hex">${icon(b.icon)}</div><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`).join('')}
         </div></section>`).join('')}
 
       <section class="card"><div class="eyebrow">Session history</div>
