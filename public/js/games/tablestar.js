@@ -239,7 +239,7 @@
         ${studio ? `<div class="note">
           <div class="note-head">Studio speed rank</div>
           <b class="note-big">${esc(studio.class.name)}</b>
-          <p>${studio.avg ? studio.avg + 's per correct answer over your last ten games.' : 'Answer some questions correctly to get on the bill.'}</p>
+          <p>${studio.avg ? studio.avg + 's per correct answer over your last ten games.' : 'Answer some questions correctly to get on the speed board.'}</p>
           <span class="pill">${studio.runs}/10 games</span>
         </div>` : ''}
         ${session.mode === 'garage' && PLAN ? `<div class="note">

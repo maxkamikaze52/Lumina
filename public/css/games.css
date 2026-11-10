@@ -771,3 +771,8 @@
   .world-tablestar .keypad button{min-height:76px;font-size:30px}
   .ts-next{position:static;align-self:flex-end;margin:0 0 6px;transform:none}
 }
+
+/* mode cards: flat poster blocks, label band matching the art */
+#ts-cards .tile-card{overflow:hidden;border-radius:12px}
+#ts-cards .tile-card .tile-art{border-radius:0}
+#ts-cards .tile-card .tile-label{border-radius:0;border-top:4px solid #120a26}

@@ -70,8 +70,8 @@ table and division is unlocked for good. **Studio always serves all 12 tables ×
 never gates anything — it only measures speed.
 
 **Studio speed ranks** are the ladder and the badges at once (`config.STUDIO_CLASSES`, slowest
-to fastest): Unsigned Act 9s · Breakthrough Artist 6s · Support Act 4.5s · Headliner 3.4s ·
-Rock Star 2.6s · Rock Legend 2s · Rock Hero 1.5s. A rank is your average seconds per correct
+to fastest): Just Starting 9s · Getting the Hang of It 6s · Good Effort 4.5s · Confident 3.4s ·
+Quick Thinker 2.6s · Top Marks 2s · Little Genius 1.5s. A rank is your average seconds per correct
 answer across your last 10 completed Studio games (total active time ÷ total correct).
 
 **Badges** (38) are all computed from stored data — no decorative ones. Top-10 badges need a

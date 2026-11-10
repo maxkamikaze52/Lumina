@@ -37,25 +37,25 @@ def level_progress(xp: int) -> dict:
 
 # --------------------------------------------------------------------------- #
 # Studio speed ranks (TableStar).  The ladder is the gig bill: slowest at the
-# bottom (Unsigned Act) and fastest at the top (Rock Hero).  Every rank is also
+# bottom (Just Starting) and fastest at the top (Little Genius).  Every rank is also
 # a badge, so the badges ARE the ladder.  `max` is the seconds-per-correct-
 # answer ceiling of each band; `from` is where the band starts on the axis.
 # --------------------------------------------------------------------------- #
 STUDIO_CLASSES = [
-    {"id": "unsigned", "tone": "#d02b3f", "name": "Unsigned Act", "max": 9.0, "from": 6.0, "icon": "mic",
-     "desc": "Nobody has heard of you yet. Every act starts in the garage."},
-    {"id": "breakthrough", "tone": "#e2552f", "name": "Breakthrough Artist", "max": 6.0, "from": 5.0, "icon": "bolt",
-     "desc": "The first real crowd. Six seconds a fact is still a search."},
-    {"id": "support", "tone": "#f0902c", "name": "Support Act", "max": 4.5, "from": 4.0, "icon": "star",
-     "desc": "You hold the stage on your own. Recall is arriving faster now."},
-    {"id": "headliner", "tone": "#f2c421", "name": "Headliner", "max": 3.4, "from": 3.0, "icon": "gem",
-     "desc": "Your name is on the poster. Threeish seconds a fact, all tables."},
-    {"id": "rockstar", "tone": "#b7cf32", "name": "Rock Star", "max": 2.6, "from": 2.0, "icon": "crown",
-     "desc": "Under three seconds. The answer arrives before the question ends."},
-    {"id": "legend", "tone": "#7cc63f", "name": "Rock Legend", "max": 2.0, "from": 1.0, "icon": "trophy",
-     "desc": "Two seconds a fact, multiplication and division alike."},
-    {"id": "hero", "tone": "#2fbf71", "name": "Rock Hero", "max": 1.5, "from": 0.0, "icon": "spark",
-     "desc": "Instant. Nothing on the ladder is faster than this."},
+    {"id": "unsigned", "name": "Just Starting", "max": 9.0, "from": 6.0, "icon": "mic",
+     "tone": "#d02b3f", "desc": "Everyone starts here. Take your time and get them right."},
+    {"id": "breakthrough", "name": "Getting the Hang of It", "max": 6.0, "from": 5.0, "icon": "bolt",
+     "tone": "#e2552f", "desc": "You are finding the answers on your own most of the time."},
+    {"id": "support", "name": "Good Effort", "max": 4.5, "from": 4.0, "icon": "star",
+     "tone": "#f0902c", "desc": "Steady and careful. The tables are starting to stick."},
+    {"id": "headliner", "name": "Confident", "max": 3.4, "from": 3.0, "icon": "gem",
+     "tone": "#f2c421", "desc": "You answer without counting on your fingers any more."},
+    {"id": "rockstar", "name": "Quick Thinker", "max": 2.6, "from": 2.0, "icon": "crown",
+     "tone": "#b7cf32", "desc": "Under three seconds a fact. That is real fluency."},
+    {"id": "legend", "name": "Top Marks", "max": 2.0, "from": 1.0, "icon": "trophy",
+     "tone": "#7cc63f", "desc": "Two seconds a fact, times and division alike."},
+    {"id": "hero", "name": "Little Genius", "max": 1.5, "from": 0.0, "icon": "spark",
+     "tone": "#2fbf71", "desc": "Instant. The answer is there before the question ends."},
 ]
 RANK_IDS = [c["id"] for c in STUDIO_CLASSES]
 
@@ -218,20 +218,20 @@ BADGES = level_badges() + [
     dict(id="ts-studio", name="Studio Veteran", game="tablestar", icon="mic",
          desc="Complete 20 Studio runs.", check=lambda s: s["ts"]["studio_runs"] >= 20),
     # the speed ladder: each rank is a badge, slowest to fastest
-    dict(id="ts-rank-unsigned", name="Unsigned Act", game="tablestar", icon="mic",
-         desc="Get on the Studio bill.", check=lambda s: s["ts"]["studio_idx"] >= 0),
-    dict(id="ts-rank-breakthrough", name="Breakthrough Artist", game="tablestar", icon="bolt",
+    dict(id="ts-rank-unsigned", name="Just Starting", game="tablestar", icon="mic",
+         desc="Get on the speed board.", check=lambda s: s["ts"]["studio_idx"] >= 0),
+    dict(id="ts-rank-breakthrough", name="Getting the Hang of It", game="tablestar", icon="bolt",
          desc="Average under 6 seconds per correct answer.", check=lambda s: s["ts"]["studio_idx"] >= 1),
-    dict(id="ts-rank-support", name="Support Act", game="tablestar", icon="star",
+    dict(id="ts-rank-support", name="Good Effort", game="tablestar", icon="star",
          desc="Average under 4.5 seconds per correct answer.", check=lambda s: s["ts"]["studio_idx"] >= 2),
-    dict(id="ts-rank-headliner", name="Headliner", game="tablestar", icon="gem",
+    dict(id="ts-rank-headliner", name="Confident", game="tablestar", icon="gem",
          desc="Average under 3.4 seconds per correct answer.", check=lambda s: s["ts"]["studio_idx"] >= 3),
-    dict(id="ts-rank-rockstar", name="Rock Star", game="tablestar", icon="crown",
+    dict(id="ts-rank-rockstar", name="Quick Thinker", game="tablestar", icon="crown",
          desc="Average under 2.6 seconds per correct answer.", check=lambda s: s["ts"]["studio_idx"] >= 4),
-    dict(id="ts-rank-legend", name="Rock Legend", game="tablestar", icon="trophy",
+    dict(id="ts-rank-legend", name="Top Marks", game="tablestar", icon="trophy",
          desc="Average under 2 seconds per correct answer.", check=lambda s: s["ts"]["studio_idx"] >= 5),
-    dict(id="ts-rank-hero", name="Rock Hero", game="tablestar", icon="spark",
-         desc="Average under 1.5 seconds per correct answer — the top of the bill.",
+    dict(id="ts-rank-hero", name="Little Genius", game="tablestar", icon="spark",
+         desc="Average under 1.5 seconds per correct answer — the top of the ladder.",
          check=lambda s: s["ts"]["studio_idx"] >= 6),
     dict(id="ts-tables", name="All Twelve", game="tablestar", icon="grid",
          desc="Answer correctly from every table 1–12.", check=lambda s: len(s["ts"]["tables"]) >= 12),

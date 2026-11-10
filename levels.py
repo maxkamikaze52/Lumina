@@ -30,10 +30,10 @@ def _threshold(n: int) -> int:
 
 # ten stages of ten levels, each a colour family and a name
 STAGES = [
-    ("Soundcheck", "gray"), ("Open Mic", "bronze"), ("Club Circuit", "copper"),
-    ("Support Act", "silver"), ("Headliner", "gold"), ("Tour Bus", "jade"),
-    ("Arena", "sapphire"), ("Stadium", "amethyst"), ("Legend", "crimson"),
-    ("Hall of Fame", "prism"),
+    ("Little Learner", "gray"), ("Busy Bee", "bronze"), ("Good Listener", "copper"),
+    ("Neat Writer", "silver"), ("Star Pupil", "gold"), ("Bookworm", "jade"),
+    ("Problem Solver", "sapphire"), ("Top of the Class", "amethyst"),
+    ("Prize Winner", "crimson"), ("Head of School", "prism"),
 ]
 
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]

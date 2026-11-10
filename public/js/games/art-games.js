@@ -23,57 +23,85 @@
             <path d="M18-20l-30 10 26 6-22 26" fill="none" stroke="#ff4d5e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
             <text x="-6" y="30" font-family="Fredoka,sans-serif" font-size="30" font-weight="700" fill="#fff" text-anchor="middle">×12</text>
           </g>`;
-      case 'studio':
-        return `<rect width="320" height="160" fill="#ff8a3d"/>
-          <path d="M0 0h320v46H0z" fill="#ffa95c"/>
-          <g transform="translate(64 82)">
-            <rect x="-22" y="-30" width="44" height="60" rx="22" fill="#fff" ${OL}/>
-            <path d="M-22 2h44" stroke="${O}" stroke-width="4"/>
-            <path d="M0 30v22M-22 60h44" stroke="${O}" stroke-width="6" stroke-linecap="round"/>
+      case 'studio': {
+        return `<defs>
+            <linearGradient id="ps-a" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffa45c"/><stop offset="1" stop-color="#f5813a"/>
+            </linearGradient>
+            <linearGradient id="ps-b" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ef7a34"/><stop offset="1" stop-color="#dd6a28"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="160" fill="url(#ps-a)"/>
+          <rect y="104" width="320" height="56" fill="url(#ps-b)"/>
+          <path d="M0 104h320" stroke="#22305c" stroke-width="3" opacity=".25"/>
+          ${star(292, 26, 10, '#ffe14d')}${star(258, 40, 6, '#fff')}
+
+          <!-- microphone on a stand, with a cable -->
+          <g transform="translate(66 80)">
+            <rect x="-20" y="-34" width="40" height="52" rx="20" fill="#fff" stroke="#22305c" stroke-width="5"/>
+            <path d="M-20 6h40" stroke="#22305c" stroke-width="4"/>
+            <rect x="-13" y="-24" width="26" height="6" rx="3" fill="#e9eefc"/>
+            <rect x="-13" y="-13" width="26" height="6" rx="3" fill="#e9eefc"/>
+            <path d="M0 18v22" stroke="#22305c" stroke-width="6" stroke-linecap="round"/>
+            <path d="M-24 40h48" stroke="#22305c" stroke-width="7" stroke-linecap="round"/>
+            <path d="M22 4c22 6 14 30 -6 34" fill="none" stroke="#22305c" stroke-width="4"
+              stroke-linecap="round" opacity=".85"/>
+            <circle cx="0" cy="-8" r="5" fill="#dfe6f8" opacity=".9"/>
           </g>
-          <g transform="translate(210 78)">
-            <rect x="-52" y="-56" width="104" height="72" rx="12" fill="#22305c" ${OL}/>
-            <path d="M-38-38l26 26-26 26" fill="none" stroke="#ffc93c" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6-38l26 26-26 26" fill="none" stroke="#2ecc71" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="-16" y="16" width="32" height="10" rx="3" fill="#22305c"/>
-            <path d="M-52 34h104" stroke="${O}" stroke-width="6" stroke-linecap="round"/>
-          </g>
-          ${star(270, 34, 12, '#ffc93c')}`;
-      case 'soundcheck':
-        return `<rect width="320" height="160" fill="#2ecc71"/>
-          <g transform="translate(160 82)">
-            <path d="M-70-14h26l30-26v80l-30-26h-26z" fill="#fff" ${OL}/>
-            <path d="M-4-30c16 10 16 50 0 60M14-42c26 16 26 68 0 84" fill="none" stroke="#22305c" stroke-width="6" stroke-linecap="round"/>
-            <path d="M56-46l-18 26h16l-14 26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-          </g>
-          ${star(42, 40, 13, '#ffc93c')}${star(282, 48, 11, '#fff')}
-          <circle cx="60" cy="126" r="9" fill="#ff4d5e" stroke="${O}" stroke-width="4"/><circle cx="260" cy="126" r="9" fill="#3a9bff" stroke="${O}" stroke-width="4"/>`;
-      case 'garage':
-        return `<rect width="320" height="160" fill="#ffc93c"/>
-          <path d="M0 120h320v40H0z" fill="#e8a92a"/>
-          <g transform="translate(120 84) rotate(-12)">
-            <rect x="-10" y="-58" width="20" height="34" rx="3" fill="#b9793f" ${OL} stroke-width="4"/>
-            <rect x="-9" y="-24" width="18" height="52" fill="#8a5a2b" ${OL} stroke-width="4"/>
-            <ellipse cx="0" cy="4" rx="22" ry="18" fill="#ff4d5e" ${OL} stroke-width="4"/>
-            <ellipse cx="0" cy="34" rx="30" ry="26" fill="#ff4d5e" ${OL} stroke-width="4"/>
-            <circle cx="0" cy="18" r="9" fill="#22305c" stroke="#ffc93c" stroke-width="3"/>
-          </g>
-          <g transform="translate(228 92)">
-            <rect x="-42" y="-40" width="84" height="66" rx="8" fill="#22305c" ${OL}/>
-            <circle cx="-16" cy="-8" r="15" fill="#3d4a72" stroke="${O}" stroke-width="4"/>
-            <circle cx="18" cy="-8" r="15" fill="#3d4a72" stroke="${O}" stroke-width="4"/>
-            <circle cx="-16" cy="-8" r="5" fill="#ffc93c"/><circle cx="18" cy="-8" r="5" fill="#ffc93c"/>
-            <rect x="-34" y="14" width="68" height="6" rx="3" fill="#5b6ee1"/>
+
+          <!-- screen with fast-forward chevrons, stand and shadow bar -->
+          <g transform="translate(212 76)">
+            <rect x="-58" y="-58" width="116" height="78" rx="14" fill="#22305c" stroke="#22305c" stroke-width="5"/>
+            <rect x="-50" y="-50" width="100" height="62" rx="9" fill="#1b2747"/>
+            <path d="M-34-38l24 24-24 24" fill="none" stroke="#ffc93c" stroke-width="10"
+              stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4-38l24 24-24 24" fill="none" stroke="#2ecc71" stroke-width="10"
+              stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="-12" y="20" width="24" height="10" rx="3" fill="#22305c"/>
+            <rect x="-40" y="30" width="80" height="9" rx="4" fill="#22305c" stroke="#22305c" stroke-width="3"/>
+            <circle cx="46" cy="-52" r="3" fill="#5b6ee1"/>
+            <circle cx="46" cy="-42" r="3" fill="#ff5a68"/>
           </g>`;
+      }
       case 'speed':
-        return `<rect width="320" height="160" fill="#3a9bff"/>
-          <g transform="translate(160 84)">
-            <circle r="54" fill="#fff" ${OL}/>
-            <path d="M0-30v32l22 14" fill="none" stroke="#22305c" stroke-width="8" stroke-linecap="round"/>
-            <circle r="6" fill="#22305c"/>
+      case 'soundcheck': {
+        const ticks = Array.from({ length: 12 }, (_, i) => {
+          const a = (Math.PI * 2 * i) / 12;
+          const long = i % 3 === 0;
+          const r1 = 44, r2 = long ? 34 : 38;
+          return `<line x1="${(160 + r1 * Math.sin(a)).toFixed(1)}" y1="${(80 - r1 * Math.cos(a)).toFixed(1)}"
+            x2="${(160 + r2 * Math.sin(a)).toFixed(1)}" y2="${(80 - r2 * Math.cos(a)).toFixed(1)}"
+            stroke="#22305c" stroke-width="${long ? 4 : 2.4}" stroke-linecap="round" opacity=".55"/>`;
+        }).join('');
+        return `<defs>
+            <linearGradient id="pc-a" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5fb0ff"/><stop offset="1" stop-color="#3f93ea"/>
+            </linearGradient>
+            <linearGradient id="pc-b" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3c8ce0"/><stop offset="1" stop-color="#2f78c6"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="160" fill="url(#pc-a)"/>
+          <rect y="104" width="320" height="56" fill="url(#pc-b)"/>
+          <path d="M0 104h320" stroke="#22305c" stroke-width="3" opacity=".22"/>
+          ${star(44, 30, 10, '#ffe14d')}${star(280, 34, 9, '#fff')}
+          <circle cx="46" cy="120" r="3" fill="#fff" opacity=".6"/>
+          <circle cx="278" cy="122" r="3" fill="#fff" opacity=".6"/>
+
+          <g transform="translate(160 80)">
+            <circle r="58" fill="#22305c" stroke="#22305c" stroke-width="4"/>
+            <circle r="52" fill="#fff"/>
+            <circle r="52" fill="none" stroke="#dfe8f8" stroke-width="3"/>
+            ${ticks}
+            <path d="M0-34v34" stroke="#22305c" stroke-width="9" stroke-linecap="round"/>
+            <path d="M0 0l24 16" stroke="#22305c" stroke-width="9" stroke-linecap="round"/>
+            <circle r="7" fill="#22305c"/><circle r="2.6" fill="#ff5a68"/>
+            <circle cx="-18" cy="-22" r="7" fill="#fff" opacity=".55"/>
           </g>
-          ${star(40, 36, 13, '#ffc93c')}${star(280, 40, 11, '#ffc93c')}
-          <path d="M40 128h44M236 128h44" stroke="#fff" stroke-width="8" stroke-linecap="round"/>`;
+          <path d="M22 108h40M258 108h40" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+          <path d="M22 122h26M272 122h26" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/>`;
+      }
 
       /* ---------- Spellbound ---------- */
       case 'practice':
