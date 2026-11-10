@@ -206,9 +206,7 @@ def plan(pid: str) -> dict:
         "targetTables": target_tables,
         "targetsDone": done,
         "ready": stage != "study" or done,
-        # the learning curve is not optional: you must finish the gig path before
-        # the full-deck Studio or a free play is offered at all
-        "locked": not m["mastered"],
+        "locked": False,
         "secure": secure, "total": total,
         "remaining": max(0, total - secure),
         "pct": round(secure / total * 100, 1) if total else 0,

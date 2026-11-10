@@ -231,10 +231,6 @@
       if (path) PLAN = path;
       const stage = mode === 'garage' ? (path.mode || 'test') : null;
       if (path && !path.ready) { App.toast('Finish the learning round first — then the next gig opens.', 'x'); return; }
-      if (path && path.locked && mode !== 'garage') {
-        App.toast('The Garage comes first: the gig, then what it exposes. Everything opens after that.', 'x');
-        return;
-      }
       const r = await App.API.post('/api/session/start',
         { game: 'tablestar', mode, difficulty: stage || mode,
           meta: { stage, tables: mode === 'studio' ? ALL_TABLES : (path ? path.targetTables : TS.tables),
@@ -326,7 +322,9 @@
       <div class="giant">YOUR <em>GIG</em></div>
 
       <div class="tilegrid" id="ts-cards">
-        ${ART.tile({ art: 'garage', name: 'THE GARAGE', sub: 'Gig, then learn what it exposes', label: '#ffe08a', action: 'data-tab="garage"' })}
+        ${ART.tile({ art: 'garage', name: 'GARAGE', sub: 'Gig, then learn what it exposes', label: '#ffe08a', action: 'data-tab="garage"' })}
+        ${ART.tile({ art: 'studio', name: 'STUDIO', sub: '12 × 12 · all divisions · ranked', label: '#b9a6ff', action: 'data-tab="studio"' })}
+        ${ART.tile({ art: 'speed', name: 'SOUNDCHECK', sub: '25 questions · 2–12', label: '#a8f0c8', action: 'data-tab="sound"' })}
       </div>
 
       <div id="ts-tab"></div>
@@ -360,57 +358,98 @@
     if (!plan) { try { plan = PLAN = await App.API.get('/api/tablestar/plan'); } catch (e) {} }
     const ranks = (plan && plan.ranks) || [];
     const mine = d.class || {};
-    const rows = ranks.map((r) => {
-      const isMe = r.id && r.id === mine.id;
-      return `<div class="rank-row ${isMe ? 'on' : ''}"${isMe ? ' aria-current="true"' : ''}>
-        <span class="rank-sec">${r.max}s</span>
-        <span class="rank-badge">${icon(r.icon || 'bolt')}</span>
-        <span class="rank-name">${esc(r.name)}</span>
-        ${isMe && d.avg ? `<span class="rank-you">you: ${d.avg}s</span>` : ''}
-      </div>`;
-    }).join('');
-    const recent = (d.history || []).slice(0, 8);
-    host.innerHTML = `<div class="card rank-card">
-      <div class="between">
-        <div><div class="eyebrow">Studio · your speed</div>
-          <h2 style="margin-top:4px">${esc(mine.name || 'Unranked')}</h2></div>
-        <span class="pill amber">${d.runs || 0}/10 games${d.remaining ? ` · ${d.remaining} to go` : ''}</span>
-      </div>
-      <p class="small muted" style="margin-top:6px">
-        ${d.avg ? `Your average is <b>${d.avg}s</b> per correct answer, taken over your last ten Studio games.` : 'Finish a Studio game with correct answers in it and you will be put on the bill.'}
-        ${mine.toNext != null && mine.next ? ` Shave <b>${mine.toNext}s</b> per answer to reach ${esc(mine.next.name)}.` : ''}</p>
-      <div class="rank-ladder">${rows || '<p class="small muted">Ranks are loading.</p>'}</div>
-      <p class="small muted" style="margin-top:10px">Every rank is also a badge — reach it and it joins your collection.</p>
-      <div class="row" style="margin-top:14px">
-        <button class="btn jade big" data-mode="studio">${icon('play')} PLAY STUDIO</button>
-        <span class="small muted">60 seconds · every table 1–12 · × and ÷ · answer with ENTER</span>
-      </div>
-    </div>
+    const recent = (d.history || []).slice(0, 10);
+    const secs = recent.reduce((a, r) => a + (r.duration || 0), 0);
+    const right = recent.reduce((a, r) => a + (r.correct || 0), 0);
+    const qpm = secs ? Math.round((right / secs) * 60) : null;
 
-    <div class="card" style="margin-top:16px">
-      <div class="eyebrow">Your past games</div>
-      ${recent.length ? `<table class="lb ts-history"><thead><tr>
-          <th>When</th><th>Correct</th><th>Accuracy</th><th>Per answer</th><th class="hide-sm">XP</th></tr></thead><tbody>
-        ${recent.map((r) => `<tr>
-          <td class="small">${esc(when(r.at))}</td>
-          <td class="num">${r.correct}</td>
-          <td class="num">${Math.round(r.accuracy || 0)}%</td>
-          <td class="num">${r.avg}s</td>
-          <td class="num hide-sm">+${num(r.xp || 0)}</td></tr>`).join('')}
-        </tbody></table>` : '<p class="small muted" style="margin-top:8px">No Studio games yet. Your first one is one click away.</p>'}
-    </div>
+    host.innerHTML = `<div class="studio-panel">
+      <div class="studio-band">
+        <div class="studio-band-top">
+          <h2 class="studio-title">STUDIO</h2>
+          <button class="play-big" data-mode="studio">${icon('play')} PLAY</button>
+        </div>
+        <div class="studio-meta">
+          <span>${icon('grid')} <b>Tables:</b> all tables</span>
+          <span>${icon('bolt')} <b>Play solo</b></span>
+          <span class="coin">1 per correct answer</span>
+        </div>
+      </div>
 
-    <div class="card" style="margin-top:16px">
-      <div class="eyebrow">Everyone's average</div>
-      <table class="lb"><thead><tr><th>#</th><th>Player</th><th>Avg</th><th class="hide-sm">Rank</th></tr></thead><tbody>
-        ${d.board && d.board.length ? d.board.slice(0, 10).map((r) => `<tr class="${r.id === App.state.player.id ? 'me' : ''}">
-          <td class="rank">${r.rank}</td>
-          <td><div class="who"><span class="face">${ART.avatar(r.character, { background: false })}</span>${esc(r.name)}</div></td>
-          <td class="num">${r.avg}s</td><td class="hide-sm">${esc(r.class)}</td></tr>`).join('')
-          : '<tr><td colspan="4" class="small muted" style="padding:16px">Nobody has a Studio game in yet. Yours could be the first.</td></tr>'}
-      </tbody></table>
+      <div class="studio-body">
+        <div class="studio-speed">
+          <div class="studio-speed-head">${icon('bolt')} STUDIO SPEED</div>
+          ${speedGauge(ranks, mine, d)}
+        </div>
+
+        <div class="studio-games">
+          <div class="studio-games-head">10 MOST RECENT STUDIO GAMES</div>
+          ${recent.length ? `<table class="recent-games">
+            <thead><tr><th>WHEN</th><th>SCORE</th></tr></thead><tbody>
+              ${recent.map((r) => `<tr><td>${esc(ago(r.at))}</td><td class="num">${r.correct}</td></tr>`).join('')}
+            </tbody></table>` : '<p class="small muted" style="padding:12px 0">No Studio games yet — the first one takes a minute.</p>'}
+          <div class="recent-stats">
+            <div><span>Average Score (q/min)</span><b>${qpm != null ? qpm : '—'}</b></div>
+            <div><span>Studio Speed (sec/question)</span><b>${d.avg ? d.avg : '—'}</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="eyebrow">Everyone's average</div>
+        <table class="lb"><thead><tr><th>#</th><th>Player</th><th>Avg</th><th class="hide-sm">Rank</th></tr></thead><tbody>
+          ${d.board && d.board.length ? d.board.slice(0, 10).map((r) => `<tr class="${r.id === App.state.player.id ? 'me' : ''}">
+            <td class="rank">${r.rank}</td>
+            <td><div class="who"><span class="face">${ART.avatar(r.character, { background: false })}</span>${esc(r.name)}</div></td>
+            <td class="num">${r.avg}s</td><td class="hide-sm">${esc(r.class)}</td></tr>`).join('')
+            : '<tr><td colspan="4" class="small muted" style="padding:16px">Nobody has a Studio game in yet. Yours could be the first.</td></tr>'}
+        </tbody></table>
+      </div>
     </div>`;
     host.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
+  }
+
+  /* The Studio Speed gauge: seconds down the middle, the rank names against it,
+     the band you are in lit up, and two markers — this average and the one before. */
+  function speedGauge(ranks, mine, d) {
+    if (!ranks.length) return '<p class="small muted">Ranks are loading.</p>';
+    const TOP = 0, BOTTOM = 7, H = 420;          // seconds axis, and its pixel height
+    const y = (s) => Math.max(0, Math.min(H, (s - TOP) / (BOTTOM - TOP) * H));
+    const ticks = [0, 1, 2, 3, 4, 5, 6, 7].map((s) =>
+      `<span class="tick" style="top:${y(s)}px">${s}s</span>`).join('');
+    const bands = ranks.map((r) => {
+      const mid = (r.max + r.from) / 2;
+      const on = r.id && r.id === mine.id;
+      return `<div class="gauge-rank ${on ? 'on' : ''}" style="top:${y(r.max)}px">
+        <span class="gauge-rank-name">${esc(r.name)}</span></div>`;
+    }).join('');
+    const mark = (s, cls, label) => s == null ? '' :
+      `<div class="gauge-mark ${cls}" style="top:${y(s)}px">
+         <span class="gauge-mark-val">${s}</span><i></i></div>`;
+    const prev = (d.previous && d.previous.avg) || null;
+    return `<div class="gauge" style="height:${H + 26}px">
+      <div class="gauge-scale">${ticks}</div>
+      <div class="gauge-bar" style="height:${H}px">
+        <span class="gauge-track"></span>
+        ${bands}
+        ${mark(d.avg, 'now', 'now')}
+        ${prev != null && prev !== d.avg ? mark(prev, 'prev', 'before') : ''}
+      </div>
+      <div class="gauge-legend small muted">
+        ${d.avg ? `<b>${d.avg}s</b> your last ten games` : 'Play a Studio game to get a marker'}
+        ${mine.toNext != null && mine.next ? ` · ${mine.toNext}s to ${esc(mine.next.name)}` : ''}
+      </div>
+    </div>`;
+  }
+
+  function ago(ts) {
+    if (!ts) return '—';
+    const s = Math.max(0, Date.now() / 1000 - ts);
+    if (s < 90) return 'just now';
+    if (s < 3600) return Math.round(s / 60) + ' min ago';
+    if (s < 86400) return Math.round(s / 3600) + ' hours ago';
+    if (s < 86400 * 30) return Math.round(s / 86400) + ' days ago';
+    return Math.round(s / (86400 * 30)) + ' months ago';
   }
 
   function when(ts) {
