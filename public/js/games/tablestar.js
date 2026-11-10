@@ -199,27 +199,27 @@
           <div class="stamp-sub">your studio class</div>
         </div>
       </div>` : ''}
-      <div class="stage">
-        <div class="stage-beams" aria-hidden="true"><i style="--r:-22deg"></i><i style="--r:8deg"></i><i style="--r:26deg"></i></div>
-        <div class="stage-floor" aria-hidden="true"></div>
-        <div class="stage-inner">
-          <div class="stage-eyebrow">${esc(label(session.mode))} · THAT'S A WRAP</div>
-          <div class="stage-score">${correct}</div>
-          <div class="stage-sub">correct in ${Math.round(duration)} seconds</div>
-          <div class="stage-stats">
+      <div class="res-stage">
+        <div class="res-beams" aria-hidden="true"><i style="--r:-22deg"></i><i style="--r:8deg"></i><i style="--r:26deg"></i></div>
+        <div class="res-floor" aria-hidden="true"></div>
+        <div class="res-inner">
+          <div class="res-eyebrow">${esc(label(session.mode))} · THAT'S A WRAP</div>
+          <div class="res-score">${correct}</div>
+          <div class="res-sub">correct in ${Math.round(duration)} seconds</div>
+          <div class="res-stats">
             <div><b>${acc}%</b><span>accuracy</span></div>
             <div><b>${mean ? mean.toFixed(2) + 's' : '—'}</b><span>per correct</span></div>
             <div><b class="xp">+${num(reward.xp)}</b><span>XP</span></div>
             <div><b class="bits">+${num(reward.starbits)}</b><span>Starbits</span></div>
           </div>
-          <div class="stage-pills">
+          <div class="res-pills">
             <span class="pill">best streak ${session.best}</span>
             <span class="pill">${esc(reward.class ? reward.class.name : '')}</span>
           </div>
         </div>
       </div>
 
-      <div class="stage-notes">
+      <div class="res-notes">
         ${studio ? `<div class="note">
           <div class="note-head">Studio speed rank</div>
           <b class="note-big">${esc(studio.class.name)}</b>
@@ -242,11 +242,11 @@
         </div>` : ''}
       </div>
 
-      <div class="stage-actions">
+      <div class="res-actions">
         <button class="act act-again" id="again">${icon('play')} PLAY AGAIN</button>
         <button class="act act-back" id="home">${icon('arrow')} BACK</button>
       </div>
-      ${reward.badges && reward.badges.length ? `<p class="stage-badges">New badges: ${reward.badges.map((b) => esc(b.name)).join(', ')}</p>` : ''}
+      ${reward.badges && reward.badges.length ? `<p class="res-badges">New badges: ${reward.badges.map((b) => esc(b.name)).join(', ')}</p>` : ''}
     </div>`;
     if (reward.badges && reward.badges.length) App.celebrate(reward.badges);
     main_el.querySelector('#again').onclick = () => start(session.mode);
