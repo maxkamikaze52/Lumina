@@ -69,19 +69,19 @@ def class_for(xp: int) -> dict:
 # answer ceiling of each band; `from` is where the band starts on the axis.
 # --------------------------------------------------------------------------- #
 STUDIO_CLASSES = [
-    {"id": "unsigned", "name": "Unsigned Act", "max": 9.0, "from": 6.0, "icon": "mic",
+    {"id": "unsigned", "tone": "#d02b3f", "name": "Unsigned Act", "max": 9.0, "from": 6.0, "icon": "mic",
      "desc": "Nobody has heard of you yet. Every act starts in the garage."},
-    {"id": "breakthrough", "name": "Breakthrough Artist", "max": 6.0, "from": 5.0, "icon": "bolt",
+    {"id": "breakthrough", "tone": "#e2552f", "name": "Breakthrough Artist", "max": 6.0, "from": 5.0, "icon": "bolt",
      "desc": "The first real crowd. Six seconds a fact is still a search."},
-    {"id": "support", "name": "Support Act", "max": 4.5, "from": 4.0, "icon": "star",
+    {"id": "support", "tone": "#f0902c", "name": "Support Act", "max": 4.5, "from": 4.0, "icon": "star",
      "desc": "You hold the stage on your own. Recall is arriving faster now."},
-    {"id": "headliner", "name": "Headliner", "max": 3.4, "from": 3.0, "icon": "gem",
+    {"id": "headliner", "tone": "#f2c421", "name": "Headliner", "max": 3.4, "from": 3.0, "icon": "gem",
      "desc": "Your name is on the poster. Threeish seconds a fact, all tables."},
-    {"id": "rockstar", "name": "Rock Star", "max": 2.6, "from": 2.0, "icon": "crown",
+    {"id": "rockstar", "tone": "#b7cf32", "name": "Rock Star", "max": 2.6, "from": 2.0, "icon": "crown",
      "desc": "Under three seconds. The answer arrives before the question ends."},
-    {"id": "legend", "name": "Rock Legend", "max": 2.0, "from": 1.0, "icon": "trophy",
+    {"id": "legend", "tone": "#7cc63f", "name": "Rock Legend", "max": 2.0, "from": 1.0, "icon": "trophy",
      "desc": "Two seconds a fact, multiplication and division alike."},
-    {"id": "hero", "name": "Rock Hero", "max": 1.5, "from": 0.0, "icon": "spark",
+    {"id": "hero", "tone": "#2fbf71", "name": "Rock Hero", "max": 1.5, "from": 0.0, "icon": "spark",
      "desc": "Instant. Nothing on the ladder is faster than this."},
 ]
 RANK_IDS = [c["id"] for c in STUDIO_CLASSES]
@@ -111,7 +111,7 @@ def studio_class(avg: float | None) -> dict:
 def rank_ladder() -> list[dict]:
     """Fastest first, for drawing the ladder (0s at the top)."""
     return [{"id": c["id"], "name": c["name"], "max": c["max"], "from": c["from"],
-             "icon": c["icon"], "desc": c["desc"]}
+             "icon": c["icon"], "tone": c["tone"], "desc": c["desc"]}
             for c in reversed(STUDIO_CLASSES)]
 
 

@@ -378,25 +378,25 @@
 
       <div class="studio-body">
         <div class="studio-speed">
-          <div class="studio-speed-head">${icon('bolt')} STUDIO SPEED</div>
+          <div class="block-head">${icon('bolt')} STUDIO SPEED</div>
           ${speedGauge(ranks, mine, d)}
         </div>
 
         <div class="studio-games">
-          <div class="studio-games-head">10 MOST RECENT STUDIO GAMES</div>
+          <h3 class="strip-title">10 most recent Studio games</h3>
           ${recent.length ? `<table class="recent-games">
-            <thead><tr><th>WHEN</th><th>SCORE</th></tr></thead><tbody>
+            <thead><tr><th>When</th><th>Score</th></tr></thead><tbody>
               ${recent.map((r) => `<tr><td>${esc(ago(r.at))}</td><td class="num">${r.correct}</td></tr>`).join('')}
             </tbody></table>` : '<p class="small muted" style="padding:12px 0">No Studio games yet — the first one takes a minute.</p>'}
           <div class="recent-stats">
-            <div><span>Average Score (q/min)</span><b>${qpm != null ? qpm : '—'}</b></div>
-            <div><span>Studio Speed (sec/question)</span><b>${d.avg ? d.avg : '—'}</b></div>
+            <div><span>Average score (q/min)</span><b>${qpm != null ? qpm : '—'}</b></div>
+            <div><span>Studio speed (sec/question)</span><b>${d.avg ? d.avg : '—'}</b></div>
           </div>
         </div>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <div class="eyebrow">Everyone's average</div>
+        <h3 class="strip-title">Everyone's average</h3>
         <table class="lb"><thead><tr><th>#</th><th>Player</th><th>Avg</th><th class="hide-sm">Rank</th></tr></thead><tbody>
           ${d.board && d.board.length ? d.board.slice(0, 10).map((r) => `<tr class="${r.id === App.state.player.id ? 'me' : ''}">
             <td class="rank">${r.rank}</td>
@@ -413,32 +413,37 @@
      the band you are in lit up, and two markers — this average and the one before. */
   function speedGauge(ranks, mine, d) {
     if (!ranks.length) return '<p class="small muted">Ranks are loading.</p>';
-    const TOP = 0, BOTTOM = 7, H = 420;          // seconds axis, and its pixel height
-    const y = (s) => Math.max(0, Math.min(H, (s - TOP) / (BOTTOM - TOP) * H));
+    const TOP = 0, BOTTOM = 7;
+    const TONE = ['#2fbf71', '#7cc63f', '#b7cf32', '#f2c421', '#f0902c', '#e2552f', '#d02b3f'];
+    const pct = (s) => Math.max(0, Math.min(100, (s - TOP) / (BOTTOM - TOP) * 100));
     const ticks = [0, 1, 2, 3, 4, 5, 6, 7].map((s) =>
-      `<span class="tick" style="top:${y(s)}px">${s}s</span>`).join('');
-    const bands = ranks.map((r) => {
-      const mid = (r.max + r.from) / 2;
+      `<span class="tick" style="top:${pct(s)}%">${s}s</span>`).join('');
+    const bands = ranks.map((r, i) => {
       const on = r.id && r.id === mine.id;
-      return `<div class="gauge-rank ${on ? 'on' : ''}" style="top:${y(r.max)}px">
-        <span class="gauge-rank-name">${esc(r.name)}</span></div>`;
+      const h = pct(r.max) - pct(r.from);
+      return `<div class="band ${on ? 'on' : ''}"
+        style="--h:${h.toFixed(2)}%;--tone:${r.tone || TONE[i] || '#4aa8ff'}">
+        <span class="band-name">${esc(r.name)}</span>
+        <span class="band-note">${on ? `you: ${d.avg != null ? d.avg + 's' : '—'}` : ''}</span>
+        <span class="band-sec">${r.max}s</span>
+      </div>`;
     }).join('');
-    const mark = (s, cls, label) => s == null ? '' :
-      `<div class="gauge-mark ${cls}" style="top:${y(s)}px">
-         <span class="gauge-mark-val">${s}</span><i></i></div>`;
     const prev = (d.previous && d.previous.avg) || null;
-    return `<div class="gauge" style="height:${H + 26}px">
-      <div class="gauge-scale">${ticks}</div>
-      <div class="gauge-bar" style="height:${H}px">
-        <span class="gauge-track"></span>
+    const marker = (s, cls) => s == null ? '' :
+      `<div class="gauge-mark ${cls}" style="top:${pct(s)}%">
+         <span class="gauge-mark-val">${s}s</span><i></i></div>`;
+    return `<div class="gauge">
+      <div class="gauge-axis">${ticks}</div>
+      <div class="gauge-stack">
         ${bands}
-        ${mark(d.avg, 'now', 'now')}
-        ${prev != null && prev !== d.avg ? mark(prev, 'prev', 'before') : ''}
+        <span class="gauge-line"></span>
+        ${marker(d.avg, 'now')}${prev != null && prev !== d.avg ? marker(prev, 'prev') : ''}
       </div>
-      <div class="gauge-legend small muted">
-        ${d.avg ? `<b>${d.avg}s</b> your last ten games` : 'Play a Studio game to get a marker'}
-        ${mine.toNext != null && mine.next ? ` · ${mine.toNext}s to ${esc(mine.next.name)}` : ''}
-      </div>
+    </div>
+    <div class="gauge-legend">
+      ${d.avg ? `<b>${d.avg}s</b><span>your last ten games</span>` : '<span>Play a Studio game to get a marker</span>'}
+      ${prev != null && prev !== d.avg ? `<b class="alt">${prev}s</b><span>the ten before that</span>` : ''}
+      ${mine.toNext != null && mine.next ? `<b class="up">${mine.toNext}s</b><span>to ${esc(mine.next.name)}</span>` : ''}
     </div>`;
   }
 
