@@ -171,52 +171,61 @@
 
   function renderResults(session, correct, total, acc, mean, duration, reward, rejected) {
     const studio = session.mode === 'studio' ? App.state._studio : null;
+    const missed = [...new Set(session.facts.filter((f) => !f.ok).map((f) => {
+      const [kind, rest] = f.f.split(':');
+      const [a, b] = rest.split('x');
+      return kind === 'm' ? `${a} × ${b} = ${a * b}` : `${a * b} ÷ ${a} = ${b}`;
+    }))].slice(0, 6);
     main_el.innerHTML = `<div class="stack ts">
-      <div class="results">
-        <div class="res-hero">
-          <div class="eyebrow">${label(session.mode)} complete</div>
-          <b>${correct}</b>
-          <p class="muted">correct in ${Math.round(duration)} seconds</p>
-          <div class="res-grid">
+      <div class="stage">
+        <div class="stage-beams" aria-hidden="true"><i style="--r:-22deg"></i><i style="--r:8deg"></i><i style="--r:26deg"></i></div>
+        <div class="stage-floor" aria-hidden="true"></div>
+        <div class="stage-inner">
+          <div class="stage-eyebrow">${esc(label(session.mode))} · THAT'S A WRAP</div>
+          <div class="stage-score">${correct}</div>
+          <div class="stage-sub">correct in ${Math.round(duration)} seconds</div>
+          <div class="stage-stats">
             <div><b>${acc}%</b><span>accuracy</span></div>
             <div><b>${mean ? mean.toFixed(2) + 's' : '—'}</b><span>per correct</span></div>
-            <div><b style="color:var(--jade)">+${num(reward.xp)}</b><span>XP</span></div>
-            <div><b style="color:var(--amber)">+${num(reward.starbits)}</b><span>Starbits</span></div>
+            <div><b class="xp">+${num(reward.xp)}</b><span>XP</span></div>
+            <div><b class="bits">+${num(reward.starbits)}</b><span>Starbits</span></div>
           </div>
-          <div class="row" style="justify-content:center;margin-top:14px">
-            <span class="pill">🔥 best streak ${session.best}</span>
-            <span class="pill jade">${esc(reward.class ? reward.class.name : '')}</span>
+          <div class="stage-pills">
+            <span class="pill">best streak ${session.best}</span>
+            <span class="pill">${esc(reward.class ? reward.class.name : '')}</span>
           </div>
         </div>
-        ${studio ? `<div class="card flat">
-          <div class="between"><div><div class="eyebrow">Studio speed rank</div>
-            <h3 style="margin-top:4px">${esc(studio.class.name)}</h3></div>
-            <span class="pill amber">${studio.runs}/10 runs${studio.remaining ? ' · ' + studio.remaining + ' to go' : ''}</span></div>
-          <p class="small muted" style="margin-top:8px">${studio.avg ? 'Average ' + studio.avg + 's per correct answer over your last 10 runs.' : 'Answer some questions correctly to get on the bill.'}</p>
+      </div>
+
+      <div class="stage-notes">
+        ${studio ? `<div class="note">
+          <div class="note-head">Studio speed rank</div>
+          <b class="note-big">${esc(studio.class.name)}</b>
+          <p>${studio.avg ? studio.avg + 's per correct answer over your last ten games.' : 'Answer some questions correctly to get on the bill.'}</p>
+          <span class="pill">${studio.runs}/10 games</span>
         </div>` : ''}
-        ${session.mode === 'garage' && PLAN ? `<div class="card flat">
-          <div class="eyebrow">Garage · what happens next</div>
-          <h3 style="margin-top:4px">${esc(PLAN.cta)}</h3>
-          <p class="small muted" style="margin-top:6px">${esc(PLAN.detail)}</p>
-          ${PLAN.targetTables && PLAN.targetTables.length ? `<p class="small" style="margin-top:8px">Tables to study: <b>${PLAN.targetTables.join(', ')}</b></p>` : ''}
-          ${PLAN.lastTest ? `<p class="small" style="margin-top:8px">Last test: <b>${Math.round(PLAN.lastTest.accuracy * 100)}%</b>
-            at ${PLAN.lastTest.perAnswer}s per answer · good ${PLAN.goodStreak}/${PLAN.goodNeeded} in a row${PLAN.lastTest.excellent ? ' · excellent' : ''}</p>` : ''}
+        ${session.mode === 'garage' && PLAN ? `<div class="note">
+          <div class="note-head">Next up in the Garage</div>
+          <b class="note-big">${esc(PLAN.cta)}</b>
+          <p>${PLAN.targetTables && PLAN.targetTables.length ? 'Tables to learn: ' + PLAN.targetTables.join(' · ') : 'Every table and division is open.'}</p>
+          ${PLAN.lastTest ? `<span class="pill">last gig ${Math.round(PLAN.lastTest.accuracy * 100)}%</span>` : ''}
         </div>` : ''}
-        ${rejected ? `<div class="card flat" style="border-color:rgba(255,111,145,.4)">
-          <div class="eyebrow">Run not recorded</div>
-          <p class="small" style="margin-top:6px">${esc(rejected)}</p>
-          <p class="small muted" style="margin-top:6px">The server rejects runs faster than a human can
-            read a question, so the speed ranking stays honest.</p></div>` : ''}
-        ${session.facts.some((f) => !f.ok) ? `<div class="card flat"><div class="eyebrow">Worth another look</div>
-          <p class="small" style="margin-top:8px">${[...new Set(session.facts.filter((f) => !f.ok).map((f) => {
-            const [kind, rest] = f.f.split(':');
-            const [a, b] = rest.split('x');
-            return kind === 'm' ? `${a} × ${b} = ${a * b}` : `${a * b} ÷ ${a} = ${b}`;
-          }))].slice(0, 8).join(' · ')}</p></div>` : ''}
-        <div class="row"><button class="btn jade" id="again">${icon('play')} Play again</button>
-          <button class="btn ghost" id="home">Back</button></div>
-        ${reward.badges && reward.badges.length ? '<p class="small">New badges: ' + reward.badges.map((b) => esc(b.name)).join(', ') + '</p>' : ''}
-      </div></div>`;
+        ${missed.length ? `<div class="note">
+          <div class="note-head">Worth another look</div>
+          <p class="note-facts">${missed.join(' &nbsp;·&nbsp; ')}</p>
+        </div>` : ''}
+        ${rejected ? `<div class="note bad">
+          <div class="note-head">Run not recorded</div>
+          <p>${esc(rejected)} — the server rejects runs faster than a human can read.</p>
+        </div>` : ''}
+      </div>
+
+      <div class="stage-actions">
+        <button class="act act-again" id="again">${icon('play')} PLAY AGAIN</button>
+        <button class="act act-back" id="home">${icon('arrow')} BACK</button>
+      </div>
+      ${reward.badges && reward.badges.length ? `<p class="stage-badges">New badges: ${reward.badges.map((b) => esc(b.name)).join(', ')}</p>` : ''}
+    </div>`;
     if (reward.badges && reward.badges.length) App.celebrate(reward.badges);
     main_el.querySelector('#again').onclick = () => start(session.mode);
     main_el.querySelector('#home').onclick = () => showMenu();
@@ -420,29 +429,50 @@
     host.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => start(b.dataset.mode); });
   }
 
-  /* The Studio Speed gauge: seconds down the middle, the rank names against it,
-     the band you are in lit up, and two markers — this average and the one before. */
+  /* The Studio Speed slider. Each rank gets its own row with a real minimum
+     height so the names can never collide, and the seconds axis is positioned
+     through the same piecewise map so ticks line up with the band edges. */
   function speedGauge(ranks, mine, d) {
     if (!ranks.length) return '<p class="small muted">Ranks are loading.</p>';
-    const TOP = 0, BOTTOM = 7;
-    const pct = (s) => Math.max(0, Math.min(100, (s - TOP) / (BOTTOM - TOP) * 100));
+    const TOTAL = 660, MIN = 64;
+    const weight = ranks.map((r) => Math.max(0.15, r.max - r.from));
+    const wsum = weight.reduce((a, b) => a + b, 0);
+    let hs = weight.map((w) => Math.max(MIN, (w / wsum) * TOTAL));
+    const k = TOTAL / hs.reduce((a, b) => a + b, 0);
+    hs = hs.map((h) => h * k);
+
+    const top = [], acc = [];
+    let run = 0;
+    ranks.forEach((r, i) => { top.push(run); acc.push(run); run += hs[i]; });
+    // seconds -> px, interpolating inside whichever rank band holds that second
+    const pxFor = (s) => {
+      for (let i = 0; i < ranks.length; i++) {
+        const r = ranks[i];
+        if (s <= r.max || i === ranks.length - 1) {
+          const t = Math.max(0, Math.min(1, (s - r.from) / (r.max - r.from)));
+          return top[i] + t * hs[i];
+        }
+      }
+      return TOTAL;
+    };
+
     const ticks = [0, 1, 2, 3, 4, 5, 6, 7].map((s) =>
-      `<span class="tick" style="top:${pct(s)}%">${s}s</span>`).join('');
-    const bands = ranks.map((r) => {
+      `<span class="tick" style="top:${pxFor(s).toFixed(1)}px">${s}s</span>`).join('');
+    const bands = ranks.map((r, i) => {
       const on = r.id && r.id === mine.id;
-      const h = pct(r.max) - pct(r.from);
       return `<div class="band ${on ? 'on' : ''}"
-        style="--h:${h.toFixed(2)}%;--tone:${r.tone || '#4aa8ff'}">
-        <span class="band-thresh">${r.max}s</span>
+        style="height:${hs[i].toFixed(1)}px;--tone:${r.tone || '#4aa8ff'}">
+        <span class="band-bar"></span>
         <span class="band-name">${esc(r.name)}</span>
+        <span class="band-thresh">${r.max}s</span>
       </div>`;
     }).join('');
     const prev = (d.previous && d.previous.avg) || null;
     const knob = (s, cls) => s == null ? '' :
-      `<div class="slide-knob ${cls}" style="top:${pct(s)}%"><i></i></div>`;
+      `<div class="slide-knob ${cls}" style="top:${pxFor(s).toFixed(1)}px"><i></i></div>`;
     return `<div class="slider">
-      <div class="slider-axis">${ticks}</div>
-      <div class="slider-track">
+      <div class="slider-axis" style="height:${TOTAL}px">${ticks}</div>
+      <div class="slider-track" style="height:${TOTAL}px">
         <span class="slider-rail"></span>
         <div class="slider-bands">${bands}</div>
         ${knob(d.avg, 'now')}${prev != null && prev !== d.avg ? knob(prev, 'prev') : ''}
