@@ -247,9 +247,10 @@
   border:4px solid #1a0d38;border-bottom:0;border-radius:14px 14px 0 0;padding:22px 28px 18px;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.18)}
 .studio-band-top{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
-.studio-title{font-family:var(--metal);font-size:clamp(30px,4.4vw,48px);letter-spacing:.02em;
-  color:#fff;text-transform:uppercase;margin:0;line-height:1;
-  text-shadow:0 4px 0 #1a0d38, 0 0 22px rgba(255,190,90,.25)}
+#world .studio-title, .studio-title{font-family:var(--metal);font-size:clamp(32px,4.6vw,50px);
+  letter-spacing:.02em;color:#fff;text-transform:uppercase;margin:0;line-height:1;
+  -webkit-text-stroke:2px #120a26;
+  text-shadow:0 4px 0 #120a26, 0 6px 16px rgba(0,0,0,.5)}
 .play-big{display:inline-flex;align-items:center;gap:12px;background:#f0325f;color:#fff;
   font-family:var(--metal);font-size:clamp(19px,2.2vw,25px);letter-spacing:.07em;text-transform:uppercase;
   border:3px solid #170a2e;border-radius:8px;padding:16px 44px;box-shadow:0 7px 0 #170a2e;
@@ -293,21 +294,29 @@
   background-image:linear-gradient(#96a8c8 55%,transparent 0);background-size:5px 9px}
 .slider-bands{position:absolute;inset:0;display:flex;flex-direction:column}
 .band{position:relative;display:flex;align-items:flex-start;gap:0;
-  border-bottom:3px dashed #d7dfef;padding-left:26px}
+  border-bottom:3px dashed #d7dfef;padding-left:64px}
 .band:last-child{border-bottom:0}
-.band-bar{position:absolute;left:14px;top:8px;width:11px;height:36px;border-radius:2px;
-  background:var(--tone);box-shadow:0 0 0 2px rgba(26,13,56,.25)}
+.band-bar{position:absolute;left:44px;top:10px;width:12px;height:32px;border-radius:2px;
+  background:var(--tone);box-shadow:0 0 0 2px rgba(26,13,56,.35)}
 .band-name{font-family:var(--metal);text-transform:uppercase;letter-spacing:.005em;
-  font-size:clamp(17px,2vw,25px);color:#16203f;line-height:1.1;padding-top:8px}
-.band-thresh{position:absolute;left:26px;bottom:6px;font-family:var(--metal);font-size:13px;
-  color:#7c88a8;letter-spacing:.02em}
+  font-size:clamp(18px,2.1vw,26px);color:#0f1832;line-height:1.15;padding:8px 96px 26px 0;
+  -webkit-text-stroke:.4px #0f1832;text-shadow:0 1px 0 rgba(255,255,255,.65)}
+.band.on .band-name{color:#08102a}
+.band-thresh{position:absolute;left:64px;bottom:5px;font-family:var(--metal);font-size:14px;
+  color:#4d5a7d;letter-spacing:.02em}
 .band.on{background:linear-gradient(90deg,color-mix(in srgb,var(--tone) 20%,#fff),#fbfdff 65%)}
-.band.on .band-bar{height:46px;box-shadow:0 0 0 3px #1a0d38}
-.slide-knob{position:absolute;left:-7px;transform:translateY(-50%);z-index:3}
-.slide-knob i{display:block;width:74px;height:18px;border-radius:3px;background:#fff;
+.band.on .band-bar{height:44px;box-shadow:0 0 0 3px #1a0d38}
+.slide-knob{position:absolute;right:calc(100% + 8px);transform:translateY(-50%);z-index:3}
+.slide-knob i{display:block;width:46px;height:18px;border-radius:3px;background:#fff;
   border:4px solid #1a0d38;box-shadow:0 4px 0 rgba(26,13,56,.45)}
 .slide-knob.now i{background:#4d9bf5}
 .slide-knob.prev i{background:#f0325f}
+.slide-val{position:absolute;right:6px;transform:translateY(-50%);z-index:3;
+  font-family:var(--metal);font-size:16px;padding:6px 12px;border-radius:5px;color:#fff;
+  border:3px solid #1a0d38;box-shadow:0 4px 0 rgba(26,13,56,.4);font-variant-numeric:tabular-nums}
+.slide-val.now{background:#4d9bf5}
+.slide-val.prev{background:#f0325f}
+.slide-val small{font-size:11px;letter-spacing:.08em;margin-right:5px;opacity:.85}
 .slider-foot{margin-top:22px;padding-top:16px;border-top:4px dashed #d7dfef;
   font-size:17px;font-weight:700;color:#3a4566}
 .slider-foot b{font-family:var(--metal);color:#141d3d;margin:0 3px}
@@ -423,9 +432,14 @@
   .studio-body{grid-template-columns:1fr}
   .studio-speed{border-right:0;border-bottom:4px solid #d7dfef}
   .studio-meta .coin{margin-left:0}
-  .slider{grid-template-columns:46px minmax(0,1fr)}
+  .slider{grid-template-columns:58px minmax(0,1fr)}
+  .slide-knob i{width:34px;height:15px}
+  .band{padding-left:52px}
+  .band-bar{left:34px}
+  .band-thresh{left:52px}
+  .band-name{padding-right:74px}
+  .slide-val{font-size:14px;padding:5px 9px}
   .band-name{font-size:clamp(15px,3.4vw,19px)}
-  .slide-knob i{width:52px;height:16px}
   .stage-actions{gap:16px}
   .act{width:100%;justify-content:center}
 }

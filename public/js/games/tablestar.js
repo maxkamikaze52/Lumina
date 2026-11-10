@@ -468,14 +468,16 @@
       </div>`;
     }).join('');
     const prev = (d.previous && d.previous.avg) || null;
-    const knob = (s, cls) => s == null ? '' :
-      `<div class="slide-knob ${cls}" style="top:${pxFor(s).toFixed(1)}px"><i></i></div>`;
+    const knob = (s, cls, tag) => s == null ? '' :
+      `<div class="slide-knob ${cls}" style="top:${pxFor(s).toFixed(1)}px"><i></i></div>
+       <div class="slide-val ${cls}" style="top:${pxFor(s).toFixed(1)}px">
+         <small>${tag}</small>${s}s</div>`;
     return `<div class="slider">
       <div class="slider-axis" style="height:${TOTAL}px">${ticks}</div>
       <div class="slider-track" style="height:${TOTAL}px">
         <span class="slider-rail"></span>
         <div class="slider-bands">${bands}</div>
-        ${knob(d.avg, 'now')}${prev != null && prev !== d.avg ? knob(prev, 'prev') : ''}
+        ${knob(d.avg, 'now', 'YOU')}${prev != null && prev !== d.avg ? knob(prev, 'prev', 'BEFORE') : ''}
       </div>
     </div>
     <div class="slider-foot">
