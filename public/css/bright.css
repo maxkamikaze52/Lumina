@@ -15,6 +15,7 @@
   --shadow:0 12px 0 -6px rgba(35,48,92,.10), 0 18px 40px -22px rgba(35,48,92,.35);
   --edge:1px solid #e4ebfa;
   --display:"Fredoka","Bricolage Grotesque",system-ui,sans-serif;
+  --metal:"Archivo Black","Arial Black","Helvetica Neue",Impact,sans-serif;
   --font:"Outfit",system-ui,sans-serif;
 }
 body{

@@ -383,14 +383,14 @@
         </div>
 
         <div class="studio-games">
-          <h3 class="strip-title">10 most recent Studio games</h3>
+          <h3 class="strip-title">10 MOST RECENT STUDIO GAMES</h3>
           ${recent.length ? `<table class="recent-games">
-            <thead><tr><th>When</th><th>Score</th></tr></thead><tbody>
+            <thead><tr><th>WHEN</th><th>SCORE</th></tr></thead><tbody>
               ${recent.map((r) => `<tr><td>${esc(ago(r.at))}</td><td class="num">${r.correct}</td></tr>`).join('')}
-            </tbody></table>` : '<p class="small muted" style="padding:12px 0">No Studio games yet — the first one takes a minute.</p>'}
+            </tbody></table>` : '<div class="empty-row">No games yet</div>'}
           <div class="recent-stats">
-            <div><span>Average score (q/min)</span><b>${qpm != null ? qpm : '—'}</b></div>
-            <div><span>Studio speed (sec/question)</span><b>${d.avg ? d.avg : '—'}</b></div>
+            <div class="stat-plain"><span>Average score (q/min)</span><b>${qpm != null ? qpm : '—'}</b></div>
+            <div class="stat-bar"><span>Studio speed (sec/question)</span><b>${d.avg ? d.avg : '—'}</b></div>
           </div>
         </div>
       </div>
@@ -414,36 +414,32 @@
   function speedGauge(ranks, mine, d) {
     if (!ranks.length) return '<p class="small muted">Ranks are loading.</p>';
     const TOP = 0, BOTTOM = 7;
-    const TONE = ['#2fbf71', '#7cc63f', '#b7cf32', '#f2c421', '#f0902c', '#e2552f', '#d02b3f'];
     const pct = (s) => Math.max(0, Math.min(100, (s - TOP) / (BOTTOM - TOP) * 100));
     const ticks = [0, 1, 2, 3, 4, 5, 6, 7].map((s) =>
       `<span class="tick" style="top:${pct(s)}%">${s}s</span>`).join('');
-    const bands = ranks.map((r, i) => {
+    const bands = ranks.map((r) => {
       const on = r.id && r.id === mine.id;
       const h = pct(r.max) - pct(r.from);
       return `<div class="band ${on ? 'on' : ''}"
-        style="--h:${h.toFixed(2)}%;--tone:${r.tone || TONE[i] || '#4aa8ff'}">
+        style="--h:${h.toFixed(2)}%;--tone:${r.tone || '#4aa8ff'}">
+        <span class="band-thresh">${r.max}s</span>
         <span class="band-name">${esc(r.name)}</span>
-        <span class="band-note">${on ? `you: ${d.avg != null ? d.avg + 's' : '—'}` : ''}</span>
-        <span class="band-sec">${r.max}s</span>
       </div>`;
     }).join('');
     const prev = (d.previous && d.previous.avg) || null;
-    const marker = (s, cls) => s == null ? '' :
-      `<div class="gauge-mark ${cls}" style="top:${pct(s)}%">
-         <span class="gauge-mark-val">${s}s</span><i></i></div>`;
-    return `<div class="gauge">
-      <div class="gauge-axis">${ticks}</div>
-      <div class="gauge-stack">
-        ${bands}
-        <span class="gauge-line"></span>
-        ${marker(d.avg, 'now')}${prev != null && prev !== d.avg ? marker(prev, 'prev') : ''}
+    const knob = (s, cls) => s == null ? '' :
+      `<div class="slide-knob ${cls}" style="top:${pct(s)}%"><i></i></div>`;
+    return `<div class="slider">
+      <div class="slider-axis">${ticks}</div>
+      <div class="slider-track">
+        <span class="slider-rail"></span>
+        <div class="slider-bands">${bands}</div>
+        ${knob(d.avg, 'now')}${prev != null && prev !== d.avg ? knob(prev, 'prev') : ''}
       </div>
     </div>
-    <div class="gauge-legend">
-      ${d.avg ? `<b>${d.avg}s</b><span>your last ten games</span>` : '<span>Play a Studio game to get a marker</span>'}
-      ${prev != null && prev !== d.avg ? `<b class="alt">${prev}s</b><span>the ten before that</span>` : ''}
-      ${mine.toNext != null && mine.next ? `<b class="up">${mine.toNext}s</b><span>to ${esc(mine.next.name)}</span>` : ''}
+    <div class="slider-foot">
+      ${d.avg ? `You are at <b>${d.avg}s</b>` : 'Play a game to get a marker'}
+      ${mine.toNext != null && mine.next ? ` · <b>${mine.toNext}s</b> to ${esc(mine.next.name)}` : ''}
     </div>`;
   }
 
