@@ -262,6 +262,11 @@ def buy(pid: str, item_id: str) -> tuple[bool, str]:
     it = catalogue.ITEM_BY_ID.get(item_id)
     if not it:
         return False, "That item does not exist."
+    # some stock is locked behind a level; the server checks, never the browser
+    need = int(it.get("level") or 1)
+    have = int(config.class_for(get(pid)["xp"])["n"])
+    if have < need:
+        return False, "Locked until level %d." % need
     with db() as con:
         has = con.execute("SELECT 1 FROM inventory WHERE player_id=? AND item_id=?",
                           (pid, item_id)).fetchone()

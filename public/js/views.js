@@ -68,12 +68,17 @@
     main.innerHTML = `<div class="stack">
       <section class="hero">
         <div>
-          <div class="eyebrow">${icon('compass')} ${esc(s.platform.name)} · ${esc(cls.name)}</div>
+          <div class="eyebrow">${icon('compass')} ${esc(s.platform.name)} · Level ${cls.n} · ${esc(cls.title)}</div>
           <h1 style="margin-top:8px">Welcome back,<br><em>${esc(p.name)}</em></h1>
           <div class="classbar">
-            <div class="between small"><span class="muted">${cls.next ? 'Next class: ' + esc(cls.next.name) : 'Highest class reached'}</span>
+            <div class="between small">
+              <span class="muted">${cls.next ? `Next: Level ${cls.next.n} · ${esc(cls.next.title)}` : 'Top of the ladder'}</span>
               <span><b class="num">${num(p.xp)}</b> XP${cls.next ? ` · ${num(cls.toNext)} to go` : ''}</span></div>
-            <div class="track"><i style="width:${cls.pct}%"></i></div>
+            <div class="track lvl"><i style="width:${cls.pct}%"></i></div>
+            <div class="lvl-strip">
+              ${(s.stats.levels || []).map((l) => `<span class="lvl-pip ${l.n <= cls.n ? 'on' : ''}
+                ${l.n === cls.n ? 'me' : ''}" title="Level ${l.n} · ${esc(l.title)} — ${num(l.xp)} XP">${l.n}</span>`).join('')}
+            </div>
             <div class="statline">
               <div><b>${num(p.starbits)}</b><span>Starbits</span></div>
               <div><b>${s.stats.sessions}</b><span>Games finished</span></div>
@@ -310,11 +315,12 @@
           <button class="btn ghost sm" id="rename">${icon('pencil')} Rename</button>
         </div>
         <div class="classbar"><div class="track"><i style="width:${cls.pct}%"></i></div>
-          <div class="between small muted"><span>${esc(cls.name)} — ${esc(cls.desc)}</span>
-          <span>${cls.next ? esc(cls.next.name) + ' in ' + num(cls.toNext) + ' XP' : 'Max class'}</span></div></div>
+          <div class="between small muted"><span>Level ${cls.n} · ${esc(cls.title)}</span>
+          <span>${cls.next ? 'Level ' + cls.next.n + ' in ' + num(cls.toNext) + ' XP' : 'Top of the ladder'}</span></div></div>
         <div class="divider"></div>
-        <div class="row" style="gap:8px;flex-wrap:wrap">${s.classes.map((c, i) => `<span class="pill ${i <= classIdx ? 'jade' : ''}" title="${esc(c.desc)}">
-          ${icon(c.emblem)} ${esc(c.name)}</span>`).join('')}</div>
+        <h3 style="margin-bottom:10px">The 20 levels</h3>
+        <div class="row" style="gap:8px;flex-wrap:wrap">${s.classes.map((c, i) => `<span class="pill ${i < classIdx ? 'jade' : i === classIdx ? 'amber' : ''}"
+          title="Level ${c.n} · ${esc(c.title)} — ${num(c.xp)} XP">${icon(c.emblem)} ${c.n} ${esc(c.title)}</span>`).join('')}</div>
       </section>
 
       <section class="grid g3">

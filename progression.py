@@ -453,6 +453,10 @@ def stats(pid: str) -> dict:
     avg = (td / tc) if tc else None
     return {
         "xp": p["xp"], "starbits": p["starbits"], "class": cls,
+        "level": {"n": cls["n"], "name": cls["name"], "title": cls["title"],
+                  "xp": cls["xp"], "toNext": cls["toNext"], "pct": cls["pct"],
+                  "next": (cls["next"]["n"] if cls.get("next") else None)},
+        "levels": config.CLASSES,
         "studio": {"avg": avg, "class": config.studio_class(avg), "runs": len(studio)},
         "perContinent": per_cont,
         "words": {"seen": len(words), "mastered": sum(1 for w in words if w["box"] >= 4),

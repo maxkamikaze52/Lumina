@@ -32,15 +32,20 @@
       <section class="shop-grid">
         ${items.map((i) => {
           const has = owned.has(i.id);
-          const can = App.state.player.starbits >= i.price;
-          return `<article class="shop-item">
-            <div class="shop-thumb">${ART.thumb(i)}</div>
+          const lvl = App.state.stats.level;
+          const need = i.level || 1;
+          const locked = lvl.n < need;
+          const can = !locked && App.state.player.starbits >= i.price;
+          return `<article class="shop-item ${locked ? 'locked' : ''}">
+            <div class="shop-thumb">${ART.thumb(i)}
+              ${locked ? `<span class="lock-tag">LEVEL ${need}</span>` : ''}</div>
             <b>${esc(i.name)}</b>
             <span class="rar" style="color:${rarity[i.rarity].colour}">${rarity[i.rarity].label}</span>
             <div class="between" style="margin-top:auto">
-              ${has ? '<span class="owned-tag">Owned</span>' : `<span class="price">${icon('bit')}${num(i.price)}</span>`}
+              ${has ? '<span class="owned-tag">Owned</span>' : `<span class="price">${ART.starbit({ size: 15 })}${num(i.price)}</span>`}
               ${has ? `<button class="btn ghost sm" data-equip="${i.id}">${i.slot === 'furniture' || i.slot === 'theme' ? 'Room' : 'Wear'}</button>`
-                : `<button class="btn sm ${can ? '' : 'ghost'}" data-buy="${i.id}" ${can ? '' : 'disabled'}>Buy</button>`}
+                : locked ? `<button class="btn ghost sm" data-needlevel="${need}">Level ${need}</button>`
+                : `<button class="btn sm ${can ? '' : 'ghost'}" data-buy="${i.id}">Buy</button>`}
             </div></article>`;
         }).join('')}
       </section>
@@ -51,6 +56,10 @@
 
     main.querySelectorAll('[data-cat]').forEach((b) => { b.onclick = () => { shopState.cat = b.dataset.cat; App.render(); }; });
     main.querySelectorAll('[data-rar]').forEach((b) => { b.onclick = () => { shopState.rarity = b.dataset.rar; App.render(); }; });
+
+    main.querySelectorAll('[data-needlevel]').forEach((b) => {
+      b.onclick = () => App.toast(`Locked until level ${b.dataset.needlevel}. Earn XP in any game.`, 'x');
+    });
 
     main.querySelectorAll('[data-buy]').forEach((b) => {
       b.onclick = () => {

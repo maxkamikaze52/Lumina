@@ -5,12 +5,14 @@ room are plain SVG generated in the client.  Nothing here is a picture file: it
 stays cheap to add items without an artist.
 """
 
+# Prices are in Starbits, on the same 10x scale as XP, and every rarity above
+# common is gated behind a level: you cannot buy your way past the ladder.
 RARITY = {
-    "common":    {"price": 40,  "label": "Common",    "colour": "#8b93b8"},
-    "uncommon":  {"price": 90,  "label": "Uncommon",  "colour": "#2ec4a6"},
-    "rare":      {"price": 180, "label": "Rare",      "colour": "#3a9bff"},
-    "epic":      {"price": 340, "label": "Epic",      "colour": "#a865ff"},
-    "legendary": {"price": 600, "label": "Legendary", "colour": "#ffb020"},
+    "common":    {"price": 400,  "label": "Common",    "colour": "#8b93b8", "level": 1},
+    "uncommon":  {"price": 900,  "label": "Uncommon",  "colour": "#2ec4a6", "level": 3},
+    "rare":      {"price": 1800, "label": "Rare",      "colour": "#3a9bff", "level": 6},
+    "epic":      {"price": 3400, "label": "Epic",      "colour": "#a865ff", "level": 10},
+    "legendary": {"price": 6000, "label": "Legendary", "colour": "#ffb020", "level": 15},
 }
 
 SLOTS = ["skin", "hair", "hairColor", "eyes", "eyeColor", "mouth",
@@ -24,6 +26,7 @@ def item(iid, name, cat, slot, style, colour, rarity, price=None, desc="", extra
         "id": iid, "name": name, "cat": cat, "slot": slot, "style": style,
         "colour": colour, "rarity": rarity,
         "price": RARITY[rarity]["price"] if price is None else price,
+        "level": (extra or {}).get("level") or RARITY[rarity]["level"],
         "desc": desc, **(extra or {}),
     })
 

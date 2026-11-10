@@ -631,3 +631,20 @@
 .chipwrap:has(.chip.bits) .about::before{border-color:#ffcd3c}
 @keyframes aboutIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 @media (max-width:640px){.chipwrap .about{width:min(80vw,294px)}}
+
+/* ---- the level strip on Home ------------------------------------------ */
+.track.lvl{height:14px;border-radius:99px;background:#e9eefb;border:2px solid #120a26;overflow:hidden}
+.track.lvl i{display:block;height:100%;background:linear-gradient(90deg,#2fbf9a,#ffcd3c 60%,#d8324f)}
+.lvl-strip{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
+.lvl-pip{display:grid;place-items:center;min-width:30px;height:30px;border-radius:8px;
+  font-family:var(--metal);font-size:13px;background:#eef2fb;color:#8a97b5;
+  border:2px solid #dbe3f2}
+.lvl-pip.on{background:#ffd43b;color:#2b1a00;border-color:#120a26;box-shadow:0 3px 0 #120a26}
+.lvl-pip.me{background:#d8324f;color:#fff;border-color:#120a26;box-shadow:0 3px 0 #120a26}
+
+/* ---- locked shop items ------------------------------------------------- */
+.shop-item.locked{opacity:.92}
+.shop-item.locked .shop-thumb{position:relative;filter:grayscale(.65)}
+.lock-tag{position:absolute;left:8px;bottom:8px;font-family:var(--metal);font-size:11px;
+  letter-spacing:.08em;background:#120a26;color:#ffd43b;border:2px solid #ffd43b;
+  border-radius:5px;padding:4px 8px}

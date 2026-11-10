@@ -16,50 +16,23 @@ PLATFORM = {
 }
 
 # --------------------------------------------------------------------------- #
-# Educational classes (platform-wide, driven by lifetime XP)
+# Levels (platform-wide, driven by lifetime XP).  The ladder itself lives in
+# levels.py; `class_for` is kept as the one name the rest of the code calls.
 # --------------------------------------------------------------------------- #
-CLASSES = [
-    {"n": 1, "id": "newcomer", "name": "Newcomer", "xp": 0, "hue": 212,
-     "desc": "Your first steps into Astrolab. Everything is still undiscovered.",
-     "emblem": "compass"},
-    {"n": 2, "id": "student", "name": "Student", "xp": 300, "hue": 186,
-     "desc": "You have started to build real habits. Keep the streak alive.",
-     "emblem": "book"},
-    {"n": 3, "id": "junior-scholar", "name": "Junior Scholar", "xp": 900, "hue": 154,
-     "desc": "Curiosity has turned into knowledge. Your notebook is filling up.",
-     "emblem": "scroll"},
-    {"n": 4, "id": "advanced-student", "name": "Advanced Student", "xp": 2000, "hue": 96,
-     "desc": "You work ahead of the class now. Three worlds are opening up.",
-     "emblem": "pencil"},
-    {"n": 5, "id": "honor-student", "name": "Honor Student", "xp": 3800, "hue": 44,
-     "desc": "Recognised for accuracy as much as effort. Quietly excellent.",
-     "emblem": "laurel"},
-    {"n": 6, "id": "academic-champion", "name": "Academic Champion", "xp": 6500, "hue": 26,
-     "desc": "You win the things you practise. Others study your results.",
-     "emblem": "trophy"},
-    {"n": 7, "id": "professor", "name": "Professor", "xp": 10000, "hue": 348,
-     "desc": "You teach by example. Hard questions have stopped being scary.",
-     "emblem": "flask"},
-    {"n": 8, "id": "headmaster", "name": "Headmaster", "xp": 15000, "hue": 306,
-     "desc": "The whole academy is your map: numbers, words and the world.",
-     "emblem": "column"},
-    {"n": 9, "id": "legendary-scholar", "name": "Legendary Scholar", "xp": 22000, "hue": 272,
-     "desc": "Your name is written into the observatory ceiling. Nothing left unseen.",
-     "emblem": "star"},
-]
+import levels as _levels
+
+CLASSES = _levels.LEVELS
 
 
 def class_for(xp: int) -> dict:
-    cur = CLASSES[0]
-    for c in CLASSES:
-        if xp >= c["xp"]:
-            cur = c
-    nxt = next((c for c in CLASSES if c["xp"] > xp), None)
-    if nxt:
-        span = nxt["xp"] - cur["xp"]
-        pct = (xp - cur["xp"]) / span if span else 1
-        return {**cur, "next": nxt, "toNext": nxt["xp"] - xp, "pct": round(min(1, pct) * 100, 1)}
-    return {**cur, "next": None, "toNext": 0, "pct": 100}
+    """The level this XP total holds, with progress into the next one."""
+    return _levels.level_for(xp)
+
+
+def level_progress(xp: int) -> dict:
+    c = class_for(xp)
+    return {"class": c["name"], "classN": c["n"], "hue": 212, "pct": c["pct"],
+            "title": c["title"]}
 
 
 # --------------------------------------------------------------------------- #
@@ -131,6 +104,8 @@ DIFFICULTY_MULT = {
 # Rewards are tuned per *minute of real effort*, not per session: a fast maths run
 # answers ~20 questions a minute, a spelling session manages ~8 words, geography
 # ~10 countries.  The resulting XP/minute lands in the same 90-130 band for all three.
+XP_SCALE = 10   # one knob for the whole economy: same ratios, bigger numbers
+
 XP_PER_CORRECT = {"tablestar": 3.4, "spellbound": 8.5, "worldquest": 8.0}
 BITS_PER_CORRECT = {"tablestar": 0.8, "spellbound": 1.5, "worldquest": 1.4}
 ACCURACY_BONUS = {"tablestar": 26, "spellbound": 30, "worldquest": 28}
@@ -145,18 +120,22 @@ def compute_reward(game: str, mode: str, difficulty: str, correct: int,
         raise ValueError("unknown game")
     mult = DIFFICULTY_MULT.get(difficulty, DIFFICULTY_MULT.get(mode, 1.0))
     acc = (correct / total) if total else 0.0
-    xp = correct * XP_PER_CORRECT[game] * mult
-    xp += acc * ACCURACY_BONUS[game]
+    # The Nth correct answer is worth more than the first: a run is multiplied by
+    # how far past the game's par you got, so a long, accurate run pays off.
+    par = max(8, int((duration or 60) / 60 * 20))       # ~20 answers a minute is par
+    ramp = 1.0 + min(1.5, max(0, correct - par) / max(1, par) * 0.75)
+    xp = correct * XP_PER_CORRECT[game] * mult * ramp
+    xp += acc * ACCURACY_BONUS[game] * ramp
     xp += COMPLETION_XP[game]
     if acc >= 0.99 and correct >= 10:
-        xp += 12  # flawless run bonus
-    bits = correct * BITS_PER_CORRECT[game] * (0.85 + 0.3 * mult)
+        xp += 12 * ramp  # flawless run bonus
+    bits = correct * BITS_PER_CORRECT[game] * (0.85 + 0.3 * mult) * (1 + (ramp - 1) * 0.6)
     bits += COMPLETION_BITS[game]
     if acc >= 0.99 and correct >= 10:
         bits += 6
     return {
-        "xp": int(round(xp)),
-        "starbits": int(round(bits)),
+        "xp": int(round(xp * XP_SCALE)),
+        "starbits": int(round(bits * XP_SCALE)),
         "accuracy": round(acc * 100, 1),
         "multiplier": mult,
     }
@@ -180,7 +159,21 @@ def plausible(correct: int, total: int, duration: float) -> tuple[bool, str]:
 # --------------------------------------------------------------------------- #
 # Badges.  `check(s)` is evaluated against a summary of the player's real data.
 # --------------------------------------------------------------------------- #
-BADGES = [
+def level_badges() -> list[dict]:
+    """One badge per level, generated from the ladder so they can never drift."""
+    out = []
+    for l in _levels.LEVELS:
+        out.append(dict(
+            id="level-%02d" % l["n"],
+            name="Level %d · %s" % (l["n"], l["title"]),
+            game="platform", icon=l["emblem"],
+            desc=("Reach level %d (%s XP)." % (l["n"], format(l["xp"], ","))
+                  if l["n"] > 1 else "Start your climb."),
+            check=(lambda s, n=l["n"]: s["class_n"] >= n)))
+    return out
+
+
+BADGES = level_badges() + [
     # --- platform -----------------------------------------------------------
     dict(id="first-game", name="First Steps", game="platform", icon="spark",
          desc="Complete your first game.", check=lambda s: s["games"] >= 1),
