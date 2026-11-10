@@ -695,3 +695,9 @@
 .lvl-card.me{border-color:#120a26;box-shadow:0 6px 0 #120a26, 0 0 0 4px var(--glow,#ffd24a)}
 .lvl-card:not(.me) svg.crest{filter:saturate(.72)}
 .lvl-card.todo svg.crest{opacity:.62}
+
+/* ---- crests fit their box: never cropped, never overflowing ----------- */
+.lvl-card svg.crest{width:100%;max-width:104px;height:auto;display:block}
+.lvl-pip svg.crest{width:100%;max-width:44px;height:auto;display:block}
+.badge.crest-badge svg.crest{width:96px;height:auto;display:block}
+.lvl-card{padding:14px 8px 12px}
