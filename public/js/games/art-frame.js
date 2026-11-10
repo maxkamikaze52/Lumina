@@ -1,57 +1,118 @@
-/* Astrolab — the badge frame for a character.
-   The same plate as the level badge, with the middle punched out, so a student's
-   character sits inside their badge.  The silhouette of the plate is what tells
-   two badges apart across a classroom, so the edges matter.
+/* Astrolab — the badge that frames a student's character.
+   Geometry, in the SVG's own 0..100 space:
+     head opening   circle at (50, 44)  r = 27      ← the avatar shows through
+     inner rim      r = 27 .. 30
+     spoke ring     r = 30 .. 45       (the decorative panels, outside the head)
+     diamonds       r = 45..48
+     level plate    bottom, y 76..92, drawn last and never masked
+   The head can never cover the badge, because the badge lives outside r = 27.
 */
 (function () {
   'use strict';
   const A = window.ART = window.ART || {};
+  const INK = '#0a0818';
+  let seq = 0;
 
-  /* A CIRCLE-CROPPED BUST, for placing inside a badge.
-     Measured from the avatar drawing itself: the head is a circle at (56,56)
-     with r=26, the ears at y=58, and the neck starts at y=86, so the face spans
-     y=30..82.  The window is a square that holds the whole head with a little
-     air above the hair and the top of the shoulders below — centred on x=56,
-     which is what the frame's circular opening is centred on. */
+  const CX = 50, CY = 44, HEAD = 27, RING_IN = 30, RING_OUT = 45;
+
+  /* the family colour for a level, straight from the crest palette */
+  function tones(level) {
+    if (A.crestTier) {
+      const t = A.crestTier(level);
+      if (t && t.light) return { light: t.light, mid: t.mid || t.light, deep: t.deep || '#1a0f33' };
+    }
+    return { light: '#ff6fae', mid: '#d6449a', deep: '#2a0f2e' };
+  }
+
+  /* a radial panel: a wedge of the ring, drawn as a quad between two radii */
+  function spoke(i, count, t, gap) {
+    const step = (Math.PI * 2) / count;
+    const a0 = i * step - Math.PI / 2 + gap;
+    const a1 = (i + 1) * step - Math.PI / 2 - gap;
+    const r0 = RING_IN + 0.5, r1 = RING_OUT - (i % 2 ? 1.5 : 0);
+    const p = (r, a) => (CX + r * Math.cos(a)).toFixed(2) + ' ' + (CY + r * Math.sin(a)).toFixed(2);
+    return '<path d="M' + p(r0, a0) + ' L' + p(r1, a0) + ' L' + p(r1, a1) + ' L' + p(r0, a1) +
+      ' Z" fill="url(#TONE)" stroke="' + INK + '" stroke-width="0.8" stroke-linejoin="round"/>';
+  }
+
+  A.avatarFrame = function (level, opts) {
+    const o = opts || {};
+    const size = o.size || 240;
+    const n = Math.max(1, Math.min(100, level || 1));
+    const id = 'af' + (++seq);
+    const t = tones(n);
+    const count = n >= 90 ? 16 : n >= 60 ? 14 : 12;
+
+    let spokes = '';
+    for (let i = 0; i < count; i++) {
+      spokes += spoke(i, count, t, 0.014).split('url(#TONE)').join('url(#' + id + 'p)');
+    }
+
+    /* a pale diamond stud between every other spoke pair */
+    let studs = '';
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI * 2 * i) / 8 - Math.PI / 4;
+      const x = CX + 44 * Math.cos(a), y = CY + 44 * Math.sin(a);
+      studs += '<rect x="' + (x - 2.6).toFixed(2) + '" y="' + (y - 2.6).toFixed(2) +
+        '" width="5.2" height="5.2" transform="rotate(45 ' + x.toFixed(2) + ' ' +
+        y.toFixed(2) + ')" fill="#fffaf6" stroke="' + INK + '" stroke-width="0.7"/>';
+    }
+
+    return '<svg class="avatar-frame" width="' + size + '" height="' + size +
+      '" viewBox="0 0 100 100" role="img" aria-label="Level ' + n + ' badge" ' +
+      'xmlns="http://www.w3.org/2000/svg">' +
+      '<defs>' +
+      '<linearGradient id="' + id + 'p" x1="0" y1="0" x2="0.2" y2="1">' +
+      '<stop offset="0" stop-color="' + t.light + '"/>' +
+      '<stop offset=".55" stop-color="' + t.mid + '"/>' +
+      '<stop offset="1" stop-color="' + t.deep + '"/>' +
+      '</linearGradient>' +
+      '<radialGradient id="' + id + 'o" cx=".5" cy=".5" r=".5">' +
+      '<stop offset=".62" stop-color="' + t.light + '" stop-opacity=".42"/>' +
+      '<stop offset="1" stop-color="' + t.light + '" stop-opacity="0"/>' +
+      '</radialGradient>' +
+      '<mask id="' + id + 'h">' +
+      '<rect width="100" height="100" fill="#fff"/>' +
+      '<circle cx="' + CX + '" cy="' + CY + '" r="' + HEAD + '" fill="#000"/>' +
+      '</mask>' +
+      '</defs>' +
+
+      /* glow behind the ring, then the ring itself, then the studs */
+      '<circle cx="' + CX + '" cy="' + CY + '" r="47" fill="url(#' + id + 'o)"/>' +
+      '<g mask="url(#' + id + 'h)">' + spokes + '</g>' +
+      studs +
+
+      /* the rim of the head opening: dark, hot, then a hairline */
+      '<circle cx="' + CX + '" cy="' + CY + '" r="' + (HEAD + 1.6) + '" fill="none" ' +
+      'stroke="' + INK + '" stroke-width="5"/>' +
+      '<circle cx="' + CX + '" cy="' + CY + '" r="' + (HEAD + 1.6) + '" fill="none" ' +
+      'stroke="' + t.light + '" stroke-width="2"/>' +
+      '<circle cx="' + CX + '" cy="' + CY + '" r="' + (HEAD - 0.6) + '" fill="none" ' +
+      'stroke="' + INK + '" stroke-width="1.2" opacity=".8"/>' +
+
+      /* the level plate: outside the head circle, at the bottom, on top */
+      '<g class="num-plate">' +
+      '<rect x="27" y="76" width="46" height="17" rx="8.5" fill="' + INK + '"/>' +
+      '<rect x="29" y="78" width="42" height="13" rx="6.5" fill="' + t.deep + '" ' +
+      'stroke="' + t.light + '" stroke-width="1.6"/>' +
+      '<text x="50" y="85.4" text-anchor="middle" dominant-baseline="middle" ' +
+      'font-family="Archivo Black, Arial Black, sans-serif" font-size="10" fill="' + t.light +
+      '">' + n + '</text>' +
+      '</g>' +
+      '</svg>';
+  };
+
+  /* A circle-cropped bust of the character, sized to exactly fill the head
+     opening above: the opening is 54 units of the 100 box, and the avatar's head
+     is a circle at (56, 56) with r = 26 in its own 112 x 212 box. */
   A.avatarHead = function (equipped, opts) {
     const o = opts || {};
     const label = o.label || 'Player character';
     const svg = (window.ART.avatar(equipped, { background: false, label }) || '');
-    const TOP = 16, SIDE = 76;          // y 16..92, x 18..94 → the head, centred
     return svg
-      .replace(/<ellipse cx="56" cy="206"[^>]*\/>/, '')   // drop the ground shadow
+      .replace(/<ellipse cx="56" cy="206"[^>]*\/>/, '')     // drop the ground shadow
       .replace('<svg class="avatar"', '<svg class="avatar avatar-head"')
       .replace('viewBox="0 0 112 212"',
-               'viewBox="' + (56 - SIDE / 2) + ' ' + TOP + ' ' + SIDE + ' ' + SIDE +
-               '" preserveAspectRatio="xMidYMid slice"');
-  };
-
-  A.avatarFrame = function (level, opts) {
-    const o = opts || {};
-    const size = o.size || 190;
-    const n = Math.max(1, Math.min(100, level || 1));
-    const inner = A.levelCrest(n, { size: 100 }) || '';
-    // split the badge drawing from its number plate: the plate must sit ON TOP of
-    // the mask, never inside the hole that the head shows through
-    const withoutPlate = inner.replace(/<g class="num-plate">[\s\S]*?<\/g>/, '');
-    const plate = (inner.match(/<g class="num-plate">[\s\S]*?<\/g>/) || [''])[0];
-    const body = withoutPlate.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>[\s\S]*$/, '');
-    const family = A.crestTier(n);
-    const glow = A.crestGlow(n);
-    const id = 'af' + n + '-' + size;
-    return `<svg class="avatar-frame badge-${family}" width="${size}" height="${size}"
-      viewBox="0 0 100 100" role="img" aria-label="Level ${n} badge frame">
-      <defs>
-        <mask id="${id}">
-          <rect width="100" height="100" fill="#fff"/>
-          <circle cx="50" cy="43" r="25" fill="#000"/>
-        </mask>
-      </defs>
-      <g mask="url(#${id})">${body}</g>
-      <circle cx="50" cy="43" r="25.4" fill="none" stroke="#0a0818" stroke-width="2.4"/>
-      <circle cx="50" cy="43" r="25.4" fill="none" stroke="${glow}" stroke-width=".9"
-        opacity=".8"/>
-      ${plate}
-    </svg>`;
+        'viewBox="17 17 78 78" preserveAspectRatio="xMidYMid slice"');
   };
 })();
