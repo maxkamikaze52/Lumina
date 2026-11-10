@@ -169,6 +169,19 @@
     renderResults(session, correct, total, acc, mean, duration, reward, rejected);
   }
 
+  /* One span per letter, so the paint can run out of the bottom of the glyphs.
+     Which letters drip, and how far, is fixed per word — no reflow, no jitter. */
+  function stampLetters(word) {
+    const DRIP = [0, 1, 0, 2, 0, 0, 1, 0, 2, 0, 1, 0, 0, 2];
+    const chars = word.toUpperCase().split('').map((ch, i) => {
+      if (ch === ' ') return '<span class="gap"></span>';
+      const d = DRIP[i % DRIP.length];
+      const drip = d ? `<i class="drip d${d}" style="--dw:${d === 2 ? 0.22 : 0.34}"></i>` : '';
+      return `<span class="ch" style="--i:${i}">${esc(ch)}${drip}</span>`;
+    }).join('');
+    return `<div class="stamp-text">${chars}</div>`;
+  }
+
   function renderResults(session, correct, total, acc, mean, duration, reward, rejected) {
     const studio = session.mode === 'studio' ? App.state._studio : null;
     const missed = [...new Set(session.facts.filter((f) => !f.ok).map((f) => {
@@ -182,9 +195,8 @@
         <div class="stamp-glow"></div>
         <div class="stamp-rings"><span></span><span></span></div>
         <div class="stamp">
-          <div class="stamp-text">${esc(rankName)}</div>
+          ${stampLetters(rankName)}
           <div class="stamp-sub">your studio class</div>
-          <div class="stamp-drips"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         </div>
       </div>` : ''}
       <div class="stage">
