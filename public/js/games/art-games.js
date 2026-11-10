@@ -325,42 +325,68 @@
 })();
 
 /* -------------------------------------------------------------------------
-   THE STARBIT — the app's coin, reused everywhere it shows a reward.
-   A cut seven-point star struck in gold: dark rim, hot bevel, a bright star
-   on the face and a glint, so it reads at 15px and at 160px.
+   THE STARBIT — the app's coin.  A struck-metal lotus in a milled ring, on a
+   gold disc: silver-grey petals with a hot bevel, so it reads at 15px and 200px.
    ------------------------------------------------------------------------- */
 (function () {
   'use strict';
   const S = window.ART;
   let n = 0;
 
+  const OUTER = '<ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(0.0 50 34)"/><ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(45.0 50 34)"/><ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(90.0 50 34)"/><ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(135.0 50 34)"/><ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(180.0 50 34)"/><ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(225.0 50 34)"/><ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(270.0 50 34)"/><ellipse cx="50" cy="34" rx="6.6" ry="15.4" transform="rotate(315.0 50 34)"/>';
+  const INNER = '<ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(22.5 50 38)"/><ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(67.5 50 38)"/><ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(112.5 50 38)"/><ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(157.5 50 38)"/><ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(202.5 50 38)"/><ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(247.5 50 38)"/><ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(292.5 50 38)"/><ellipse cx="50" cy="38" rx="5.2" ry="11.4" transform="rotate(337.5 50 38)"/>';
+
   S.starbit = function (opts) {
     const o = opts || {};
-    const id = 'sb' + (++n);
     const size = o.size || 24;
-    const pts = [];
-    for (let i = 0; i < 14; i++) {
-      const r = i % 2 ? 6.3 : 11.9;
-      const a = (Math.PI / 7) * i - Math.PI / 2;
-      pts.push((12 + r * Math.cos(a)).toFixed(2) + ',' + (12 + r * Math.sin(a)).toFixed(2));
-    }
-    const star = pts.join(' ');
-    return '<svg class="starbit" width="' + size + '" height="' + size + '" viewBox="0 0 24 24"' +
-      ' role="img" aria-label="Starbit">' +
+    const id = 'sb' + (++n);
+    return '<svg class="starbit" width="' + size + '" height="' + size +
+      '" viewBox="0 0 100 100" role="img" aria-label="Starbit" xmlns="http://www.w3.org/2000/svg">' +
       '<defs>' +
-      '<linearGradient id="' + id + '-g" x1="0" y1="0" x2="0.65" y2="1">' +
-      '<stop offset="0" stop-color="#fff6c2"/><stop offset="0.4" stop-color="#ffd23f"/>' +
-      '<stop offset="1" stop-color="#dd9400"/></linearGradient>' +
-      '<linearGradient id="' + id + '-r" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0" stop-color="#ff9d00"/><stop offset="1" stop-color="#8f5000"/>' +
+      // the coin face: warm gold, lit from the top left
+      '<radialGradient id="' + id + 'c" cx=".36" cy=".3" r=".82">' +
+      '<stop offset="0" stop-color="#fff6c0"/><stop offset=".42" stop-color="#ffd04a"/>' +
+      '<stop offset=".82" stop-color="#d99400"/><stop offset="1" stop-color="#8a5a00"/>' +
+      '</radialGradient>' +
+      // the metal the petals are struck from
+      '<linearGradient id="' + id + 'm" x1="0" y1="0" x2=".35" y2="1">' +
+      '<stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#e6e9f2"/>' +
+      '<stop offset=".62" stop-color="#aab0c2"/><stop offset="1" stop-color="#6b7286"/>' +
       '</linearGradient>' +
+      '<linearGradient id="' + id + 'r" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#fff3b8"/><stop offset=".5" stop-color="#e0a21a"/>' +
+      '<stop offset="1" stop-color="#8a5a00"/></linearGradient>' +
+      '<filter id="' + id + 's" x="-30%" y="-30%" width="160%" height="160%">' +
+      '<feDropShadow dx="0" dy="1.2" stdDeviation="1.4" flood-color="#5a3800" ' +
+      'flood-opacity=".55"/></filter>' +
       '</defs>' +
-      '<polygon points="' + star + '" fill="url(#' + id + '-r)" transform="translate(0 .7)"/>' +
-      '<polygon points="' + star + '" fill="url(#' + id + '-g)" stroke="#4a2a00"' +
-      ' stroke-width="1.2" stroke-linejoin="round"/>' +
-      '<path d="M12 3.4 13.4 8.1 18.1 9.4 14.1 11.8 14.9 16.4 12 14 9.1 16.4 9.9 11.8' +
-      ' 5.9 9.4 10.6 8.1z" fill="#fffce8" opacity=".62"/>' +
-      '<circle cx="8.3" cy="7" r="1.1" fill="#fffdf4"/>' +
+
+      /* the coin body: dark rim, gold face, milled inner ring */
+      '<circle cx="50" cy="50" r="47" fill="#5a3800"/>' +
+      '<circle cx="50" cy="50" r="44" fill="url(#' + id + 'r)"/>' +
+      '<circle cx="50" cy="50" r="44" fill="url(#' + id + 'c)"/>' +
+      '<circle cx="50" cy="50" r="39.5" fill="none" stroke="#8a5a00" stroke-width="1.6" ' +
+      'opacity=".55"/>' +
+      '<circle cx="50" cy="50" r="36" fill="none" stroke="#fff3b8" stroke-width="1.2" ' +
+      'opacity=".45"/>' +
+
+      /* the lotus, struck metal, with a soft drop shadow so it sits proud */
+      '<g filter="url(#' + id + 's)">' +
+      '<g fill="url(#' + id + 'm)" stroke="#5c6377" stroke-width=".9" ' +
+      'stroke-linejoin="round">' + OUTER + '</g>' +
+      '<g fill="url(#' + id + 'm)" stroke="#6b7286" stroke-width=".8" ' +
+      'stroke-linejoin="round" opacity=".95">' + INNER + '</g>' +
+      /* the boss: a small struck dome in the centre */
+      '<circle cx="50" cy="50" r="9.2" fill="url(#' + id + 'm)" stroke="#5c6377" ' +
+      'stroke-width=".9"/>' +
+      '<circle cx="50" cy="50" r="4.6" fill="none" stroke="#ffffff" stroke-width="1.1" ' +
+      'opacity=".7"/>' +
+      '</g>' +
+
+      /* specular highlights: a crescent on the coin and a glint on the boss */
+      '<path d="M18 32a34 34 0 0 1 20 -17" fill="none" stroke="#fffdf0" stroke-width="3" ' +
+      'stroke-linecap="round" opacity=".7"/>' +
+      '<circle cx="47" cy="47" r="2.2" fill="#fff" opacity=".9"/>' +
       '</svg>';
   };
 
@@ -371,3 +397,4 @@
       S.starbit({ size: o.size || 18 }) + '<b>' + txt + '</b></span>';
   };
 })();
+
