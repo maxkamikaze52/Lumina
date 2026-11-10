@@ -23,7 +23,11 @@
     const size = o.size || 190;
     const n = Math.max(1, Math.min(100, level || 1));
     const inner = A.levelCrest(n, { size: 100 }) || '';
-    const body = inner.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>[\s\S]*$/, '');
+    // split the badge drawing from its number plate: the plate must sit ON TOP of
+    // the mask, never inside the hole that the head shows through
+    const withoutPlate = inner.replace(/<g class="num-plate">[\s\S]*?<\/g>/, '');
+    const plate = (inner.match(/<g class="num-plate">[\s\S]*?<\/g>/) || [''])[0];
+    const body = withoutPlate.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>[\s\S]*$/, '');
     const family = A.crestTier(n);
     const glow = A.crestGlow(n);
     const id = 'af' + n + '-' + size;
@@ -32,13 +36,14 @@
       <defs>
         <mask id="${id}">
           <rect width="100" height="100" fill="#fff"/>
-          <circle cx="50" cy="46" r="26.5" fill="#000"/>
+          <circle cx="50" cy="43" r="25" fill="#000"/>
         </mask>
       </defs>
       <g mask="url(#${id})">${body}</g>
-      <circle cx="50" cy="46" r="27" fill="none" stroke="#0a0818" stroke-width="2.4"/>
-      <circle cx="50" cy="46" r="27" fill="none" stroke="${glow}" stroke-width=".9"
+      <circle cx="50" cy="43" r="25.4" fill="none" stroke="#0a0818" stroke-width="2.4"/>
+      <circle cx="50" cy="43" r="25.4" fill="none" stroke="${glow}" stroke-width=".9"
         opacity=".8"/>
+      ${plate}
     </svg>`;
   };
 })();

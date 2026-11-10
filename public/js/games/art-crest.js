@@ -308,11 +308,13 @@
         ${motif(step, n % 10 === 0 ? 9 : n % 10, t)}
       </g>
       ${rim(step, n, t)}
-      <rect x="30" y="74" width="40" height="16" rx="8" fill="${t.deep}"
-        stroke="${t.mid}" stroke-width="1.5"/>
-      <text x="50" y="82.4" text-anchor="middle" dominant-baseline="middle"
-        font-family="Archivo Black, Arial Black, sans-serif" font-size="11.5"
-        fill="${t.light}">${n}</text>`;
+      <g class="num-plate">
+        <rect x="32" y="76.5" width="36" height="13" rx="6.5" fill="${t.deep}"
+          stroke="${t.mid}" stroke-width="1.4"/>
+        <text x="50" y="83.4" text-anchor="middle" dominant-baseline="middle"
+          font-family="Archivo Black, Arial Black, sans-serif" font-size="10.5"
+          fill="${t.light}">${n}</text>
+      </g>`;
 
     return `<svg class="crest badge-${family} eg-${stage}-${step}${o.locked ? ' locked' : ''}"
       width="${size}" height="${size}" viewBox="0 0 100 100" role="img"
