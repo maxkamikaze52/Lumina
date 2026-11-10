@@ -292,3 +292,51 @@
     </svg>`;
   };
 })();
+
+/* -------------------------------------------------------------------------
+   THE STARBIT — the app's coin, reused everywhere it shows a reward.
+   A cut seven-point star struck in gold: dark rim, hot bevel, a bright star
+   on the face and a glint, so it reads at 15px and at 160px.
+   ------------------------------------------------------------------------- */
+(function () {
+  'use strict';
+  const S = window.ART;
+  let n = 0;
+
+  S.starbit = function (opts) {
+    const o = opts || {};
+    const id = 'sb' + (++n);
+    const size = o.size || 24;
+    const pts = [];
+    for (let i = 0; i < 14; i++) {
+      const r = i % 2 ? 6.3 : 11.9;
+      const a = (Math.PI / 7) * i - Math.PI / 2;
+      pts.push((12 + r * Math.cos(a)).toFixed(2) + ',' + (12 + r * Math.sin(a)).toFixed(2));
+    }
+    const star = pts.join(' ');
+    return '<svg class="starbit" width="' + size + '" height="' + size + '" viewBox="0 0 24 24"' +
+      ' role="img" aria-label="Starbit">' +
+      '<defs>' +
+      '<linearGradient id="' + id + '-g" x1="0" y1="0" x2="0.65" y2="1">' +
+      '<stop offset="0" stop-color="#fff6c2"/><stop offset="0.4" stop-color="#ffd23f"/>' +
+      '<stop offset="1" stop-color="#dd9400"/></linearGradient>' +
+      '<linearGradient id="' + id + '-r" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#ff9d00"/><stop offset="1" stop-color="#8f5000"/>' +
+      '</linearGradient>' +
+      '</defs>' +
+      '<polygon points="' + star + '" fill="url(#' + id + '-r)" transform="translate(0 .7)"/>' +
+      '<polygon points="' + star + '" fill="url(#' + id + '-g)" stroke="#4a2a00"' +
+      ' stroke-width="1.2" stroke-linejoin="round"/>' +
+      '<path d="M12 3.4 13.4 8.1 18.1 9.4 14.1 11.8 14.9 16.4 12 14 9.1 16.4 9.9 11.8' +
+      ' 5.9 9.4 10.6 8.1z" fill="#fffce8" opacity=".62"/>' +
+      '<circle cx="8.3" cy="7" r="1.1" fill="#fffdf4"/>' +
+      '</svg>';
+  };
+
+  S.starbitChip = function (amount, opts) {
+    const o = opts || {};
+    const txt = window.App ? window.App.num(amount) : amount;
+    return '<span class="starbit-chip ' + (o.cls || '') + '">' +
+      S.starbit({ size: o.size || 18 }) + '<b>' + txt + '</b></span>';
+  };
+})();

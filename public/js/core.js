@@ -122,7 +122,7 @@
         <span class="spacer"></span>
         <div class="world-bits">
           <span class="w" title="Lifetime XP">${window.icon('spark')}<b id="w-xp-w">${num(App.state.player.xp)}</b></span>
-          <span class="w" title="Starbits">${window.icon('bit')}<b id="w-bits-w">${num(App.state.player.starbits)}</b></span>
+          <span class="w" title="Starbits">${window.ART.starbit({ size: 18 })}<b id="w-bits-w">${num(App.state.player.starbits)}</b></span>
         </div>
       </div>
       <div class="world-body"><div class="world-inner" id="world-inner"></div></div>`;

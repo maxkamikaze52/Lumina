@@ -210,7 +210,8 @@
             <div><b>${acc}%</b><span>accuracy</span></div>
             <div><b>${mean ? mean.toFixed(2) + 's' : '—'}</b><span>per correct</span></div>
             <div><b class="xp">+${num(reward.xp)}</b><span>XP</span></div>
-            <div><b class="bits">+${num(reward.starbits)}</b><span>Starbits</span></div>
+            <div><b class="bits">+${num(reward.starbits)}</b><span class="with-coin">
+              ${ART.starbit({ size: 15 })} Starbits</span></div>
           </div>
           <div class="res-pills">
             <span class="pill">best streak ${session.best}</span>
@@ -406,8 +407,8 @@
           <em>Players</em><b>${esc(opts.items)}</b></span>
         <span class="mi"><i class="mi-ic">${icon('calendar')}</i>
           <em>Time</em><b>${opts.time}</b></span>
-        <span class="mi coin"><i class="mi-ic">${icon('bit')}</i>
-          <em>Reward</em><b>${esc(opts.coin)}</b></span>
+        <span class="mi coin"><i class="mi-ic gold">${ART.starbit({ size: 26 })}</i>
+          <em>Starbits</em><b>${esc(opts.coin)}</b></span>
       </div>
       ${opts.extra || ''}
     </div>`;

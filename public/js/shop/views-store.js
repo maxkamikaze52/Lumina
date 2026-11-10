@@ -23,7 +23,7 @@
     main.innerHTML = `<div class="stack">
       <div class="between"><div><div class="eyebrow">Store</div><h1 style="margin-top:4px">Spend your Starbits</h1>
         <p class="lead" style="margin-top:6px">Everything is earned in games. No real money, no loot boxes.</p></div>
-        <div class="chip bits">${icon('bit')}<b>${num(App.state.player.starbits)}</b></div></div>
+        <div class="chip bits">${ART.starbit({ size: 18 })}<b>${num(App.state.player.starbits)}</b></div></div>
 
       <div class="filters">${CATS.map((c) => `<button class="pill ${shopState.cat === c ? 'jade' : ''}" data-cat="${c}">${c}</button>`).join('')}</div>
       <div class="filters">${['All', 'common', 'uncommon', 'rare', 'epic', 'legendary'].map((r) =>

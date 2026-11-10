@@ -542,3 +542,29 @@
 .btn-go svg{width:22px;height:22px}
 .garage-why{margin:16px 0 0;font-size:16px;font-weight:600;line-height:1.55;color:#5a6a92}
 
+
+/* ---- mode cards: one box, so the ring can never clip ------------------ */
+#ts-cards .tile-card{position:relative;overflow:visible;background:#120a26;
+  border:5px solid #120a26;border-radius:14px;padding:0;
+  box-shadow:0 9px 0 #120a26}
+/* the art and the label fill the frame; no borders of their own to double up */
+#ts-cards .tile-card .tile-art{border:0;border-radius:9px 9px 0 0;height:190px;
+  overflow:hidden;margin:0}
+/* the selected ring is drawn OUTSIDE the frame, so the bottom shadow can't cover it */
+#ts-cards .tile-card.on::after{content:"";position:absolute;inset:-9px;
+  border:5px solid #ffd43b;border-radius:18px;pointer-events:none;z-index:4;
+  box-shadow:0 0 0 3px rgba(18,10,38,.65)}
+#ts-cards .tile-card.on{border-color:#120a26}
+#ts-cards .tile-card .tile-label{border:0;border-radius:0 0 9px 9px}
+
+/* the Starbit coin and its chip, reused across the app */
+.starbit{display:inline-block;vertical-align:-.16em;flex:0 0 auto;
+  filter:drop-shadow(0 1px 0 rgba(74,42,0,.35))}
+.starbit-chip{display:inline-flex;align-items:center;gap:7px;background:#ffd43b;
+  border:2px solid #4a2a00;border-radius:99px;padding:4px 12px 4px 6px;
+  box-shadow:0 3px 0 rgba(74,42,0,.35)}
+.starbit-chip b{font-family:var(--metal);font-size:15px;color:#2b1a00}
+.chip.bits .starbit{border:0}
+.with-coin{display:inline-flex;align-items:center;gap:5px;justify-content:center}
+.mi-ic.gold{background:radial-gradient(circle at 34% 28%,#fff4bd,#ffcd3c 55%,#d99400)!important}
+.mi-ic.gold .starbit svg,.mi-ic svg.starbit{filter:none}
