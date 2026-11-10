@@ -90,7 +90,10 @@
           </div>
         </div>
         <div class="hero-figure"><div class="ring"></div><div class="ring b"></div>
-          ${ART.avatar(p.character, { label: p.name + ' character' })}
+          <div class="framed-avatar">
+            ${ART.avatarFrame(cls.n, { size: 240 })}
+            <div class="framed-inner">${ART.avatar(p.character, { label: p.name + ' character' })}</div>
+          </div>
         </div>
       </section>
 
@@ -306,7 +309,8 @@
       <section class="card">
         <div class="between" style="align-items:flex-start">
           <div class="row" style="gap:18px;align-items:center;flex-wrap:nowrap">
-            <div class="avatar-btn" style="width:74px;height:74px">${ART.avatar(p.character, { background: false })}</div>
+            <div class="framed-avatar small">${ART.avatarFrame(cls.n, { size: 96 })}
+              <div class="framed-inner">${ART.avatar(p.character, { background: false })}</div></div>
             <div><h1 style="font-size:30px">${esc(p.name)}</h1>
               <div class="row" style="gap:8px;margin-top:6px">
                 <span class="pill amber">${esc(cls.name)}</span>
@@ -364,13 +368,21 @@
         <div class="between"><h2 style="font-size:22px">${g === 'platform' ? 'Platform achievements' : App.LABEL[g] + ' badges'}</h2>
           <span class="small muted">${byGame[g].filter((b) => b.unlocked).length}/${byGame[g].length}</span></div>
         <div class="badge-grid" style="margin-top:12px">
-          ${byGame[g].map((b) => b.level
-            ? `<div class="badge crest-badge ${b.unlocked ? '' : 'locked'}" title="${esc(b.desc)}">
-                 ${ART.levelCrest(b.level, { size: 104, locked: !b.unlocked })}
-                 <b>${esc(b.title)}</b>
-                 <span>Level ${b.level} · ${(b.xp || 0).toLocaleString('en-GB')} XP</span></div>`
-            : `<div class="badge ${b.unlocked ? '' : 'locked'}" title="${esc(b.desc)}">
-                 <div class="hex">${icon(b.icon)}</div><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`).join('')}
+          ${byGame[g].map((b) => {
+            const r = b.rarity || {};
+            const prestige = b.prestige ? ` pre-${b.prestige}` : '';
+            const ring = b.prestige
+              ? `<span class="pre-ring">${'★'.repeat(b.prestige)}</span>` : '';
+            return `<div class="badge ${b.unlocked ? '' : 'locked'}${prestige}" title="${esc(b.desc)}">
+              ${ring}
+              <div class="hex">${icon(b.icon)}</div>
+              <b>${esc(b.name)}</b>
+              <span class="badge-desc">${esc(b.desc)}</span>
+              <span class="rarity ${r.pct >= 100 ? 'all' : r.pct <= 5 ? 'rare' : ''}">
+                ${r.pct != null ? (r.pct === 100 ? 'everyone has it' : r.pct + '% of students') : ''}
+                ${r.label && r.pct !== 100 ? `<i>${esc(r.label)}</i>` : ''}
+              </span></div>`;
+          }).join('')}
         </div></section>`).join('')}
 
       <section class="card"><div class="eyebrow">Session history</div>

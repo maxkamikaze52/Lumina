@@ -96,6 +96,9 @@ def build_summary(pid: str) -> dict:
                 if c["id"] == sclass["id"]), -1)
 
     days = {time.strftime("%Y-%m-%d", time.localtime(s["finished"])) for s in sessions}
+    perfect_days = len({time.strftime("%Y-%m-%d", time.localtime(s["finished"]))
+                        for s in sessions
+                        if (s["accuracy"] or 0) >= 100 and (s["total"] or 0) >= 12})
     daily_done = 0
     for row in _all_daily_claimed(pid):
         daily_done += 1
@@ -129,7 +132,7 @@ def build_summary(pid: str) -> dict:
         "overall_rank": overall_rank,
         "overall_board_size": len(overall_rows),
         "best_board_rank": best_board_rank,
-        "active_days": len(days),
+        "active_days": len(days), "perfect_days": perfect_days,
         "daily_done": daily_done,
         "ts": {
             "runs": len(ts_sessions),
@@ -137,6 +140,10 @@ def build_summary(pid: str) -> dict:
             "mult": mult, "div": div, "perfect": 1 if perfect_ts else 0,
             "fast_run": 1 if fast_run else 0, "studio_idx": idx,
             "tables": sorted(tables), "avg": avg, "studio": sclass,
+            # prestige badges read these three
+            "best_avg": min([((r["duration"] or 0) / r["correct"])
+                             for r in studio if r["correct"]] or [None]) if studio else None,
+            "best_streak": max([s.get("best") or 0 for s in ts_sessions] or [0]),
         },
         "sb": {
             "sessions": len(sb_sessions),
@@ -191,7 +198,7 @@ def public_badge(bid: str, unlocked_at: float | None) -> dict:
     b = config.BADGE_BY_ID[bid]
     out = {"id": bid, "name": b["name"], "desc": b["desc"], "game": b["game"],
            "icon": b["icon"], "unlocked": unlocked_at is not None,
-           "at": unlocked_at}
+           "at": unlocked_at, "prestige": b.get("prestige", 0)}
     # a level badge carries its crest data, so the client can draw the tier
     if bid.startswith("level-"):
         lv = config.LEVEL_BY_N[int(bid.split("-")[1])]  # 3-digit ids, e.g. level-044
@@ -203,8 +210,17 @@ def public_badge(bid: str, unlocked_at: float | None) -> dict:
 
 
 def badge_list(pid: str) -> list[dict]:
+    """Every achievement, with how rare it is right now."""
+    import badge_stats
     got = store.unlocked_badges(pid)
-    return [public_badge(b["id"], got.get(b["id"])) for b in config.BADGES]
+    total = badge_stats.population()
+    counts = badge_stats.owned_counts()
+    out = []
+    for b in config.BADGES:
+        row = public_badge(b["id"], got.get(b["id"]))
+        row["rarity"] = badge_stats.rarity(b["id"], total, counts)
+        out.append(row)
+    return out
 
 
 # --------------------------------------------------------------------------- #

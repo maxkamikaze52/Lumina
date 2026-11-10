@@ -776,3 +776,37 @@
 #ts-cards .tile-card{overflow:hidden;border-radius:12px}
 #ts-cards .tile-card .tile-art{border-radius:0}
 #ts-cards .tile-card .tile-label{border-radius:0;border-top:4px solid #120a26}
+
+/* ---- badges: rarity, prestige, and the framed character ---------------- */
+.badge .badge-desc{display:block;font-size:12px;line-height:1.35;color:#8a97b5;margin-top:4px}
+.badge .rarity{display:block;margin-top:8px;font-family:var(--metal);font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:#6d7a99;
+  border-top:2px solid #eef2fb;padding-top:7px}
+.badge .rarity i{display:block;font-style:normal;color:#9aa6c2;font-size:10.5px;margin-top:2px}
+.badge .rarity.rare{color:#b3243f}
+.badge .rarity.all{color:#2f7d5c}
+.badge.locked .rarity{color:#a9b3c9}
+.badge.locked .rarity.rare{color:#c88a97}
+
+/* prestige: a heavier frame and a star tier */
+.badge[class*="pre-"]{background:linear-gradient(180deg,#fffaf0,#fff5e3);border-color:#e8c98a}
+.badge.pre-3{border-width:2px}
+.badge.pre-4{border-width:3px;box-shadow:0 8px 0 -4px rgba(180,120,20,.25)}
+.badge.pre-5{border-width:3px;border-color:#d8a03a;
+  box-shadow:0 0 0 3px rgba(255,205,60,.35), 0 10px 0 -4px rgba(180,120,20,.35)}
+.badge .pre-ring{position:absolute;top:8px;right:10px;font-size:11px;color:#d8971c;
+  letter-spacing:1px}
+:root[data-theme="dark"] .badge[class*="pre-"]{background:linear-gradient(180deg,#241d0c,#1b1608);
+  border-color:#5a460c}
+:root[data-theme="dark"] .badge .badge-desc{color:#9aa6c6}
+:root[data-theme="dark"] .badge .rarity{border-top-color:#243050;color:#9aa6c6}
+
+/* the character inside its badge */
+.framed-avatar{position:relative;width:min(260px,80%);aspect-ratio:1;margin:0 auto;
+  display:grid;place-items:center}
+.framed-avatar svg.avatar-frame{position:absolute;inset:0;width:100%;height:100%}
+.framed-avatar .framed-inner{position:relative;width:56%;height:56%;display:grid;place-items:center;
+  border-radius:50%;overflow:hidden}
+.framed-avatar .framed-inner svg.avatar{width:100%;height:100%}
+.framed-avatar.small{width:96px}
+.framed-avatar.small .framed-inner{width:56%;height:56%}

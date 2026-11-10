@@ -174,6 +174,10 @@ def level_badges() -> list[dict]:
 
 
 LEVEL_BY_N = {l["n"]: l for l in _levels.LEVELS}
+# Level progress is drawn on the Profile ladder from levels.py.  The level badges
+# are NOT achievements: if they were listed in both places every one would show
+# up twice.  Only these achievements (and the Studio speed ranks) are badges.
+LEVEL_BADGE_PREFIX = "level-"
 
 # the ten colour stages, as one row each, for the Home strip
 STAGE_SUMMARY = [
@@ -278,9 +282,53 @@ BADGES = level_badges() + [
          check=lambda s: s["wq"]["challenge_done"] >= 1),
     dict(id="wq-global", name="Global Champion", game="worldquest", icon="trophy",
          desc="Master 100 countries across the world.", check=lambda s: s["wq"]["mastered"] >= 100),
+    # --- prestige: hard to get, worth showing off ---------------------------
+    dict(id="pref-perfect-25", name="Twenty-Five Clean", game="tablestar",
+         icon="target", prestige=3,
+         desc="Finish 25 runs with 100% accuracy (12+ answers).",
+         check=lambda s: s["ts"]["perfect"] >= 25),
+    dict(id="pref-speed-elite", name="Faster Than Thought", game="tablestar",
+         icon="bolt", prestige=4,
+         desc="Average under 1.6 seconds per correct answer in a Studio run.",
+         check=lambda s: s["ts"].get("best_avg") is not None and s["ts"]["best_avg"] <= 1.6),
+    dict(id="pref-all-tables", name="Every Table, Every Way", game="tablestar",
+         icon="grid", prestige=3,
+         desc="Answer correctly from all 12 tables, and 300 divisions.",
+         check=lambda s: len(s["ts"]["tables"]) >= 12 and s["ts"]["div"] >= 300),
+    dict(id="pref-streak-100", name="Hundred in a Row", game="tablestar",
+         icon="chain", prestige=4,
+         desc="Answer 100 questions correctly in a row.",
+         check=lambda s: s["ts"].get("best_streak", 0) >= 100),
+    dict(id="pref-century", name="A Century of Days", game="platform",
+         icon="calendar", prestige=3,
+         desc="Play on 100 different days.",
+         check=lambda s: s["active_days"] >= 100),
+    dict(id="pref-marathon", name="The Long Road", game="platform",
+         icon="flame", prestige=3,
+         desc="Complete 500 games.",
+         check=lambda s: s["games"] >= 500),
+    dict(id="pref-words-300", name="Word Collector", game="spellbound",
+         icon="book", prestige=3,
+         desc="Master 300 different words.",
+         check=lambda s: s["sb"]["mastered"] >= 300),
+    dict(id="pref-world-196", name="The Whole World", game="worldquest",
+         icon="globe", prestige=5,
+         desc="Master all 196 countries.",
+         check=lambda s: s["wq"]["mastered"] >= 196),
+    dict(id="pref-top3", name="Podium", game="platform", icon="podium", prestige=4,
+         desc="Reach the top 3 of the overall leaderboard.",
+         check=lambda s: s["overall_rank"] <= 3 and s["overall_board_size"] >= 10),
+    dict(id="pref-perfect-week", name="Seven Perfect Days", game="platform",
+         icon="star", prestige=5,
+         desc="Finish a perfect run on seven different days.",
+         check=lambda s: s.get("perfect_days", 0) >= 7),
 ]
 
-BADGE_BY_ID = {b["id"]: b for b in BADGES}
+# Level progress is drawn on the Profile ladder from levels.py, so the level
+# badges are NOT in the achievement list — otherwise every level would appear
+# twice.  They still resolve by id, because old rows in `badges` mention them.
+BADGES = [b for b in BADGES if not b["id"].startswith(LEVEL_BADGE_PREFIX)]
+BADGE_BY_ID = {b["id"]: b for b in BADGES + level_badges()}
 
 # --------------------------------------------------------------------------- #
 # Daily challenges — three per player per day, deterministic, all real.

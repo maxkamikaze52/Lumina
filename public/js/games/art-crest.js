@@ -225,45 +225,50 @@
     }
   }
 
-  /* ---------- rim ornament: one per level, cycling a bigger set ---------- */
+  /* ---------- rim: one clean band, one ornament, nothing overlapping ----------
+     The plate's largest radius is 37, so ornaments sit at 41 with a radius of
+     at most 2.6 — always inside the 100 box and never on top of the art.  Every
+     ornament gets a thin dark outline so it reads whatever the metal colour is. */
   function rim(step, n, t) {
-    const C = 50, r = 37;
-    let out = '';
-    const kind = n % 6;
+    const C = 50, cy = 47, R = 41;
+    const OUT = '#0a0818';
+    let out = `<circle cx="${C}" cy="${cy}" r="${R - 2}" fill="none" stroke="${OUT}"
+      stroke-width="1.4" opacity=".55"/>`;
+    const kind = n % 5;
     if (kind === 0) {
-      for (let i = 0; i < 12; i++) {
-        const a = (Math.PI * 2 * i) / 12 - Math.PI / 2;
-        out += `<circle cx="${(C + r * Math.cos(a)).toFixed(1)}" cy="${(47 + r * Math.sin(a)).toFixed(1)}"
-          r="2.2" fill="${t.light}" stroke="${t.edge}" stroke-width=".6"/>`;
-      }
-    } else if (kind === 1) {
-      out += `<circle cx="${C}" cy="47" r="${r}" fill="none" stroke="${t.light}"
-        stroke-width="1.8" stroke-dasharray="5 4" opacity=".8"/>`;
-    } else if (kind === 2) {
+      // even studs
       for (let i = 0; i < 10; i++) {
         const a = (Math.PI * 2 * i) / 10 - Math.PI / 2;
-        out += `<line x1="${(C + (r - 4) * Math.cos(a)).toFixed(1)}" y1="${(47 + (r - 4) * Math.sin(a)).toFixed(1)}"
-          x2="${(C + (r + 2) * Math.cos(a)).toFixed(1)}" y2="${(47 + (r + 2) * Math.sin(a)).toFixed(1)}"
-          stroke="${t.light}" stroke-width="1.8" opacity=".75"/>`;
+        const x = C + R * Math.cos(a), y = cy + R * Math.sin(a);
+        out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4"
+          fill="${t.light}" stroke="${OUT}" stroke-width="1"/>`;
+      }
+    } else if (kind === 1) {
+      // segmented band
+      out += `<circle cx="${C}" cy="${cy}" r="${R}" fill="none" stroke="${t.light}"
+        stroke-width="2.2" stroke-dasharray="6 5" opacity=".95"/>`;
+    } else if (kind === 2) {
+      // diamonds between the plate and the band, evenly spaced
+      for (let i = 0; i < 8; i++) {
+        const a = (Math.PI * 2 * i) / 8 - Math.PI / 8;
+        const x = C + R * Math.cos(a), y = cy + R * Math.sin(a);
+        out += `<rect x="${(x - 2.2).toFixed(1)}" y="${(y - 2.2).toFixed(1)}" width="4.4"
+          height="4.4" transform="rotate(45 ${x.toFixed(1)} ${y.toFixed(1)})"
+          fill="${t.light}" stroke="${OUT}" stroke-width="1"/>`;
       }
     } else if (kind === 3) {
-      for (let i = 0; i < 6; i++) {
-        const a = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-        const x = C + r * Math.cos(a), y = 47 + r * Math.sin(a);
-        out += `<rect x="${(x - 2.4).toFixed(1)}" y="${(y - 2.4).toFixed(1)}" width="4.8" height="4.8"
-          transform="rotate(45 ${x.toFixed(1)} ${y.toFixed(1)})" fill="${t.light}"
-          stroke="${t.edge}" stroke-width=".7"/>`;
-      }
-    } else if (kind === 4) {
-      out += `<circle cx="${C}" cy="47" r="${r}" fill="none" stroke="${t.mid}"
-        stroke-width="2.4" opacity=".9"/>
-        <circle cx="${C}" cy="47" r="${r - 3}" fill="none" stroke="${t.light}"
-        stroke-width="1.2" opacity=".7"/>`;
+      // a double band, no ornament loose in space
+      out += `<circle cx="${C}" cy="${cy}" r="${R}" fill="none" stroke="${t.mid}"
+          stroke-width="2.6" stroke-linecap="round"/>
+        <circle cx="${C}" cy="${cy}" r="${R - 4}" fill="none" stroke="${t.light}"
+          stroke-width="1.2" opacity=".8"/>`;
     } else {
-      for (let i = 0; i < 16; i++) {
-        const a = (Math.PI * 2 * i) / 16;
-        out += `<circle cx="${(C + r * Math.cos(a)).toFixed(1)}" cy="${(47 + r * Math.sin(a)).toFixed(1)}"
-          r="1.3" fill="${t.light}" opacity=".8"/>`;
+      // small beads, tight to the band
+      for (let i = 0; i < 20; i++) {
+        const a = (Math.PI * 2 * i) / 20;
+        out += `<circle cx="${(C + (R - 1) * Math.cos(a)).toFixed(1)}"
+          cy="${(cy + (R - 1) * Math.sin(a)).toFixed(1)}" r="1.5"
+          fill="${t.light}" stroke="${OUT}" stroke-width=".5"/>`;
       }
     }
     return out;
@@ -288,16 +293,20 @@
           <stop offset=".74" stop-color="${t.deep}"/>
           <stop offset="1" stop-color="${t.mid}"/>
         </linearGradient>
-        <radialGradient id="${id}g" cx=".36" cy=".28" r=".88">
-          <stop offset="0" stop-color="${t.light}"/>
-          <stop offset=".45" stop-color="${t.glass}"/>
-          <stop offset="1" stop-color="${t.deep}"/>
+        <radialGradient id="${id}g" cx=".34" cy=".26" r=".95">
+          <stop offset="0" stop-color="${t.mid}"/>
+          <stop offset=".55" stop-color="${t.deep}"/>
+          <stop offset="1" stop-color="#0a0818"/>
         </radialGradient>
       </defs>
       ${plate(stage, t, id)}
-      <circle cx="50" cy="44" r="24" fill="url(#${id}g)" stroke="${t.edge}" stroke-width="1.4"/>
-      <ellipse cx="43" cy="34" rx="10" ry="6" fill="#fff" opacity=".3"/>
-      ${motif(step, n % 10 === 0 ? 9 : n % 10, t)}
+      <circle cx="50" cy="44" r="24" fill="url(#${id}g)" stroke="#0a0818" stroke-width="1.6"/>
+      <circle cx="50" cy="44" r="21.5" fill="none" stroke="${t.light}" stroke-width=".8"
+        opacity=".5"/>
+      <ellipse cx="42" cy="33" rx="9" ry="5" fill="#fff" opacity=".26"/>
+      <g stroke="#0a0818" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
+        ${motif(step, n % 10 === 0 ? 9 : n % 10, t)}
+      </g>
       ${rim(step, n, t)}
       <rect x="30" y="74" width="40" height="16" rx="8" fill="${t.deep}"
         stroke="${t.mid}" stroke-width="1.5"/>
