@@ -8,20 +8,22 @@
   const A = window.ART = window.ART || {};
 
   /* A CIRCLE-CROPPED BUST, for placing inside a badge.
-     The avatar is drawn in a 112x212 box with the face between y=18 (hair) and
-     y=88 (chin) and the shoulders starting at y=100, so the window is a square
-     from y=12 to y=94: the whole head, centred, with the top of the outfit
-     showing at the bottom.  Anything tighter cuts the chin; anything looser
-     shows the body. */
+     Measured from the avatar drawing itself: the head is a circle at (56,56)
+     with r=26, the ears at y=58, and the neck starts at y=86, so the face spans
+     y=30..82.  The window is a square that holds the whole head with a little
+     air above the hair and the top of the shoulders below — centred on x=56,
+     which is what the frame's circular opening is centred on. */
   A.avatarHead = function (equipped, opts) {
     const o = opts || {};
     const label = o.label || 'Player character';
     const svg = (window.ART.avatar(equipped, { background: false, label }) || '');
+    const TOP = 16, SIDE = 76;          // y 16..92, x 18..94 → the head, centred
     return svg
       .replace(/<ellipse cx="56" cy="206"[^>]*\/>/, '')   // drop the ground shadow
       .replace('<svg class="avatar"', '<svg class="avatar avatar-head"')
       .replace('viewBox="0 0 112 212"',
-               'viewBox="14 11 84 84" preserveAspectRatio="xMidYMid slice"');
+               'viewBox="' + (56 - SIDE / 2) + ' ' + TOP + ' ' + SIDE + ' ' + SIDE +
+               '" preserveAspectRatio="xMidYMid slice"');
   };
 
   A.avatarFrame = function (level, opts) {

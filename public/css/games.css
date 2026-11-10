@@ -857,3 +857,7 @@
 /* a bust reads better than a floating head: fill the opening from the top */
 .framed-avatar .framed-inner{width:60%;height:60%;transform:none}
 .framed-avatar .framed-inner svg.avatar-head{width:100%;height:100%}
+
+/* the head fills the opening: 76/112 of the avatar box, centred */
+.framed-avatar .framed-inner{width:62%;height:62%;transform:none}
+.framed-avatar .framed-inner svg.avatar-head{width:100%;height:100%}
