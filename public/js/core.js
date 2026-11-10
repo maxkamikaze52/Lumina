@@ -85,8 +85,47 @@
     const p = App.state.player;
     [['w-xp', p.xp], ['w-xp-w', p.xp], ['w-bits', p.starbits], ['w-bits-w', p.starbits]]
       .forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.textContent = num(val); });
+    // the two wallet buttons carry their own mark: a spark for XP, the coin for Starbits
+    document.querySelectorAll('.chip[data-about] .ico').forEach((el) => {
+      el.innerHTML = el.closest('[data-about="xp"]')
+        ? window.icon('spark')
+        : window.ART.starbit({ size: 19 });
+    });
     const av = document.getElementById('w-avatar');
     if (av) av.innerHTML = window.ART.avatar(p.character, { background: false });
+  };
+
+  /* The wallet buttons explain themselves when clicked, and stay put: the panel
+     is anchored to the button, closes on a second click, on Escape or outside. */
+  App.aboutInit = function () {
+    if (App._aboutBound) return;
+    App._aboutBound = true;
+    const close = (except) => {
+      document.querySelectorAll('.chipwrap.open').forEach((w) => {
+        if (w === except) return;
+        w.classList.remove('open');
+        const a = w.querySelector('.about');
+        if (a) a.hidden = true;
+        const b = w.querySelector('.chip');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+    };
+    document.querySelectorAll('.chip[data-about]').forEach((btn) => {
+      btn.setAttribute('aria-expanded', 'false');
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const wrap = btn.closest('.chipwrap');
+        const panel = wrap && wrap.querySelector('.about');
+        if (!panel) return;
+        const open = panel.hidden;
+        close(wrap);
+        panel.hidden = !open;
+        wrap.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', String(open));
+      };
+    });
+    document.addEventListener('click', () => close(null));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(null); });
   };
 
   App.reload = async function () {

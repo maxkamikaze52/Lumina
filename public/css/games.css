@@ -568,3 +568,45 @@
 .with-coin{display:inline-flex;align-items:center;gap:5px;justify-content:center}
 .mi-ic.gold{background:radial-gradient(circle at 34% 28%,#fff4bd,#ffcd3c 55%,#d99400)!important}
 .mi-ic.gold .starbit svg,.mi-ic svg.starbit{filter:none}
+
+/* ---- the wallet buttons: two different currencies, two different looks -- */
+.chipwrap{position:relative}
+.chipwrap .chip{cursor:pointer;font-family:var(--metal);letter-spacing:.02em;
+  transition:transform .12s,box-shadow .12s;border-width:2px;border-style:solid}
+.chipwrap .chip:hover{transform:translateY(-2px)}
+.chipwrap.open .chip{transform:translateY(-2px)}
+.chipwrap .chip .ico{display:inline-flex;align-items:center;justify-content:center}
+.chipwrap .chip svg{width:19px;height:19px}
+
+/* XP: a spark on deep teal */
+.chip.xp{background:#0f3f36;border-color:#2fbf9a;color:#ecfff8;
+  box-shadow:0 4px 0 #08251f}
+.chip.xp b{font-size:16px;color:#8ff0cf}
+.chip.xp .ico svg{color:#4be0b4}
+.chip.xp .lbl{color:#7fd8bd;font-size:11px;letter-spacing:.14em}
+
+/* Starbits: the coin on gold */
+.chip.bits{background:#3a2400;border-color:#ffcd3c;color:#fff8e0;
+  box-shadow:0 4px 0 #1f1300}
+.chip.bits b{font-size:16px;color:#ffd857}
+.chip.bits .ico{filter:drop-shadow(0 0 6px rgba(255,205,60,.55))}
+
+.chipwrap.open .chip.xp{box-shadow:0 4px 0 #08251f, 0 0 0 3px rgba(75,224,180,.45)}
+.chipwrap.open .chip.bits{box-shadow:0 4px 0 #1f1300, 0 0 0 3px rgba(255,205,60,.45)}
+
+/* the explanation panel */
+.chipwrap .about{position:absolute;right:0;top:calc(100% + 12px);z-index:60;width:294px;
+  background:#120a26;border:3px solid #2fbf9a;border-radius:12px;padding:14px 16px;
+  box-shadow:0 14px 34px -12px rgba(0,0,0,.75);color:#fff;
+  animation:aboutIn .18s ease-out both}
+.chipwrap .about b{display:block;font-family:var(--metal);font-size:17px;letter-spacing:.03em;
+  text-transform:uppercase;color:#8ff0cf;margin-bottom:6px}
+.chipwrap .about p{margin:0;font-size:14.5px;line-height:1.5;color:#d8d3ee;font-weight:600}
+.chipwrap .about::before{content:"";position:absolute;top:-9px;right:22px;width:14px;height:14px;
+  background:#120a26;border-left:3px solid #2fbf9a;border-top:3px solid #2fbf9a;
+  transform:rotate(45deg)}
+.chipwrap:has(.chip.bits) .about{border-color:#ffcd3c}
+.chipwrap:has(.chip.bits) .about b{color:#ffd857}
+.chipwrap:has(.chip.bits) .about::before{border-color:#ffcd3c}
+@keyframes aboutIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (max-width:640px){.chipwrap .about{width:min(80vw,294px)}}

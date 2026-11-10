@@ -39,11 +39,25 @@
     <nav class="tabs" id="tabs" aria-label="Sections"></nav>
 
     <div class="wallet">
-      <div class="chip xp" title="Lifetime experience — never spent">
-        <span class="ico" data-icon="spark"></span><b id="w-xp">0</b><span class="lbl">XP</span>
+      <div class="chipwrap">
+        <button class="chip xp" data-about="xp" aria-describedby="about-xp">
+          <span class="ico" data-icon="spark"></span><b id="w-xp">0</b><span class="lbl">XP</span>
+        </button>
+        <div class="about" id="about-xp" role="tooltip" hidden>
+          <b>Experience</b>
+          <p>Everything you have ever earned, from every game. It never goes down and you can
+            never spend it — it is what moves you up the class ladder.</p>
+        </div>
       </div>
-      <div class="chip bits" title="Starbits — spend these in the store">
-        <span class="ico" data-icon="bit"></span><b id="w-bits">0</b>
+      <div class="chipwrap">
+        <button class="chip bits" data-about="bits" aria-describedby="about-bits">
+          <span class="ico" data-icon="bit"></span><b id="w-bits">0</b>
+        </button>
+        <div class="about" id="about-bits" role="tooltip" hidden>
+          <b>Starbits</b>
+          <p>The coin of Astrolab. Earn them by playing, then spend them in the Store on
+            clothes, pets and things for your room.</p>
+        </div>
       </div>
       <button class="avatar-btn" id="w-avatar" data-nav="character" aria-label="Your character"></button>
     </div>
