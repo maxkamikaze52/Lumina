@@ -226,24 +226,28 @@ def complete_session(pid: str, body: dict) -> tuple[int, dict]:
     with store.db() as con:
         # ---- per-game detail tables (these drive mastery + badges) ----------
         if game == "tablestar":
-            for f in (details.get("facts") or [])[:400]:
-                fact = str(f.get("f"))[:12]
-                good = bool(f.get("ok"))
-                ms = float(f.get("ms") or 0)
-                if not fact:
-                    continue
-                row = con.execute(
-                    "SELECT correct,wrong,ms FROM perfacts WHERE player_id=? AND fact=?",
-                    (pid, fact)).fetchone()
-                if row:
-                    con.execute(
-                        "UPDATE perfacts SET correct=correct+?,wrong=wrong+?,ms=?"
-                        " WHERE player_id=? AND fact=?",
-                        (1 if good else 0, 0 if good else 1,
-                         (row["ms"] * 0.6 + ms * 0.4) if row["ms"] else ms, pid, fact))
-                else:
-                    con.execute("INSERT INTO perfacts VALUES(?,?,?,?,?)",
-                                (pid, fact, 1 if good else 0, 0 if good else 1, ms))
+            # Mastery belongs to the GARAGE.  A Studio game is a speed test, not
+            # evidence that a fact has been learned, so it never touches
+            # perfacts — the gig's heat maps and study plan stay honest.
+            if s["mode"] != "studio":
+                for f in (details.get("facts") or [])[:400]:
+                    fact = str(f.get("f"))[:12]
+                    good = bool(f.get("ok"))
+                    ms = float(f.get("ms") or 0)
+                    if not fact:
+                        continue
+                    row = con.execute(
+                        "SELECT correct,wrong,ms FROM perfacts WHERE player_id=? AND fact=?",
+                        (pid, fact)).fetchone()
+                    if row:
+                        con.execute(
+                            "UPDATE perfacts SET correct=correct+?,wrong=wrong+?,ms=?"
+                            " WHERE player_id=? AND fact=?",
+                            (1 if good else 0, 0 if good else 1,
+                             (row["ms"] * 0.6 + ms * 0.4) if row["ms"] else ms, pid, fact))
+                    else:
+                        con.execute("INSERT INTO perfacts VALUES(?,?,?,?,?)",
+                                    (pid, fact, 1 if good else 0, 0 if good else 1, ms))
         if game == "spellbound":
             for w in (details.get("words") or [])[:200]:
                 word = str(w.get("w"))[:40]
@@ -339,7 +343,7 @@ def complete_session(pid: str, body: dict) -> tuple[int, dict]:
         "daily": progression.daily(pid),
         "sessionId": sid,
         "tokens": tokens,
-        "path": path_info["path"] if path_info else None,
+        "path": path_info["plan"] if path_info else None,
     }
 
 

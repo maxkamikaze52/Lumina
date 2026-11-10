@@ -147,7 +147,7 @@
           App.toast(r.message, 'bit');
           if (r.badges && r.badges.length) App.celebrate(r.badges);
           await App.reload();
-          App.render();
+          App.render({ keepScroll: true });
         } catch (e) { App.toast(e.message, 'x'); }
       };
     });

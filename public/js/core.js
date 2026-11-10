@@ -191,7 +191,9 @@
   };
   App.onCleanup = function (fn) { App.cleanups.push(fn); };
 
-  App.render = async function () {
+  App.render = async function (opts) {
+    const keepScroll = !!(opts && opts.keepScroll);
+    const here = window.scrollY;
     App.cleanup();
     const main = document.getElementById('main');
     const view = window.VIEWS[App.route.name] || window.VIEWS.home;
@@ -205,7 +207,10 @@
         <button class="btn ghost sm" style="margin-top:14px" onclick="location.reload()">Reload</button></div>`;
     }
     App.paintTabs();
-    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    // A re-render after a click (collect, buy, save) must not throw you back to
+    // the top of a long page.  Only a fresh navigation scrolls up.
+    if (keepScroll) window.scrollTo({ top: here, behavior: 'auto' });
+    else window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
   };
 
   const TABS = [
