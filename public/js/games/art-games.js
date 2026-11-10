@@ -211,10 +211,13 @@
   /* a labelled mode tile, the way the game menus are laid out */
   S.tile = function (opts) {
     const o = opts || {};
+    const art = typeof o.art === 'string' && o.art.indexOf('mode:') === 0 && window.ART.modeArt
+      ? window.ART.modeArt[o.art.slice(5)]()
+      : S.poster(o.art);
     return `<button class="tile-card ${o.on ? 'on' : ''}" ${o.action || ''} aria-pressed="${!!o.on}">
       <div class="tile-art" style="--a1:${o.a1 || '#cfe9ff'};--a2:${o.a2 || '#fff3c4'}"><svg
         viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true">${S.poster(o.art)}</svg></div>
+        aria-hidden="true">${art}</svg></div>
       <div class="tile-label" style="--label:${o.label || '#ffc93c'}">
         <b>${o.name}</b><span>${o.sub || ''}</span></div>
       ${o.on ? `<span class="tile-check">${window.icon('check')}</span>` : ''}

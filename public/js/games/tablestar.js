@@ -381,9 +381,9 @@
       <div class="giant">YOUR <em>GIG</em></div>
 
       <div class="tilegrid" id="ts-cards">
-        ${ART.tile({ art: 'garage', name: 'GARAGE', sub: 'Gig, then learn what it exposes', label: '#ffe08a', action: 'data-tab="garage"' })}
-        ${ART.tile({ art: 'studio', name: 'STUDIO', sub: '12 × 12 · all divisions · ranked', label: '#b9a6ff', action: 'data-tab="studio"' })}
-        ${ART.tile({ art: 'speed', name: 'SOUNDCHECK', sub: '25 questions · 2–12', label: '#a8f0c8', action: 'data-tab="sound"' })}
+        ${ART.tile({ art: 'mode:garage', name: 'GARAGE', sub: 'Gig, then learn what it exposes', label: '#ffe08a', action: 'data-tab="garage"' })}
+        ${ART.tile({ art: 'mode:studio', name: 'STUDIO', sub: '12 × 12 · all divisions · ranked', label: '#e0c9ff', action: 'data-tab="studio"' })}
+        ${ART.tile({ art: 'mode:sound', name: 'SOUNDCHECK', sub: '25 questions · 2–12 · warm-up', label: '#a8f0c8', action: 'data-tab="sound"' })}
       </div>
 
       <div id="ts-tab"></div>
