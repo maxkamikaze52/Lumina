@@ -5,6 +5,8 @@
   const views = window.VIEWS;
   const esc = App.esc, num = App.num, cap = App.cap;
   const st = () => App.state;
+  // each item's rarity colour, fed to the CSS as --rc so thumbnails get a matching background
+  const rc = (i) => `--rc:${App.state.catalogue.rarity[i.rarity].colour}`;
 
   /* ----------------------------------------------------------- store --- */
   const CATS = ['All', 'Clothing', 'Accessories', 'Pets', 'Furniture', 'Decorations', 'Room themes', 'Special collections', 'Appearance'];
@@ -23,7 +25,7 @@
     main.innerHTML = `<div class="stack">
       <div class="between"><div><div class="eyebrow">Store</div><h1 style="margin-top:4px">Spend your Starbits</h1>
         <p class="lead" style="margin-top:6px">Everything is earned in games. No real money, no loot boxes.</p></div>
-        <div class="chip bits">${ART.starbit({ size: 18 })}<b>${num(App.state.player.starbits)}</b></div></div>
+        <div class="chip bits">${icon('bit')}<b>${num(App.state.player.starbits)}</b></div></div>
 
       <div class="filters">${CATS.map((c) => `<button class="pill ${shopState.cat === c ? 'jade' : ''}" data-cat="${c}">${c}</button>`).join('')}</div>
       <div class="filters">${['All', 'common', 'uncommon', 'rare', 'epic', 'legendary'].map((r) =>
@@ -32,20 +34,15 @@
       <section class="shop-grid">
         ${items.map((i) => {
           const has = owned.has(i.id);
-          const lvl = App.state.stats.level;
-          const need = i.level || 1;
-          const locked = lvl.n < need;
-          const can = !locked && App.state.player.starbits >= i.price;
-          return `<article class="shop-item ${locked ? 'locked' : ''}">
-            <div class="shop-thumb">${ART.thumb(i)}
-              ${locked ? `<span class="lock-tag">LEVEL ${need}</span>` : ''}</div>
+          const can = App.state.player.starbits >= i.price;
+          return `<article class="shop-item" style="${rc(i)}">
+            <div class="shop-thumb">${ART.thumb(i)}</div>
             <b>${esc(i.name)}</b>
             <span class="rar" style="color:${rarity[i.rarity].colour}">${rarity[i.rarity].label}</span>
             <div class="between" style="margin-top:auto">
-              ${has ? '<span class="owned-tag">Owned</span>' : `<span class="price">${ART.starbit({ size: 15 })}${num(i.price)}</span>`}
+              ${has ? '<span class="owned-tag">Owned</span>' : `<span class="price">${icon('bit')}${num(i.price)}</span>`}
               ${has ? `<button class="btn ghost sm" data-equip="${i.id}">${i.slot === 'furniture' || i.slot === 'theme' ? 'Room' : 'Wear'}</button>`
-                : locked ? `<button class="btn ghost sm" data-needlevel="${need}">Level ${need}</button>`
-                : `<button class="btn sm ${can ? '' : 'ghost'}" data-buy="${i.id}">Buy</button>`}
+                : `<button class="btn sm ${can ? '' : 'ghost'}" data-buy="${i.id}" ${can ? '' : 'disabled'}>Buy</button>`}
             </div></article>`;
         }).join('')}
       </section>
@@ -57,15 +54,11 @@
     main.querySelectorAll('[data-cat]').forEach((b) => { b.onclick = () => { shopState.cat = b.dataset.cat; App.render(); }; });
     main.querySelectorAll('[data-rar]').forEach((b) => { b.onclick = () => { shopState.rarity = b.dataset.rar; App.render(); }; });
 
-    main.querySelectorAll('[data-needlevel]').forEach((b) => {
-      b.onclick = () => App.toast(`Locked until level ${b.dataset.needlevel}. Earn XP in any game.`, 'x');
-    });
-
     main.querySelectorAll('[data-buy]').forEach((b) => {
       b.onclick = () => {
         const it = App.state.catalogue.items.find((i) => i.id === b.dataset.buy);
         App.modal(`<div class="row" style="gap:16px;align-items:center;flex-wrap:nowrap">
-            <div class="shop-thumb" style="width:120px;height:140px;flex:none">${ART.thumb(it)}</div>
+            <div class="shop-thumb" style="${rc(it)};width:120px;height:140px;flex:none">${ART.thumb(it)}</div>
             <div><h2 style="font-size:22px">${esc(it.name)}</h2>
             <p class="small muted" style="margin-top:6px">${esc(it.desc)}</p>
             <p class="small" style="margin-top:10px">Rarity: <b>${esc(App.state.catalogue.rarity[it.rarity].label)}</b></p>
@@ -92,7 +85,7 @@
 
   /* ------------------------------------------------------- character --- */
   const SLOT_LABEL = {
-    skin: 'Skin', hair: 'Hair', hairColor: 'Hair colour', eyes: 'Eyes', eyeColor: 'Eye colour',
+    hair: 'Hair', hairColor: 'Hair colour', eyes: 'Eyes', eyeColor: 'Eye colour',
     mouth: 'Mouth', top: 'Top', bottom: 'Trousers', shoes: 'Shoes', hat: 'Hat',
     accessory: 'Accessory', back: 'Back', pet: 'Pet', effect: 'Effect'
   };
@@ -111,7 +104,7 @@
         <div class="stack">
           <div class="stage"><div class="halo"></div>${ART.avatar(equipped, { label: 'Your character' })}</div>
           <div class="card flat small">
-            <div class="between"><span class="muted">Owned items</span><b>${owned.size}</b></div>
+            <div class="between"><span class="muted">Owned items</span><b>${s.catalogue.items.filter((i) => owned.has(i.id)).length}</b></div>
             <div class="divider" style="margin:10px 0"></div>
             <button class="btn ghost sm block" data-nav="store">${icon('store')} Visit the store</button>
           </div>
@@ -122,10 +115,8 @@
           <div class="between"><h3>${SLOT_LABEL[slot]}</h3>
             ${equipped[slot] ? `<button class="btn ghost sm" id="takeoff">Remove</button>` : ''}</div>
           <div class="swatches" style="margin-top:14px">
-            ${items.map((i) => `<button class="swatch ${equipped[slot] === i.id ? 'on' : ''}" data-wear="${i.id}">
-              ${['skin', 'eyeColor', 'hairColor'].includes(i.slot)
-                ? `<span class="chipc" style="background:${i.colour}"></span>`
-                : `<span class="mini">${ART.thumb(i)}</span>`}
+            ${items.map((i) => `<button class="swatch ${equipped[slot] === i.id ? 'on' : ''}" data-wear="${i.id}" style="${rc(i)}">
+              <span class="mini">${ART.thumb(i)}</span>
               <span>${esc(i.name)}</span></button>`).join('') || '<div class="empty small">Nothing owned in this slot yet — look in the store.</div>'}
           </div>
         </div>
@@ -174,19 +165,7 @@
       <section class="room-wrap">
         <div class="room-canvas" id="canvas">
           <svg viewBox="0 0 960 600" id="scene" aria-label="Your room">
-            <defs>
-              <linearGradient id="wallShade" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
-              <linearGradient id="floorShade" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
-              <pattern id="floorLines" width="40" height="600" patternUnits="userSpaceOnUse">
-                <line x1="0" y1="0" x2="0" y2="600" stroke="rgba(0,0,0,.12)" stroke-width="2"/></pattern>
-            </defs>
-            <rect width="960" height="420" fill="${esc(theme.colour)}"/>
-            <rect width="960" height="420" fill="url(#wallShade)"/>
-            <rect y="420" width="960" height="180" fill="${esc(theme.floor || '#a9793f')}"/>
-            <rect y="420" width="960" height="180" fill="url(#floorLines)"/>
-            <rect y="414" width="960" height="10" fill="rgba(0,0,0,.22)"/>
+            <g id="roomBg">${ART.room(theme)}</g>
             <g id="objects"></g>
           </svg>
           <div class="room-side">
@@ -198,14 +177,14 @@
           <div class="card flat">
             <div class="eyebrow">Your furniture</div>
             <div class="tray" style="margin-top:10px" id="tray">
-              ${mine.map((i) => `<button data-add="${i.id}" title="${esc(i.name)}">${ART.thumb(i)}</button>`).join('')
+              ${mine.map((i) => `<button data-add="${i.id}" title="${esc(i.name)}" style="${rc(i)}">${ART.thumb(i)}</button>`).join('')
                 || '<span class="small muted">Buy furniture in the store.</span>'}
             </div>
             <div class="divider"></div>
             <div class="eyebrow">Wall &amp; floor</div>
             <div class="tray" style="margin-top:10px">
               ${s.catalogue.items.filter((i) => i.slot === 'theme' && owned.has(i.id)).map((i) =>
-                `<button data-theme="${i.id}" style="border-color:${i.id === room.theme ? 'var(--jade)' : ''}" title="${esc(i.name)}">${ART.thumb(i)}</button>`).join('')}
+                `<button data-theme="${i.id}" style="${rc(i)};border-color:${i.id === room.theme ? 'var(--jade)' : ''}" title="${esc(i.name)}">${ART.thumb(i)}</button>`).join('')}
             </div>
           </div>
           <div class="card flat small muted">Click an object to select it, then drag to move.
@@ -274,7 +253,7 @@
       b.onclick = () => {
         layout.theme = b.dataset.theme; roomState.dirty = true;
         const t = s.catalogue.items.find((i) => i.id === b.dataset.theme);
-        main.querySelector('#scene rect').setAttribute('fill', t.colour);
+        main.querySelector('#roomBg').innerHTML = ART.room(t);
         main.querySelectorAll('[data-theme]').forEach((x) => { x.style.borderColor = ''; });
         b.style.borderColor = 'var(--jade)';
       };

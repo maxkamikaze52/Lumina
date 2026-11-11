@@ -3,12 +3,19 @@
 
 /* ---------- store ---------- */
 .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px}
-.shop-item{border-radius:16px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-  display:flex;flex-direction:column;gap:8px;transition:transform .2s var(--ease),border-color .2s}
-.shop-item:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.2)}
-.shop-thumb{height:112px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#26305a,#151a33);
-  display:grid;place-items:center;overflow:hidden;position:relative}
+.shop-item{--rc:#8b93b8;border-radius:16px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;gap:8px;transition:transform .2s var(--ease),border-color .2s,box-shadow .2s}
+.shop-item:hover{transform:translateY(-3px);border-color:var(--rc);box-shadow:0 8px 22px -10px var(--rc)}
+/* every thumbnail sits on a backdrop in its rarity colour (the same colour as the rarity name) */
+.shop-thumb,.swatch .mini,.tray button{--rc:#8b93b8;
+  background:radial-gradient(circle at 50% 36%,#2a3158,#151a33);   /* fallback */
+  background:radial-gradient(circle at 50% 34%,color-mix(in srgb,var(--rc) 58%,#10142b),color-mix(in srgb,var(--rc) 20%,#0c1026) 92%);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 55%,transparent)}
+.shop-item .shop-thumb,.swatch .mini{--rc:inherit}
+.shop-thumb{height:112px;border-radius:12px;display:grid;place-items:center;overflow:hidden;position:relative}
 .shop-thumb svg{width:100%;height:100%}
+.shop-thumb::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),transparent 40%)}
 .shop-item b{font-size:14px;font-family:var(--display);font-weight:600;line-height:1.2}
 .shop-item .price{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--amber);font-size:14px}
 .shop-item .price svg{width:14px;height:14px}
@@ -31,8 +38,9 @@
 .swatch{border-radius:12px;padding:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
   display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);text-align:center}
 .swatch.on{border-color:var(--jade);background:rgba(46,196,166,.12)}
-.swatch .chipc{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.18)}
-.swatch .mini{width:64px;height:64px}
+.swatch{--rc:#8b93b8}
+.swatch .mini{width:64px;height:64px;border-radius:10px;display:grid;place-items:center;overflow:hidden}
+.swatch .mini svg{width:100%;height:100%}
 .lockrow{display:flex;align-items:center;gap:10px;justify-content:space-between;width:100%}
 
 /* ---------- room ---------- */
@@ -45,7 +53,7 @@
 .room-canvas .placed.sel{outline:2px dashed var(--amber);outline-offset:2px}
 .room-side{display:flex;flex-direction:column;gap:12px}
 .tray{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:320px;overflow:auto;padding-right:4px}
-.tray button{border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);aspect-ratio:1;display:grid;place-items:center;padding:4px}
+.tray button{border-radius:10px;border:1px solid rgba(255,255,255,.08);aspect-ratio:1;display:grid;place-items:center;padding:4px}
 .tray button svg{width:100%;height:100%}
 
 
@@ -55,3 +63,9 @@
   .char-stage{grid-template-columns:1fr}
   .stage{min-height:320px}
 }
+
+/* legendary items get a slow shimmer; epic a faint glow */
+@keyframes shopShine{0%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
+.shop-item[style*="#ffb020"] .shop-thumb::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.22) 50%,transparent 60%);animation:shopShine 4.5s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.shop-item[style*="#ffb020"] .shop-thumb::before{animation:none}}

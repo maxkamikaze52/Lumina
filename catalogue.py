@@ -5,17 +5,15 @@ room are plain SVG generated in the client.  Nothing here is a picture file: it
 stays cheap to add items without an artist.
 """
 
-# Prices are in Starbits, on the same 10x scale as XP, and every rarity above
-# common is gated behind a level: you cannot buy your way past the ladder.
 RARITY = {
-    "common":    {"price": 400,  "label": "Common",    "colour": "#8b93b8", "level": 1},
-    "uncommon":  {"price": 900,  "label": "Uncommon",  "colour": "#2ec4a6", "level": 3},
-    "rare":      {"price": 1800, "label": "Rare",      "colour": "#3a9bff", "level": 6},
-    "epic":      {"price": 3400, "label": "Epic",      "colour": "#a865ff", "level": 10},
-    "legendary": {"price": 6000, "label": "Legendary", "colour": "#ffb020", "level": 15},
+    "common":    {"price": 40,  "label": "Common",    "colour": "#8b93b8"},
+    "uncommon":  {"price": 90,  "label": "Uncommon",  "colour": "#2ec4a6"},
+    "rare":      {"price": 180, "label": "Rare",      "colour": "#3a9bff"},
+    "epic":      {"price": 340, "label": "Epic",      "colour": "#a865ff"},
+    "legendary": {"price": 600, "label": "Legendary", "colour": "#ffb020"},
 }
 
-SLOTS = ["skin", "hair", "hairColor", "eyes", "eyeColor", "mouth",
+SLOTS = ["hair", "hairColor", "eyes", "eyeColor", "mouth",
          "top", "bottom", "shoes", "hat", "accessory", "back", "pet", "effect"]
 
 ITEMS = []
@@ -26,25 +24,14 @@ def item(iid, name, cat, slot, style, colour, rarity, price=None, desc="", extra
         "id": iid, "name": name, "cat": cat, "slot": slot, "style": style,
         "colour": colour, "rarity": rarity,
         "price": RARITY[rarity]["price"] if price is None else price,
-        "level": (extra or {}).get("level") or RARITY[rarity]["level"],
         "desc": desc, **(extra or {}),
     })
 
 
 # --------------------------------------------------------------------------- #
-# Character — appearance (cheap, so a new player can look like themselves)
+# Character — appearance (cheap, so a new player can look like themselves).
+# There is no skin slot: every character shares one skin tone (drawn in art-avatar.js).
 # --------------------------------------------------------------------------- #
-for iid, name, col, rar in [
-    ("skin-porcelain", "Porcelain", "#f7d9c4", "common"),
-    ("skin-peach", "Peach", "#f1c27d", "common"),
-    ("skin-honey", "Honey", "#e0ac69", "common"),
-    ("skin-amber", "Amber", "#c68642", "common"),
-    ("skin-umber", "Umber", "#8d5524", "common"),
-    ("skin-ebony", "Ebony", "#5b3a1e", "uncommon"),
-]:
-    item(iid, f"{name} skin", "Appearance", "skin", "round", col, rar,
-         price=0 if rar == "common" else None, desc="Skin tone.")
-
 for iid, name, style, rar in [
     ("hair-buzz", "Buzz Cut", "buzz", "common"),
     ("hair-bob", "Bob", "bob", "common"),
@@ -282,14 +269,14 @@ for iid, name, wall, floor, rar in THEMES:
 
 ITEM_BY_ID = {i["id"]: i for i in ITEMS}
 
-STARTER = ["skin-peach", "hair-buzz", "hc-brown", "eye-round", "ec-brown", "mouth-smile",
+STARTER = ["hair-buzz", "hc-brown", "eye-round", "ec-brown", "mouth-smile",
            "top-tee-cream", "bot-jeans", "shoe-trainers", "theme-study",
            # the pieces that are already placed in the starting room
            "room-desk-oak", "room-chair-azure", "room-bookshelf-walnut",
            "dec-plant-leaf", "room-rug-fern"]
 
 DEFAULT_EQUIPPED = {
-    "skin": "skin-peach", "hair": "hair-buzz", "hairColor": "hc-brown",
+    "hair": "hair-buzz", "hairColor": "hc-brown",
     "eyes": "eye-round", "eyeColor": "ec-brown", "mouth": "mouth-smile",
     "top": "top-tee-cream", "bottom": "bot-jeans", "shoes": "shoe-trainers",
     "hat": None, "accessory": None, "back": None, "pet": None, "effect": None,
