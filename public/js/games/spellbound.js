@@ -437,7 +437,8 @@
       </div>
       <div class="giant">PICK A <em style="color:#17bd93">GAME</em></div>
       <div class="tilegrid">
-        ${ART.tile({ art: 'practice', name: 'LISTEN & SPELL', sub: 'Hear it, type it, check it', label: '#a8f0c8', action: 'data-mode="practice"' })}
+        ${ART.tile({ art: 'practice', name: 'DAILY HIVE', sub: 'Your own 7 letters · new every day', label: '#ffc93c', action: 'id="daily"' })}
+        ${ART.tile({ art: 'review', name: 'LISTEN & SPELL', sub: 'Hear it, type it, check it', label: '#a8f0c8', action: 'data-mode="practice"' })}
         ${ART.tile({ art: 'builder', name: 'WORD BUILDER', sub: 'Scrambled letters, put them right', label: '#ffe08a', action: 'data-mode="builder"' })}
         ${ART.tile({ art: 'missing', name: 'MISSING LETTERS', sub: 'Fill the gaps', label: '#ffc2dd', action: 'data-mode="missing"' })}
         ${ART.tile({ art: 'review', name: 'MY TRICKY WORDS', sub: `${difficult} word${difficult === 1 ? '' : 's'} to revisit`, label: '#d8c8ff', action: 'id="review"' })}
@@ -526,6 +527,8 @@
     main.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => startSession(b.dataset.mode); });
     main.querySelector('#go').onclick = () => startSession('practice');
     main.querySelector('#review').onclick = () => startSession('review');
+    const daily = main.querySelector('#daily');
+    if (daily) daily.onclick = () => window.SPELLBOUND.openDaily();
   }
 
   window.SPELLBOUND = {

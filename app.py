@@ -16,6 +16,7 @@ import progression
 import store
 import api_shop
 import tablestar_path
+import spellbound_daily
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PUBLIC = os.path.join(HERE, "public")
@@ -24,7 +25,8 @@ PORT = int(os.environ.get("ASTROLAB_PORT", "8807"))
 store.init()
 
 GAMES = {"tablestar": {"sound", "studio", "garage"},
-         "spellbound": {"practice", "builder", "missing", "review"},
+         "spellbound": {"practice", "builder", "missing", "review", "hive", "hive_hunt",
+                        "hive_sprint", "hive_review"},
          "worldquest": {"locate", "identify", "capital", "flag", "marathon", "challenge"}}
 
 
@@ -104,6 +106,35 @@ def api(path: str, method: str, body: dict, player: dict | None, q: dict) -> tup
     if path == "/api/studio":
         return 200, studio_table(pid)
 
+    # ---- Spellbound: the Daily Hive (per-player honeycomb) ----------------
+    if path == "/api/spellbound/daily" and method == "GET":
+        level = q.get("level", "easy")
+        out = {"hive": spellbound_daily.hive(pid, level),
+               "levels": list(spellbound_daily.LEVELS),
+               "mult": spellbound_daily.LEVEL_MULT,
+               "today": spellbound_daily.day_key()}
+        with store.db() as con:
+            rows = con.execute(
+                "SELECT mode,difficulty,score,accuracy,finished FROM sessions"
+                " WHERE player_id=? AND game='spellbound' AND mode LIKE 'hive%'"
+                " AND finished>? ORDER BY finished DESC LIMIT 20",
+                (pid, store.now() - 86400)).fetchall()
+        out["today_runs"] = [dict(r) for r in rows]
+        best = {}
+        for r in rows:
+            lv = r["difficulty"]
+            best[lv] = max(best.get(lv, 0), r["score"] or 0)
+        out["today_best"] = best
+        return 200, out
+
+    if path == "/api/spellbound/check" and method == "POST":
+        res = spellbound_daily.check(pid, str(body.get("level") or "easy"),
+                                     body.get("word"), body.get("day"))
+        return 200, res
+
+    if path == "/api/spellbound/daily/finish" and method == "POST":
+        return 200, finish_hive(pid, body)
+
     if path == "/api/tablestar/path":
         return 200, tablestar_path.plan(pid)
 
@@ -142,6 +173,123 @@ def state(pid: str) -> dict:
         "games": list(GAMES),
         "platform": config.PLATFORM,
     }
+
+
+def finish_hive(pid: str, body: dict) -> dict:
+    """Settle a Daily Hive run: score, speed bonus and the reward, all server-side.
+
+    The browser reports the words it typed and how long each took; every word is
+    re-validated here against THIS player's hive, so a tampered score cannot land.
+    """
+    level = str(body.get("level") or "easy")
+    if level not in spellbound_daily.LEVELS:
+        level = "easy"
+    mode = str(body.get("mode") or "hive")
+    if mode not in ("hive", "hive_hunt", "hive_sprint", "hive_review"):
+        mode = "hive"
+    hive = spellbound_daily.hive(pid, level)
+    duration = max(0.1, min(float(body.get("duration") or 0), 3 * 3600))
+
+    found, hunt, seen = [], 0, set()
+    for item in (body.get("found") or [])[:120]:
+        w = spellbound_daily._clean(item.get("w")) if isinstance(item, dict) else ""
+        ok = spellbound_daily.check(pid, level, w)
+        if not ok.get("ok") or w in seen:
+            continue
+        seen.add(w)
+        try:
+            ms = max(120.0, float(item.get("ms") or 0))
+        except (TypeError, ValueError):
+            ms = 4000.0
+        tgt = spellbound_daily.target_ms(w)
+        mult = spellbound_daily.speed_mult(ms, tgt)
+        found.append({"w": w, "ms": round(ms), "target": tgt, "speed": round(mult, 2),
+                      "points": int(round(ok["points"] * mult)), "pangram": ok["pangram"]})
+        hunt += 1 if mult >= 1.35 else 0
+
+    typed = []
+    for item in (body.get("typed") or [])[:40]:
+        if not isinstance(item, dict):
+            continue
+        w = spellbound_daily._clean(item.get("w"))
+        if not w:
+            continue
+        try:
+            ms = max(120.0, float(item.get("ms") or 0))
+        except (TypeError, ValueError):
+            ms = 4000.0
+        typed.append({"w": w, "ok": bool(item.get("ok")), "ms": ms})
+
+    word_points = sum(f["points"] for f in found)
+    right = sum(1 for t in typed if t["ok"])
+    total = len(typed)
+    speed = 1.0
+    if typed:
+        speed = sum(spellbound_daily.speed_mult(t["ms"],
+                    spellbound_daily.target_ms(t["w"])) for t in typed) / len(typed)
+    mode_pts = {"hive_hunt": 1.5, "hive_sprint": 1.25}.get(mode, 0.6)
+    speed_points = int(round(right * 60 * speed * spellbound_daily.LEVEL_MULT[level] * mode_pts))
+    score = word_points + speed_points
+
+    if not body.get("completed", True):
+        return {"recorded": False, "score": score, "reason": "abandoned"}
+
+    # keep the existing plausibility floor happy. A hive run is mostly thinking
+    # time, so the answers-per-second ceiling must not read it as superhuman.
+    correct = len(typed) or len(found)
+    total_ans = max(correct, len(found) if not typed else len(typed))
+    play_speed = min(duration, max(20.0, 6.0 * total_ans))
+    if total_ans > play_speed / 0.65 + 3:
+        return {"recorded": False, "score": score, "reason": "implausible"}
+
+    try:
+        sid = store.open_session(pid, "spellbound", mode, level, {
+            "level": level, "day": hive["day"], "hive": "".join(hive["letters"]),
+            "centre": hive["centre"], "hiveScore": score, "wordsFound": len(found),
+        })
+    except Exception as e:  # noqa: BLE001
+        return {"recorded": False, "score": score, "reason": str(e)}
+
+    reward = config.compute_reward("spellbound", mode,
+                                   spellbound_daily.REWARD_KEY.get(level, "easy"),
+                                   max(1, correct), max(1, total_ans), duration)
+    # the hive score is the headline number: let it drive the payout up to 3x
+    boost = max(0.5, min(3.0, score / 900.0))
+    xp = int(round(reward["xp"] * boost))
+    bits = int(round(reward["starbits"] * boost))
+    with store.db() as con:
+        meta = {"level": level, "day": hive["day"], "hiveScore": score,
+                "words": found,
+                "typed": [{"w": t["w"], "ok": t["ok"], "ms": round(t["ms"])} for t in typed],
+                "speed": round(speed, 2)}
+        store.close_session(con, sid, correct, max(1, total_ans), score, xp, bits,
+                            reward["accuracy"], duration, meta,
+                            "sb-hive-" + sid[-8:])
+        store.credit(con, pid, xp, bits)
+        for f in found:
+            row = con.execute(
+                "SELECT attempts,correct,wrong,streak,box FROM wordstats"
+                " WHERE player_id=? AND word=?", (pid, f["w"])).fetchone()
+            if row:
+                con.execute(
+                    "UPDATE wordstats SET attempts=attempts+1,correct=correct+1,"
+                    "streak=streak+1,box=MIN(5,box+1),last=? WHERE player_id=? AND word=?",
+                    (store.now(), pid, f["w"]))
+            else:
+                con.execute("INSERT INTO wordstats VALUES(?,?,?,?,?,?,?,?)",
+                            (pid, f["w"], 1, 1, 0, 1, 2, store.now()))
+    try:
+        progression.evaluate_badges(pid)
+    except Exception:  # noqa: BLE001
+        pass
+    p = store.get(pid)
+    return {"recorded": True, "sessionId": sid, "score": score,
+            "wordPoints": word_points, "speedPoints": speed_points,
+            "speed": round(speed, 2), "words": found, "found": len(found),
+            "pangrams": sum(1 for f in found if f["pangram"]), "hunt": hunt,
+            "correct": right, "total": total, "xp": xp, "starbits": bits,
+            "multiplier": reward["multiplier"],
+            "totals": {"xp": p["xp"], "starbits": p["starbits"]}}
 
 
 def studio_table(pid: str) -> dict:
