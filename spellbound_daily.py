@@ -109,6 +109,20 @@ def hive(pid: str, level: str, day: str | None = None) -> dict:
             continue
         picked.append(w)
     picked = sorted(picked, key=lambda w: (len(w), w))
+
+    # Listen & Spell vocabulary: this player's own sample of the level's 5,000,
+    # so the spoken round is different for everybody too. Longer words at the
+    # harder levels, shorter at the easy ones.
+    lv_words = sorted(data()["levels"][level]["words"])
+    rng2 = random.Random(_seed(pid, day, level + "|spell"))
+    want_len = {"easy": (4, 7), "intermediate": (5, 9),
+                "hard": (7, 11), "extreme": (9, 12)}[level]
+    band = [w for w in lv_words if want_len[0] <= len(w) <= want_len[1]]
+    if len(band) < 40:
+        band = lv_words
+    spell = rng2.sample(band, min(20, len(band)))
+    spell.sort(key=lambda w: (len(w), w))
+
     return {
         "day": day,
         "level": level,
@@ -118,6 +132,7 @@ def hive(pid: str, level: str, day: str | None = None) -> dict:
         "points": {str(k): v for k, v in sorted(data()["points"].items())},
         "pangram": data()["pangram"],
         "challenge": [{"w": w, "ms": target_ms(w)} for w in picked],
+        "spell": spell,
         "total": len(picked),
     }
 

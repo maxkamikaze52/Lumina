@@ -7,7 +7,7 @@
 
   const SB = {
     data: null, list: 'common', level: 'beginner', difficulty: 'medium', mode: 'practice',
-    locale: 'GB', session: null
+    locale: 'US', session: null
   };
 
   async function loadWords() {
@@ -32,13 +32,33 @@
     return out.length >= 6 ? out : words;
   };
 
+  /* The four difficulty buttons set the VOCABULARY for Listen & Spell: the
+     5,000-word tiers behind the Daily Hive, easier words to really hard ones.
+     Server-side, so the answer list never reaches the browser. */
+  const TIER_KEY = { easy: 'easy', medium: 'intermediate', hard: 'hard', extreme: 'extreme' };
+  const tierCache = {};
+  async function tierWords(difficulty) {
+    const lv = TIER_KEY[difficulty] || 'easy';
+    if (tierCache[lv]) return tierCache[lv];
+    try {
+      const d = await App.API.get('/api/spellbound/daily?level=' + lv);
+      const words = (d.hive.spell && d.hive.spell.length ? d.hive.spell
+        : (d.hive.challenge || []).map((c) => c.w));
+      if (words.length) tierCache[lv] = words;
+      return words;
+    } catch (e) {
+      return [];
+    }
+  }
+  const tierObj = (w) => ({ w, level: 'tier', topic: 'tier', def: '', sent: '', note: '', locale: 'both' });
+
   /* ---- speech ---- */
   let voice = null;
   function speak(text, rate) {
     if (!('speechSynthesis' in window)) { App.toast('This browser has no speech voice'); return; }
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = SB.locale === 'US' ? 'en-US' : 'en-GB';
+    u.lang = 'en-US';
     u.rate = rate || (SB.difficulty === 'easy' ? 0.82 : 0.92);
     u.pitch = 1;
     if (voice) u.voice = voice;
@@ -47,7 +67,7 @@
   function pickVoice() {
     if (!('speechSynthesis' in window)) return;
     const vs = window.speechSynthesis.getVoices();
-    const want = SB.locale === 'US' ? 'en-US' : 'en-GB';
+    const want = 'en-US';
     voice = vs.find((v) => v.lang === want) || vs.find((v) => v.lang.startsWith('en')) || null;
   }
   if ('speechSynthesis' in window) {
@@ -82,16 +102,20 @@
   /* ---- start a session ---- */
   async function startSession(mode) {
     await loadWords();
-    const all = levelFilter(wordsFor(SB.list), SB.level);
     const size = mode === 'review' ? 8 : 10;
     let words;
     if (mode === 'review') {
+      const all = levelFilter(wordsFor(SB.list), SB.level);
       const stats = App.state.stats.wordMap || {};
       const difficult = all.filter((w) => stats[w.w] && stats[w.w].wrong >= 1 && stats[w.w].box < 4);
       words = (difficult.length ? difficult : all.slice()).slice(0, size);
       if (!words.length) return App.toast('No difficult words in this list yet', 'check');
     } else {
-      words = buildQueue(all, size);
+      // Listen & Spell speaks the words of the chosen difficulty tier: 5,000
+      // words from easy to really hard, and a fresh sample for every player.
+      const tier = await tierWords(SB.difficulty);
+      words = tier.length ? tier.slice(0, size).map(tierObj) : buildQueue(
+        levelFilter(wordsFor(SB.list), SB.level), size);
     }
     SB.session = {
       mode, listId: SB.list, difficulty: SB.difficulty, queue: App.shuffle(words),
@@ -126,7 +150,7 @@
     const shown = diff === 'easy';
     main.innerHTML = `<div class="stack">
       <div class="between"><div class="eyebrow">Spellbound · ${esc(cap(diff))} · word ${s.index + 1} of ${s.queue.length}</div>
-        <button class="btn ghost sm" data-leave-world>${icon('games')} Astrolab</button></div>
+        <button class="btn ghost sm" id="quit">${icon('arrow')} Back</button></div>
       <div class="progress-dots">${s.queue.map((_, i) => `<i class="${i < s.answers.length ? (s.answers[i].ok ? 'ok' : 'bad') : ''}"></i>`).join('')}</div>
       <div class="sb-play">
         ${shown ? `<div class="sb-word">${esc(w.w)}</div><p class="small muted center">Look at it, then spell it. The spelling hides when you start typing.</p>`
@@ -193,7 +217,8 @@
       input.disabled = true;
       setTimeout(() => { s.index++; drawRound(main); }, ok ? 900 : 2100);
     }
-    main.querySelector('#quit').onclick = () => abandon();
+    const quit = main.querySelector('#quit');
+    if (quit) quit.onclick = () => abandon();
   }
 
   const normalise = (s) => s.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
@@ -204,7 +229,7 @@
     const letters = App.shuffle(w.w.replace(/[^a-zA-Z']/g, '').split(''));
     main.innerHTML = `<div class="stack">
       <div class="between"><div class="eyebrow">Word Builder · ${s.index + 1} of ${s.queue.length}</div>
-        <button class="btn ghost sm" data-leave-world>${icon('games')} Astrolab</button></div>
+        <button class="btn ghost sm" id="quit">${icon('arrow')} Back</button></div>
       <div class="sb-play">
         <p class="small muted center">Put the letters in order. Drag them, or tap a letter then a slot.</p>
         <div class="slots" id="slots">${letters.map((_, i) => `<div class="slot" data-slot="${i}"></div>`).join('')}</div>
@@ -276,7 +301,8 @@
       s.bestStreak = Math.max(s.bestStreak, s.streak);
       setTimeout(() => { s.index++; drawRound(main); }, ok ? 900 : 2000);
     };
-    main.querySelector('#quit').onclick = () => abandon();
+    const quit = main.querySelector('#quit');
+    if (quit) quit.onclick = () => abandon();
     setTimeout(() => speak(w.w), 250);
   }
 
@@ -293,7 +319,7 @@
 
     main.innerHTML = `<div class="stack">
       <div class="between"><div class="eyebrow">Missing Letters · ${s.index + 1} of ${s.queue.length}</div>
-        <button class="btn ghost sm" data-leave-world>${icon('games')} Astrolab</button></div>
+        <button class="btn ghost sm" id="quit">${icon('arrow')} Back</button></div>
       <div class="sb-play">
         <p class="small muted center">${esc(w.def)}</p>
         <div class="gaps" id="gaps">${letters.map((c, i) => gaps.includes(i)
@@ -317,8 +343,13 @@
       });
     }
     function type(ch) {
-      if (ch === 'del') { focus = Math.max(0, focus - (blanks[focus] ? 0 : 1)); blanks[focus] = ''; }
-      else if (ch === 'clear') blanks.fill('');
+      if (ch === 'enter') { check(); return; }
+      if (ch === 'del') {
+        if (blanks[focus]) blanks[focus] = '';
+        else { focus = Math.max(0, focus - 1); blanks[focus] = ''; }
+        paint(); return;
+      }
+      if (ch === 'clear') { blanks.fill(''); paint(); return; }
       else if (/^[a-z]$/i.test(ch)) {
         blanks[focus] = ch;
         if (focus < blanks.length - 1) focus++;
@@ -351,20 +382,24 @@
       document.removeEventListener('keydown', keyHandler);
       setTimeout(() => { s.index++; drawRound(main); }, ok ? 900 : 2000);
     }
-    main.querySelector('#quit').onclick = () => abandon();
+    const quit = main.querySelector('#quit');
+    if (quit) quit.onclick = () => abandon();
     setTimeout(() => speak(w.w), 250);
     paint();
   }
 
+  /* a real honeycomb keyboard: hex keys, flat-topped, tiling like comb */
+  /* a real honeycomb keyboard: hex keys, flat-topped, tiling like comb */
   function keypadHTML() {
-    const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
-    return `<div style="max-width:520px;margin:14px auto 0;display:grid;gap:6px">
-      ${rows.map((r, i) => `<div style="display:flex;gap:5px;justify-content:center">
-        ${i === 2 ? '<button class="btn ghost sm" data-k="del">⌫</button>' : ''}
-        ${r.split('').map((c) => `<button class="btn ghost sm" style="min-width:34px;padding:8px 0;flex:1" data-k="${c}">${c}</button>`).join('')}
+    const rows = [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                  ['z', 'x', 'c', 'v', 'b', 'n', 'm']];
+    return `<div class="sb-keys" id="keys" role="group" aria-label="Letter keyboard">
+      ${rows.map((r, i) => `<div class="sb-keyrow">
+        ${i === 2 ? '<button class="sb-key sb-key-wide sb-key-mid" data-k="del" aria-label="Delete last letter">⌫</button>' : ''}
+        ${r.map((c) => `<button class="sb-key" data-k="${c}" aria-label="${c}">${c}</button>`).join('')}
+        ${i === 2 ? '<button class="sb-key sb-key-wide sb-key-go" data-k="enter" aria-label="Enter">↵</button>' : ''}
       </div>`).join('')}
-      <div style="display:flex;justify-content:center;margin-top:4px">
-        <button class="btn jade sm" onclick="this.closest('.sb-play').querySelector('[data-k]')" hidden></button></div>
     </div>`;
   }
 
@@ -431,9 +466,7 @@
     main.innerHTML = `<div class="stack">
       <div class="world-title">
         <span class="badge-pill">Spelling</span>
-        <div class="segbar" style="margin-left:auto">
-          <button data-locale="GB" class="${SB.locale === 'GB' ? 'on' : ''}">British</button>
-          <button data-locale="US" class="${SB.locale === 'US' ? 'on' : ''}">American</button></div>
+        <span class="badge-pill" style="margin-left:auto">American spelling</span>
       </div>
       <div class="giant">PICK A <em style="color:#17bd93">GAME</em></div>
       <div class="tilegrid">
@@ -517,13 +550,6 @@
     main.querySelectorAll('[data-list]').forEach((b) => { b.onclick = () => { SB.list = b.dataset.list; open(); }; });
     main.querySelectorAll('[data-level]').forEach((b) => { b.onclick = () => { SB.level = b.dataset.level; open(); }; });
     main.querySelectorAll('[data-diff]').forEach((b) => { b.onclick = () => { SB.difficulty = b.dataset.diff; open(); }; });
-    main.querySelectorAll('[data-locale]').forEach((b) => {
-      b.onclick = async () => {
-        SB.locale = b.dataset.locale;
-        try { await App.API.post('/api/locale', { locale: SB.locale }); } catch (e) {}
-        pickVoice(); open();
-      };
-    });
     main.querySelectorAll('[data-mode]').forEach((b) => { b.onclick = () => startSession(b.dataset.mode); });
     main.querySelector('#go').onclick = () => startSession('practice');
     main.querySelector('#review').onclick = () => startSession('review');
@@ -532,7 +558,7 @@
   }
 
   window.SPELLBOUND = {
-    open, startSession,
+    open, startSession, keypadHTML,
     get config() { return SB; },
     get session() { return SB.session; }
   };

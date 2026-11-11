@@ -80,15 +80,26 @@
     slots.forEach((s) => {
       out += `<polygon class="sb-cell" points="${hex(s.x, s.y, 46)}" data-letter="${esc(letters[s.idx])}"
         tabindex="0" role="button" aria-label="letter ${esc(letters[s.idx])}"
-        fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.55)" stroke-width="3"/>`;
+        fill="#f7c65a" stroke="#8b5a2b" stroke-width="4" stroke-linejoin="round"/>`;
       out += `<text class="sb-cell-t" x="${s.x.toFixed(1)}" y="${(s.y + 12).toFixed(1)}">${esc(letters[s.idx].toUpperCase())}</text>`;
     });
     out += `<polygon class="sb-cell sb-centre" points="${hex(cx, cy, 56)}" data-letter="${esc(centre)}"
       tabindex="0" role="button" aria-label="centre letter ${esc(centre)}"
-      fill="#ffc93c" stroke="${lv().ink}" stroke-width="4"/>`;
+      fill="#ffd964" stroke="#5a3a1a" stroke-width="5" stroke-linejoin="round"/>`;
     out += `<text class="sb-cell-t sb-centre-t" x="${cx}" y="${cy + 15}">${esc(centre.toUpperCase())}</text>`;
     out += `</svg>`;
     return out;
+  }
+
+  /* the same honeycomb keyboard the spelling rounds use */
+  function keypadHTML() {
+    if (window.SPELLBOUND && window.SPELLBOUND.keypadHTML) return window.SPELLBOUND.keypadHTML();
+    return '';
+  }
+  function bindKeypad(root, onKey) {
+    root.querySelectorAll('[data-k]').forEach((b) => {
+      b.onclick = () => onKey(b.dataset.k);
+    });
   }
 
   /* ---------------- speech ---------------- */
@@ -157,9 +168,9 @@
       </div>
 
       <div class="sb-boardwrap">
-        <div class="sb-board">
+        <div class="sb-board sb-comb">
           ${h ? honeycomb(h.letters, h.centre) : ''}
-          <div class="sb-hint">Tap the letters. Words of 4+ letters. Every hive letter in
+          <div class="sb-hint sb-paper" style="padding:8px 10px">Tap the letters. Words of 4+ letters. Every hive letter in
             one word is a <b>pangram</b> (+${h ? h.pangram : 100}).</div>
         </div>
         <div class="sb-side">
@@ -215,13 +226,14 @@
       </div>
       <div class="sb-play">
         <form class="sb-entry" id="sb-form" autocomplete="off">
-          <input id="sb-typed" class="sb-input" inputmode="latin" autocapitalize="off"
+          <input id="sb-typed" class="sb-input2" inputmode="latin" autocapitalize="off"
             autocorrect="off" spellcheck="false" aria-label="Type a word"
             placeholder="Type a word…" maxlength="20">
           <button class="btn ghost" type="button" id="sb-del" aria-label="Delete last letter">⌫</button>
           <button class="btn ghost" type="button" id="sb-shuffle" aria-label="Shuffle letters">⤨</button>
           <button class="btn jade" type="submit">Enter</button>
         </form>
+        ${keypadHTML()}
         <div class="sb-msg" id="sb-msg" role="status" aria-live="polite"></div>
         <div class="sb-found" id="sb-found"></div>
       </div>
@@ -242,6 +254,12 @@
     App.onCleanup(() => clearInterval(tick));
 
     bindLetters(main);
+    bindKeypad(main, (k) => {
+      if (k === 'del') typed.value = typed.value.slice(0, -1);
+      else if (k === 'enter') main.querySelector('#sb-form').requestSubmit();
+      else if (/^[a-z]$/.test(k)) typed.value += k;
+      typed.focus();
+    });
     setTimeout(() => typed.focus(), 60);
 
     main.querySelector('#sb-del').onclick = () => { typed.value = typed.value.slice(0, -1); typed.focus(); };
@@ -336,10 +354,11 @@
         <button class="btn jade sb-speaker" id="sp-say">${icon('speaker')} Hear it again</button>
         <div class="sb-len" id="sp-len"></div>
         <form class="sb-entry" id="sp-form" autocomplete="off">
-          <input id="sp-typed" class="sb-input big" autocapitalize="off" autocorrect="off"
+          <input id="sp-typed" class="sb-input2 big" autocapitalize="off" autocorrect="off"
             spellcheck="false" aria-label="Type the word you heard" placeholder="Type what you hear…" maxlength="20">
           <button class="btn jade" type="submit">Enter</button>
         </form>
+        ${keypadHTML()}
         <div class="sb-msg" id="sp-msg" role="status" aria-live="polite"></div>
         <div class="sb-typed-list" id="sp-list"></div>
         ${canSpeak() ? '' : '<p class="small muted">This browser has no speech voice, so the word is shown for a moment instead.</p>'}
@@ -355,6 +374,12 @@
 
     const input = main.querySelector('#sp-typed');
     const msg = main.querySelector('#sp-msg');
+    bindKeypad(main, (k) => {
+      if (k === 'del') input.value = input.value.slice(0, -1);
+      else if (k === 'enter') main.querySelector('#sp-form').requestSubmit();
+      else if (/^[a-z]$/.test(k)) input.value += k;
+      input.focus();
+    });
 
     function next() {
       if (i >= queue.length) return finish();
